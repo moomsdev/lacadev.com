@@ -1,0 +1,192 @@
+/**
+ * The external dependencies.
+ */
+const {ProvidePlugin, WatchIgnorePlugin} = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin').WebpackManifestPlugin;
+
+/**
+ * The internal dependencies.
+ */
+const utils = require('./lib/utils');
+const configLoader = require('./config-loader');
+const spriteSmith = require('./spritesmith');
+const postcss = require('./postcss');
+const browsersync = require('./browsersync');
+
+/**
+ * Setup the env.
+ */
+const {env: envName} = utils.detectEnv();
+
+/**
+ * Setup babel loader.
+ */
+const babelLoader = {
+    loader : 'babel-loader',
+    options: {
+        cacheDirectory: true,
+        comments      : false,
+        presets       : [
+            '@babel/preset-env'
+        ],
+    },
+};
+
+/**
+ * Setup MiniCssExtractPlugin.
+ */
+const miniCss = new MiniCssExtractPlugin({
+    filename: 'styles/[name].css',
+});
+
+/**
+ * Setup webpack plugins.
+ */
+const plugins = [
+    new WatchIgnorePlugin({
+        paths: [
+            utils.distImagesPath('sprite.png'),
+            utils.distImagesPath('sprite@2x.png'),
+        ],
+    }),
+    new ProvidePlugin({
+        $     : 'jquery',
+        jQuery: 'jquery',
+    }),
+    miniCss,
+    spriteSmith,
+    browsersync,
+    new ManifestPlugin(),
+];
+
+/**
+ * Export the configuration.
+ */
+module.exports = {
+    /**
+     * The input.
+     */
+    entry: require('./webpack/entry'),
+
+    /**
+     * The output.
+     */
+    output: {
+        ...require('./webpack/output'),
+        clean: true,
+    },
+
+    /**
+     * Resolve utilities.
+     */
+    resolve: require('./webpack/resolve'),
+
+    /**
+     * Resolve the dependencies that are available in the global scope.
+     */
+    externals: require('./webpack/externals'),
+
+    /**
+     * Setup the transformations.
+     */
+    module: {
+        rules: [
+            /**
+             * Add support for blogs in import statements.
+             */
+            {
+                enforce: 'pre',
+                test   : /\.(js|jsx|css|scss|sass)$/,
+                use    : 'import-glob',
+            },
+
+            /**
+             * Handle the theme config.json.
+             */
+            {
+                test: utils.themeRootPath('config.json'),
+                use : configLoader,
+            },
+
+            /**
+             * Handle scripts.
+             */
+            {
+                test   : utils.tests.scripts,
+                exclude: /node_modules/,
+                use    : babelLoader,
+            },
+
+            /**
+             * Handle styles.
+             */
+            {
+                test: utils.tests.styles,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                        },
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: true,
+                        },
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true,
+                        },
+                    },
+                ],
+            },
+
+            /**
+             * Handle images.
+             */
+            {
+                test: utils.tests.images,
+                type: 'asset/resource',
+                generator: {
+                    filename: (pathData) => {
+                        const hash = utils.filehash(pathData.filename).substr(0, 10);
+                        return `images/[name].${hash}[ext]`;
+                    },
+                },
+            },
+
+            /**
+             * Handle fonts.
+             */
+            {
+                test: utils.tests.fonts,
+                type: 'asset/resource',
+                generator: {
+                    filename: (pathData) => {
+                        const hash = utils.filehash(pathData.filename).substr(0, 10);
+                        return `fonts/[name].${hash}[ext]`;
+                    },
+                },
+            },
+        ],
+    },
+
+    /**
+     * Setup the transformations.
+     */
+    plugins,
+
+    /**
+     * Setup the development tools.
+     */
+    mode   : envName,
+    cache  : true,
+    bail   : false,
+    watch  : true,
+    devtool: 'source-map',
+};

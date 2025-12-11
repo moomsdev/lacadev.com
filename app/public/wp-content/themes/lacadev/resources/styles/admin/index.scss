@@ -1,0 +1,66 @@
+// @import "../theme/utilities/_variables.scss";
+// @import "../theme/utilities/_mixin.scss";
+// @import "../theme/blocks/**.scss";
+// @import "../theme/layout/_general.scss";
+// @import "../shared/introjs.css";
+
+html :where(.wp-block) {
+    max-width: 120rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured_image.column-featured_image {
+    a {
+        display: block;
+    }
+    img {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+    }
+    .no-image-text {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        border: 1px dashed;
+        aspect-ratio: 16 / 10;
+    }
+}
+
+.banner-block {
+    height: auto !important;
+}
+
+.subsubsub {
+    z-index: 9999;
+    position: relative;
+}
+
+input[name="carbon_fields_compact_input[_smtp_password]"] {
+    max-width: 85%;
+    display: inline-block;
+}
+
+button[data-toggle="password-toggle"] {
+    padding: 2px 2rem;
+    min-width: 12%;
+    display: inline-block;
+    font-weight: 600;
+    line-height: 2;
+    text-transform: uppercase;
+    color: #fff;
+    background: #1d2327;
+    border: 1px solid;
+    border-radius: 4px;
+}
+
+#wp-auth-check-wrap #wp-auth-check {
+    padding: 0 !important;
+    width: 80% !important;
+}
+
+#wp-auth-check-wrap .wp-auth-check-close {
+    color: #fff !important;
+    z-index: 99;
+}
