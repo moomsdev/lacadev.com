@@ -50,8 +50,8 @@ const plugins = [
         paths: [/node_modules/, /dist/],
     }),
     new ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery'
+        // $: 'jquery',
+        // jQuery: 'jquery'
     }),
     miniCss,
     spriteSmith,

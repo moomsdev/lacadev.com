@@ -1,152 +1,167 @@
 import Swal from 'sweetalert2/dist/sweetalert2';
-import 'jquery-validation';
 
 window.registerFunction = {
-    form             : null,
+    form: null,
+    
+    validateEmail: function(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    },
+
+    validateField: function(field, rules, form) {
+        const value = field.value.trim();
+        let isValid = true;
+        let errorMessage = '';
+
+        if (rules.required && !value) {
+            isValid = false;
+            errorMessage = 'This field is required.';
+        } else if (rules.email && !this.validateEmail(value)) {
+            isValid = false;
+            errorMessage = 'Please enter a valid email address.';
+        } else if (rules.maxlength && value.length > rules.maxlength) {
+            isValid = false;
+            errorMessage = `Max length is ${rules.maxlength} characters.`;
+        } else if (rules.equalTo) {
+            const target = form.querySelector(rules.equalTo);
+            if (target && value !== target.value) {
+                isValid = false;
+                errorMessage = 'Values do not match.';
+            }
+        }
+
+        // Simple error display (can be improved)
+        const errorDisplay = field.parentElement.querySelector('.error-message') || document.createElement('div');
+        errorDisplay.className = 'error-message text-danger';
+        if (!isValid) {
+            errorDisplay.textContent = errorMessage;
+            if (!field.parentElement.querySelector('.error-message')) {
+                field.parentElement.appendChild(errorDisplay);
+            }
+            field.classList.add('is-invalid');
+        } else {
+            if (field.parentElement.querySelector('.error-message')) {
+                errorDisplay.remove();
+            }
+            field.classList.remove('is-invalid');
+        }
+
+        return isValid;
+    },
+
     initJobSeekerForm: function (formElement) {
         let _this = this;
         _this.form = formElement;
 
-        _this.form.on('submit', function (e) {
+        _this.form.addEventListener('submit', function (e) {
             e.preventDefault();
-            _this.form.validate({
-                rules: {
-                    username                  : {
-                        required : true,
-                        maxlength: 15,
-                    },
-                    email                     : {
-                        required : true,
-                        email    : true,
-                        maxlength: 50,
-                    },
-                    password                  : {
-                        required : true,
-                        maxlength: 50,
-                    },
-                    password_confirm          : {
-                        required : true,
-                        maxlength: 50,
-                        equalTo  : '[name="password"]',
-                    },
-                    'extras[last_name]'       : {
-                        required: true,
-                    },
-                    'extras[first_name]'      : {
-                        required: true,
-                    },
-                    'extras[_phone_number]'   : {
-                        required : true,
-                        maxlength: 13,
-                    },
-                    'extras[_identify_number]': {
-                        required : true,
-                        maxlength: 15,
-                    },
-                }
-            });
+            let isValid = true;
 
-            if (_this.form.valid()) {
+            // Define rules (simplified for brevity, extend as needed)
+            const rules = {
+                'username': { required: true, maxlength: 15 },
+                'email': { required: true, email: true, maxlength: 50 },
+                'password': { required: true, maxlength: 50 },
+                'password_confirm': { required: true, maxlength: 50, equalTo: '[name="password"]' },
+                'extras[last_name]': { required: true },
+                'extras[first_name]': { required: true },
+                'extras[_phone_number]': { required: true, maxlength: 13 },
+                'extras[_identify_number]': { required: true, maxlength: 15 },
+            };
+
+            for (const [fieldName, rule] of Object.entries(rules)) {
+                const field = _this.form.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    if (!_this.validateField(field, rule, _this.form)) {
+                        isValid = false;
+                    }
+                }
+            }
+
+            if (isValid) {
                 _this.submitForm();
             }
         });
     },
-    initEmployerForm : function (formElement) {
+
+    initEmployerForm: function (formElement) {
+        let _this = this;
         this.form = formElement;
-        this.form.on('submit', function (e) {
+        
+        this.form.addEventListener('submit', function (e) {
             e.preventDefault();
+            let isValid = true;
 
-            _this.form.on('submit', function (e) {
-                e.preventDefault();
-                _this.form.validate({
-                    rules: {
-                        username                   : {
-                            required : true,
-                            maxlength: 15,
-                        },
-                        description                : {
-                            required : true,
-                            maxlength: 500,
-                        },
-                        email                      : {
-                            required : true,
-                            email    : true,
-                            maxlength: 50,
-                        },
-                        password                   : {
-                            required : true,
-                            maxlength: 50,
-                        },
-                        password_confirm           : {
-                            required : true,
-                            maxlength: 50,
-                            equalTo  : '[name="password"]',
-                        },
-                        'extras[last_name]'        : {
-                            required: true,
-                        },
-                        'extras[first_name]'       : {
-                            required: true,
-                        },
-                        'extras[_phone_number]'    : {
-                            required : true,
-                            maxlength: 13,
-                        },
-                        'extras[_company_name]'    : {
-                            required : true,
-                            maxlength: 100,
-                        },
-                        'extras[_tax_code]'        : {
-                            required : true,
-                            maxlength: 15,
-                        },
-                        'extras[_address]'         : {
-                            required : true,
-                            maxlength: 255,
-                        },
-                        'extras[_province]': {
-                            required: true,
-                        },
-                        'extras[_career]'          : {
-                            required: true,
-                        },
-                        'extras[_company_size]'    : {
-                            required: true,
-                        },
+             const rules = {
+                'username': { required: true, maxlength: 15 },
+                'description': { required: true, maxlength: 500 },
+                'email': { required: true, email: true, maxlength: 50 },
+                'password': { required: true, maxlength: 50 },
+                'password_confirm': { required: true, maxlength: 50, equalTo: '[name="password"]' },
+                'extras[last_name]': { required: true },
+                'extras[first_name]': { required: true },
+                'extras[_phone_number]': { required: true, maxlength: 13 },
+                'extras[_company_name]': { required: true, maxlength: 100 },
+                'extras[_tax_code]': { required: true, maxlength: 15 },
+                'extras[_address]': { required: true, maxlength: 255 },
+                'extras[_province]': { required: true },
+                'extras[_career]': { required: true },
+                'extras[_company_size]': { required: true },
+            };
+
+            for (const [fieldName, rule] of Object.entries(rules)) {
+                const field = _this.form.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    if (!_this.validateField(field, rule, _this.form)) {
+                        isValid = false;
                     }
-                });
-
-                if (_this.form.valid()) {
-                    _this.submitForm();
                 }
-            });
+            }
+
+            if (isValid) {
+                _this.submitForm();
+            }
         });
     },
-    submitForm       : function () {
+
+    submitForm: function () {
         let _this = this;
         showPageLoader();
-        $.ajax({
-            url    : _this.form.attr('action'),
-            method : _this.form.attr('method'),
-            data   : _this.form.serialize(),
-            async  : false,
-            success: (response) => {
-                hidePageLoader();
-                if (response.success !== true) {
-                    if (typeof response.data === 'string') {
-                        Swal.fire('Đăng ký tài khoản không thành công!', data, 'error');
-                    }
-                }
+        
+        const formData = new FormData(_this.form);
+        const searchParams = new URLSearchParams();
+        for (const pair of formData) {
+            searchParams.append(pair[0], pair[1]);
+        }
 
-                Swal.fire('Đăng ký tài khoản thành công!', '', 'success').then(() => {
-                    $.pjax({url: response.data.redirect_to, container: '#main_content'});
+        fetch(_this.form.getAttribute('action'), {
+            method: _this.form.getAttribute('method'),
+            body: searchParams
+        })
+        .then(response => response.json())
+        .then(response => {
+            hidePageLoader();
+            if (response.success !== true) {
+                let msg = 'Đăng ký tài khoản không thành công!';
+                if (typeof response.data === 'string') {
+                    msg = response.data;
+                }
+                Swal.fire('Lỗi!', msg, 'error');
+            } else {
+                Swal.fire('Thành công!', 'Đăng ký tài khoản thành công!', 'success').then(() => {
+                    // Use Swup to load new page if available, or fallback to window.location
+                    if (window.swup) {
+                        window.swup.loadPage({ url: response.data.redirect_to });
+                    } else {
+                        window.location.href = response.data.redirect_to;
+                    }
                 });
-            },
-            error  : (error) => {
-                console.log(error);
-                Swal.fire('Đăng ký tài khoản không thành công!', '', 'error');
-                hidePageLoader();
-            },
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            Swal.fire('Lỗi!', 'Đã có lỗi xảy ra, vui lòng thử lại.', 'error');
+            hidePageLoader();
         });
     }
 }

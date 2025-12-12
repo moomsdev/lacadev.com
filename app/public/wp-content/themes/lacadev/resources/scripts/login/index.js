@@ -1,9 +1,25 @@
 // eslint-disable-next-line no-unused-vars
-import config from "@config";
 import "@styles/login";
-// import 'airbnb-browser-shims'; // Uncomment if needed
 
-jQuery(document).ready(function () {
-  jQuery("#login h1 a").attr("href", "https://lacadev.com/");
-  jQuery("#login h1 a").attr("target", "_blank");
+document.addEventListener("DOMContentLoaded", function () {
+  const loginHeaderLink = document.querySelector("#login h1 a");
+  if (loginHeaderLink) {
+    loginHeaderLink.setAttribute("href", "https://lacadev.com/");
+    loginHeaderLink.setAttribute("target", "_blank");
+  }
+
+  document.getElementById('user_login').setAttribute('placeholder', 'Username or Email Address');
+  document.getElementById('user_pass').setAttribute('placeholder', 'Password');
+
+  // create div class welcome
+  var welcomeDiv = document.createElement('div');
+  welcomeDiv.className = 'welcome';
+  welcomeDiv.textContent = 'Welcome to our website';
+
+  // insert after logo
+  var loginForm = document.getElementById('login');
+  var logo = document.querySelector('#login h1');
+  if (logo) {
+      logo.insertAdjacentElement('afterend', welcomeDiv);
+  }
 });

@@ -42,7 +42,7 @@
 	app_shim_wp_body_open();
 
 	if (is_home() || is_front_page()) :
-		echo '<h1 class="site-name d-none">' . get_bloginfo('name') . '</h1>';
+		echo '<h1 class="site-name hidden">' . get_bloginfo('name') . '</h1>';
 	endif;
 	?>
 
@@ -56,7 +56,7 @@
 		</label>
 	</div>
 
-	<div class="wrapper_mms" id="swup">
+	<div class="wrapper" id="swup">
 		<header id="header">
 			<div class="container">
                 <div class="header-inner">
@@ -68,9 +68,9 @@
                         ?>
                     </div>
 
-                    <div class="head-menu d-flex align-items-center justify-content-between">
+                    <div class="head-menu">
                         <!-- logo -->
-                        <div class="logo-menu d-flex align-items-center">
+                        <div class="logo-menu">
                             <span class="circle"></span>
                             <?php
                             echo '<nav class="nav-menu">	<button id="btn-hamburger">
@@ -89,7 +89,7 @@
                             ?>
                         </div>
 
-                        <div class="language-search d-flex align-items-center gap-4">
+                        <div class="language-search">
                             <!-- search -->
                             <div class="search-icon">
                                 <button class="search-icon__btn">

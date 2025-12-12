@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #010101;
+  --primary-color: #333;
   --primary-color-dark: #fff;
   --secondary-color: #626262;
   --secondary-color-dark: #fff;
@@ -9,7 +9,7 @@
 
 html[data-theme="dark"] {
   --primary-color: #fff;
-  --primary-color-dark: #010101;
+  --primary-color-dark: #333;
   --secondary-color: #fff;
   --secondary-color-dark: #626262;
   --background-color: hsla(230, 55%, 4%, 1);

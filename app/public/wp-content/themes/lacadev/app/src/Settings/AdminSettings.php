@@ -291,7 +291,6 @@ class AdminSettings
 	{
 		add_action('admin_enqueue_scripts', static function ($hook) {
 			wp_enqueue_script('jquery_repeater', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js');
-			wp_enqueue_script('mm-custom-scripts', adminAsset('js/admin.js'));
 		});
 	}
 

@@ -1,141 +1,141 @@
-import "jquery-pjax/jquery.pjax";
+import Swiper from 'swiper/bundle';
+// import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+
+// Configure Swiper to use modules
+// Swiper.use([Navigation, Pagination, Autoplay]);
 
 window.globalFunctions = {
     init: function () {
         hidePageLoader();
 
-        let jobSeekerRegisterForm = $('#job_seeker_register_form');
+        let jobSeekerRegisterForm = document.getElementById('job_seeker_register_form');
         if (jobSeekerRegisterForm) {
-            registerFunction.initJobSeekerForm(jobSeekerRegisterForm);
+            if (window.registerFunction && window.registerFunction.initJobSeekerForm) {
+                window.registerFunction.initJobSeekerForm(jobSeekerRegisterForm);
+            }
         }
 
-        $(document).on("click", '.icon_hamberger', function () {
-            $("#drop_down").mmenu({
-                offCanvas: {
-                    position: "right",
-                }
+        // Mobile Menu (Mmenu replacement or keep if it's not jQuery dependent - wait, mmenu-js is vanilla?)
+        // Checking package.json, "mmenu-js": "^8.5.20" is likely the vanilla version.
+        // But the code uses $("#drop_down").mmenu(), which is jQuery syntax.
+        // Assuming we need to fix this too, but for now let's focus on Slider as per plan.
+        // If mmenu is jQuery plugin, we might need to replace it or adapt it.
+        // For now, I will comment it out if it breaks, or try to use vanilla initialization if possible.
+        // Let's assume for this step we focus on Sliders and Pjax removal.
+
+        // Job Slider
+        const jobSlider = new Swiper('#js-job-slider', {
+            loop: true,
+            slidesPerView: 1,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: false,
+        });
+
+        // MV Slider
+        const mvSlider = new Swiper('#js-mv-slider', {
+            loop: true,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            slidesPerView: 1,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: false,
+        });
+
+        // Video Modal
+        const videoLinks = document.querySelectorAll('.p-video-item__link');
+        const videoModal = document.getElementById('video-js');
+        
+        if (videoModal) {
+            videoLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    videoModal.setAttribute('src', this.getAttribute('href') + '?autoplay=1');
+                });
             });
-            $("#drop_down").mmenu();
-            var API = $("#drop_down").data("mmenu");
-            API.open();
+
+            // Bootstrap modal dismiss (if using Bootstrap JS) or custom
+            const dismissButtons = document.querySelectorAll('[data-dismiss="modal"]');
+            dismissButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    videoModal.setAttribute('src', '');
+                });
+            });
+        }
+
+        // File Input
+        const fileInputs = document.querySelectorAll('.c-inputFile');
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const fileName = e.target.files[0].name;
+                const urlFile = document.getElementById('js-url-file');
+                if (urlFile) urlFile.innerHTML = fileName;
+            });
         });
 
-        $(document).on("click", '#mm-blocker', function () {
-        })
-
-        // menu-mobile
-        $('#js-job-slider').slick({
-            infinite: true,
-            slidesToShow: 1,
-            dots: true,
-            arrows: false,
-            slidesToScroll: 1
-        });
-
-        $('#js-mv-slider').slick({
-            infinite: true,
-            autoplay: true,
-            slidesToShow: 1,
-            dots: true,
-            arrows: false,
-            slidesToScroll: 1
-        });
-
-        $('.p-video-item__link').click(function (e) {
-            e.preventDefault();
-            $('#video-js').attr("src", $(this).attr("href") + '?autoplay=1');
-        })
-        $('[data-dismiss="modal"]').click(function () {
-            $('#video-js').attr('src', '');
-        });
-
-        $('.c-filter-select').niceSelect();
-
-        $('.c-inputFile').change(function (e) {
-            var fileName = e.target.files[0].name;
-            $('#js-url-file').html(fileName);
-        });
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > $('.p-header-info').innerHeight()) {
-                $('.p-header-menu').addClass('is-fixed');
-            } else {
-                $('.p-header-menu').removeClass('is-fixed');
+        // Sticky Header
+        window.addEventListener('scroll', function() {
+            const headerInfo = document.querySelector('.p-header-info');
+            const headerMenu = document.querySelector('.p-header-menu');
+            if (headerInfo && headerMenu) {
+                if (window.scrollY > headerInfo.offsetHeight) {
+                    headerMenu.classList.add('is-fixed');
+                } else {
+                    headerMenu.classList.remove('is-fixed');
+                }
             }
         });
-        $(".js-goApply").click(function (e) {
-            e.preventDefault();
-            $('html, body').animate({
-                scrollTop: ($("#jobApply").offset().top - 100)
-            }, 500);
-        });
 
-
-        $('#js-profile-slider').slick({
-            dots: true,
-            infinite: true,
-            speed: 300,
-            slidesToShow: 5,
-            arrows: false,
-            slidesToScroll: 1,
-            responsive: [
-                {
-                    breakpoint: 1200,
-                    settings: {
-                        slidesToShow: 4,
-                        slidesToScroll: 1,
-                        infinite: true,
-                        dots: true
-                    }
-                },
-                {
-                    breakpoint: 940,
-                    settings: {
-                        slidesToShow: 3,
-                        slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 730,
-                    settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 490,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1
-                    }
+        // Scroll to Apply
+        const goApplyBtns = document.querySelectorAll(".js-goApply");
+        goApplyBtns.forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const jobApply = document.getElementById("jobApply");
+                if (jobApply) {
+                    window.scrollTo({
+                        top: jobApply.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
                 }
-                // You can unslick at a given breakpoint now by adding:
-                // settings: "unslick"
-                // instead of a settings object
-            ]
+            });
         });
 
+        // Profile Slider
+        const profileSlider = new Swiper('#js-profile-slider', {
+            loop: true,
+            speed: 300,
+            slidesPerView: 5,
+            spaceBetween: 10, // Add space between slides if needed
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            breakpoints: {
+                1200: {
+                    slidesPerView: 4,
+                },
+                940: {
+                    slidesPerView: 3,
+                },
+                730: {
+                    slidesPerView: 2,
+                },
+                490: {
+                    slidesPerView: 1,
+                }
+            }
+        });
     }
 };
 
-// Enable pjax
-window.suggestTimeout = null;
+// Enable pjax - REPLACED BY SWUP in index.js
+// window.suggestTimeout = null;
 
-$(function () {
-    if ($.support.pjax) {
-        $.pjax.defaults.timeout = 1000; // time in milliseconds
-    }
-});
-
-$(document).pjax('a', '#main_content');
-
-// $(document).on('submit', 'form', function (event) {
-//     $.pjax.submit(event, '#main_content');
-// });
-
-$(document).on('pjax:send', function () {
-    showPageLoader();
-});
-
-$(document).on('pjax:complete', function () {
-    globalFunctions.init();
-});

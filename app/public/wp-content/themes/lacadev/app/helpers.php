@@ -33,7 +33,6 @@ require_once APP_APP_SETUP_DIR . 'users/auth.php';
 new \App\Settings\RequirePlugins();
 new \App\Settings\AdminSettings();
 new \App\Settings\AutoDownloadImage();
-new \App\Settings\CustomLoginPage();
 new \App\Settings\ThemeSettings();
 new \App\Settings\MMSTools\Optimize();
 

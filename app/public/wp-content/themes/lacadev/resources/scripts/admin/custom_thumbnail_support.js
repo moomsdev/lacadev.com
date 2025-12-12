@@ -8,39 +8,44 @@ let mediaGridObserver = new MutationObserver(function (mutations) {
         for (let j = 0; j < mutations[i].addedNodes.length; j++) {
 
             //get the applicable element
-            let element = jQuery(mutations[i].addedNodes[j]);
+            let element = mutations[i].addedNodes[j];
+            
+            // Ensure element is an Element node
+            if (element.nodeType !== 1) continue;
 
             //execute only if we have a class
-            if (element.attr('class')) {
-                let elementClass = element.attr('class');
-
+            if (element.className) {
+                
                 // find all 'attachments'
-                if (element.attr('class').indexOf('attachment') !== -1) {
+                if (element.className.indexOf('attachment') !== -1) {
 
                     //find attachment inner (which contains subtype info)
-                    let attachmentPreview = element.children('.attachment-preview');
-                    if (attachmentPreview.length !== 0) {
+                    let attachmentPreview = element.querySelector('.attachment-preview');
+                    if (attachmentPreview) {
 
                         //only run for SVG elements
-                        if (attachmentPreview.attr('class').indexOf('subtype-svg+xml') !== -1) {
+                        if (attachmentPreview.className.indexOf('subtype-svg+xml') !== -1) {
 
-                            let handler = function (element) {
-                                jQuery.ajax({
-                                    url: '/wp-admin/admin-ajax.php',
-                                    type: "POST",
-                                    dataType: 'html',
-                                    data: {
-                                        'action': 'mm_get_attachment_url_thumbnail',
-                                        'attachmentID': element.attr('data-id')
-                                    },
-                                    success: function (data) {
-                                        if (data) {
-                                            element.find('img').attr('src', data);
-                                            element.find('.filename').text('SVG Image');
-                                        }
+                            (function (el) {
+                                const formData = new FormData();
+                                formData.append('action', 'mm_get_attachment_url_thumbnail');
+                                formData.append('attachmentID', el.getAttribute('data-id'));
+
+                                fetch('/wp-admin/admin-ajax.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.text())
+                                .then(data => {
+                                    if (data) {
+                                        const img = el.querySelector('img');
+                                        const filename = el.querySelector('.filename');
+                                        if (img) img.src = data;
+                                        if (filename) filename.textContent = 'SVG Image';
                                     }
-                                });
-                            }(element);
+                                })
+                                .catch(error => console.error('Error:', error));
+                            })(element);
                         }
                     }
                 }
@@ -52,24 +57,28 @@ let mediaGridObserver = new MutationObserver(function (mutations) {
 let attachmentPreviewObserver = new MutationObserver(function (mutations) {
     for (var i = 0; i < mutations.length; i++) {
         for (var j = 0; j < mutations[i].addedNodes.length; j++) {
-            var element = $(mutations[i].addedNodes[j]);
+            var element = mutations[i].addedNodes[j];
+            if (element.nodeType !== 1) continue;
+
             var onAttachmentPage = false;
-            if ((element.hasClass('attachment-details')) || element.find('.attachment-details').length != 0) {
+            if (element.classList.contains('attachment-details') || element.querySelector('.attachment-details')) {
                 onAttachmentPage = true;
             }
 
             if (onAttachmentPage == true) {
-                var urlLabel = element.find('label[data-setting="url"]');
-                if (urlLabel.length != 0) {
-                    var value = urlLabel.find('input').val();
-                    element.find('.details-image').attr('src', value);
+                var urlLabel = element.querySelector('label[data-setting="url"]');
+                if (urlLabel) {
+                    var input = urlLabel.querySelector('input');
+                    var value = input ? input.value : '';
+                    var detailsImage = element.querySelector('.details-image');
+                    if (detailsImage) detailsImage.src = value;
                 }
             }
         }
     }
 });
 
-jQuery(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
     mediaGridObserver.observe(document.body, {
         childList: true,
         subtree: true

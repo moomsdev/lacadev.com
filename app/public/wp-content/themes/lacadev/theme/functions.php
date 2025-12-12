@@ -147,12 +147,18 @@ add_filter('style_loader_tag', function ($html, $handle) {
     return str_replace("media='all' />", 'media="all" rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">', $html);
 }, 10, 2);
 
-// Prevent thumbnail generation
-function remove_all_image_sizes($sizes)
+// Optimize image sizes by removing unnecessary defaults
+function optimize_image_sizes($sizes)
 {
-    return array();
+    // Remove default WordPress sizes that are rarely used
+    unset($sizes['medium_large']); // 768px
+    unset($sizes['1536x1536']);    // 2x Medium Large
+    unset($sizes['2048x2048']);    // 2x Large
+
+    // Keep 'thumbnail', 'medium', 'large' as they are standard
+    return $sizes;
 }
-add_filter('intermediate_image_sizes_advanced', 'remove_all_image_sizes');
+add_filter('intermediate_image_sizes_advanced', 'optimize_image_sizes');
 
 // =============================================================================
 // EDITOR CUSTOMIZATIONS
@@ -238,34 +244,39 @@ function custom_ajax_script()
 {
     ?>
     <script type="text/javascript">
-        jQuery(document).ready(function ($) {
-            $('#search-input').on('input', function () {
-                var searchQuery = $(this).val();
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    var searchQuery = this.value;
 
-                if (searchQuery.length > 2) {
-                    $.ajax({
-                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                        type: 'GET',
-                        data: {
+                    if (searchQuery.length > 2) {
+                        var params = new URLSearchParams({
                             action: 'ajax_search',
                             s: searchQuery
-                        },
-                        beforeSend: function () {
-                            // Bạn có thể hiển thị một biểu tượng loading ở đây
-                        },
-                        success: function (response) {
-                            // Hiển thị kết quả tìm kiếm
-                            $('.modal-body .search-results')
-                                .html(response);
-                        },
-                        error: function () {
-                            // Hiển thị thông báo lỗi nếu có
+                        });
+
+                        fetch('<?php echo admin_url('admin-ajax.php'); ?>?' + params.toString())
+                            .then(function(response) {
+                                return response.text();
+                            })
+                            .then(function(html) {
+                                var resultsContainer = document.querySelector('.modal-body .search-results');
+                                if (resultsContainer) {
+                                    resultsContainer.innerHTML = html;
+                                }
+                            })
+                            .catch(function(err) {
+                                console.error('Search error:', err);
+                            });
+                    } else {
+                        var resultsContainer = document.querySelector('.modal-body .search-results');
+                        if (resultsContainer) {
+                            resultsContainer.innerHTML = '';
                         }
-                    });
-                } else {
-                    $('.modal-body .search-results').html('');
-                }
-            });
+                    }
+                });
+            }
         });
     </script>
     <?php

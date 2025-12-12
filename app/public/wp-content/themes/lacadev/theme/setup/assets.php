@@ -33,7 +33,7 @@ function app_action_theme_enqueue_assets()
     /**
      * Main JavaScript bundle (deferred)
      */
-    Assets::enqueueScript('theme-js-bundle', $template_dir . '/dist/theme.js', ['jquery'], true);
+    Assets::enqueueScript('theme-js-bundle', $template_dir . '/dist/theme.js', [], true);
 
     /**
      * Conditional assets based on page type
@@ -96,6 +96,16 @@ function app_action_admin_enqueue_assets()
     Assets::enqueueStyle(
         'theme-admin-css-bundle',
         $template_dir . '/dist/styles/admin.css'
+    );
+
+    /**
+     * Enqueue scripts.
+     */
+    Assets::enqueueScript(
+        'theme-admin-js-bundle',
+        $template_dir . '/dist/admin.js',
+        ['jquery'],
+        true
     );
 
     // Enqueue front-end styles in admin area

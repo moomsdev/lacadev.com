@@ -2,31 +2,24 @@ import "@images/favicon.ico";
 import "@styles/theme";
 import "airbnb-browser-shims";
 import "./pages/*.js";
-import { gsap } from "gsap";
-import { SplitText } from "gsap/SplitText";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import gsap from "gsap";
 
-// import Swup from 'swup';
+import Swup from 'swup';
 import Swiper from "swiper";
 
-jQuery(document).ready(function () {
-    // const swup = new Swup();
+document.addEventListener("DOMContentLoaded", function () {
+    const swup = new Swup();
     initializePageFeatures();
 
-    // swup.hooks.on('content:replace', () => {
-    //   initializePageFeatures();
-    // });
+    swup.hooks.on('content:replace', () => {
+      initializePageFeatures();
+    });
 });
 
 function initializePageFeatures() {
-    initMenu();
-    initAnimations();
     initHoverService();
-    // initIsotop();
     setupGsap404();
-    // initSwiperSlider();
     initToggleDarkMode();
-    // setupHideHeaderOnScroll();
 
     animateText(".slogan p");
 }
@@ -108,13 +101,15 @@ function initMenu() {
   var $menuBtn = document.getElementById("btn-hamburger");
   const navMenu = document.querySelector("nav.nav-menu");
 
-  $menuBtn.onclick = function (e) {
-    navMenu.classList.toggle("actived");
-    document.body.classList.toggle("overflow-hidden");
+  if ($menuBtn) {
+      $menuBtn.onclick = function (e) {
+        navMenu.classList.toggle("actived");
+        document.body.classList.toggle("overflow-hidden");
 
-    animatedMenu(this);
-    e.preventDefault();
-  };
+        animatedMenu(this);
+        e.preventDefault();
+      };
+  }
 }
 
 function animatedMenu(x) {
@@ -145,29 +140,29 @@ function initSwiperSlider() {
 }
 
 function initIsotop() {
-  $(".menu-wrapper").imagesLoaded(() => {
-    const $menuWrapper = $(".menu-wrapper");
-
-    $(".menu-filter li").on("click", function () {
-      $(".menu-filter li").removeClass("active");
-      $(this).addClass("active");
-
-      $menuWrapper.isotope({
-        filter: $(this).attr("data-filter"),
-        animationOptions: {
-          duration: 750,
-          easing: "linear",
-          queue: false,
-        },
-      });
-      return false;
-    });
-
-    $menuWrapper.isotope({
-      itemSelector: ".loop-food",
-      layoutMode: "masonry",
-    });
-  });
+//   $(".menu-wrapper").imagesLoaded(() => {
+//     const $menuWrapper = $(".menu-wrapper");
+//
+//     $(".menu-filter li").on("click", function () {
+//       $(".menu-filter li").removeClass("active");
+//       $(this).addClass("active");
+//
+//       $menuWrapper.isotope({
+//         filter: $(this).attr("data-filter"),
+//         animationOptions: {
+//           duration: 750,
+//           easing: "linear",
+//           queue: false,
+//         },
+//       });
+//       return false;
+//     });
+//
+//     $menuWrapper.isotope({
+//       itemSelector: ".loop-food",
+//       layoutMode: "masonry",
+//     });
+//   });
 }
 
 /**
@@ -216,7 +211,7 @@ function setupGsap404() {
     yoyo: true,
     repeat: -1,
     ease: "sine.inOut",
-  });
+    });
 
   gsap.fromTo(
     "#starsSmall g",
@@ -260,24 +255,22 @@ function setupGsap404() {
 }
 
 function animateText(selector) {
-  var hasAnim = $(".slogan p");
-  hasAnim.each(function () {
-    var $this = $(this);
+  var hasAnim = document.querySelectorAll(".slogan p");
+  hasAnim.forEach(function (element) {
     var splitType = "lines, chars";
-    var splitto = new SplitText($this, {
+    var splitto = new SplitText(element, {
       type: splitType,
       linesClass: "anim_line",
       charsClass: "anim_char",
       wordsClass: "anim_word",
     });
-    var lines = $this.find(".anim_line"),
-      words = $this.find(".anim_word"),
-      chars = $this.find(".anim_char");
+    var chars = element.querySelectorAll(".anim_char");
     gsap.fromTo(
       chars,
-      { y: "100%" },
+      { y: "100%", autoAlpha: 0 },
       {
         y: "0%",
+        autoAlpha: 1,
         duration: 0.8,
         stagger: 0.01,
         ease: "power2.out",

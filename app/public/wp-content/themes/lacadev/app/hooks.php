@@ -65,3 +65,31 @@ add_filter('login_headertext', 'app_filter_login_headertext');
 // add_action( 'after_setup_theme', 'app_bootstrap_carbon_fields', 100 );
 add_action('carbon_fields_register_fields', 'app_bootstrap_carbon_fields_register_fields');
 add_filter('carbon_fields_map_field_api_key', 'app_filter_carbon_fields_google_maps_api_key');
+
+/**
+ * Pages/Posts list table: Add Thumbnail column
+ */
+function app_add_featured_image_column($cols) {
+    if (is_array($cols)) {
+        $cols = insertArrayAtPosition($cols, ['featured_image' => 'Image'], 1);
+    }
+    return $cols;
+}
+add_filter('manage_page_posts_columns', 'app_add_featured_image_column', 9999);
+add_filter('manage_post_posts_columns', 'app_add_featured_image_column', 9999);
+
+function app_render_featured_image_column($column, $postId) {
+    if ($column !== 'featured_image') {
+        return;
+    }
+    $thumbnailUrl = get_the_post_thumbnail_url($postId);
+    echo "<a href='javascript:' data-trigger-change-thumbnail-id data-post-id='{$postId}'>";
+    if ($thumbnailUrl) {
+        echo "<img src='" . esc_url($thumbnailUrl) . "' alt='' style='max-width: 50px; height: auto;' />";
+    } else {
+        echo "<div class='no-image-text'>Choose Image</div>";
+    }
+    echo "</a>";
+}
+add_action('manage_page_posts_custom_column', 'app_render_featured_image_column', 10, 2);
+add_action('manage_post_posts_custom_column', 'app_render_featured_image_column', 10, 2);
