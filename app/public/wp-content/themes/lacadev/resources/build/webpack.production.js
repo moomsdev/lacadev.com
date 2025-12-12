@@ -7,6 +7,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /**
  * Internal dependencies.
@@ -72,7 +73,15 @@ const plugins = [
         analyzerMode: 'static',
         reportFilename: 'bundle-report.html',
         openAnalyzer: false
-    })
+    }),
+    new CopyWebpackPlugin({
+        patterns: [
+            {
+                from: utils.srcScriptsPath('sw.js'),
+                to: utils.distPath('sw.js'),
+            },
+        ],
+    }),
 ];
 
 module.exports = {

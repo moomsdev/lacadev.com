@@ -2,8 +2,14 @@ import "@images/favicon.ico";
 import "@styles/theme";
 import "airbnb-browser-shims";
 import "./pages/*.js";
-import gsap from "gsap";
+import "./ajax-search.js";
 
+// Performance libraries - bundled instead of separate loads
+import "./lib/instantpage.js";
+import "./lib/smooth-scroll.min.js";
+import "./lib/lazysizes.min.js";
+
+import gsap from "gsap";
 import Swup from 'swup';
 import Swiper from "swiper";
 
@@ -20,8 +26,6 @@ function initializePageFeatures() {
     initHoverService();
     setupGsap404();
     initToggleDarkMode();
-
-    animateText(".slogan p");
 }
 
 /**

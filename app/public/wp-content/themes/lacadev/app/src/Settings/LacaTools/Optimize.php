@@ -31,23 +31,18 @@ class Optimize
 			$this->disableEmoji();
 		}
 
-		// Optimization Library
-		if (get_option('_enable_instant_page') === 'yes') {
-			$this->enableInstantPage();
-		}
+		// BUNDLED INTO THEME.JS - These libraries are now included in the main bundle
+		// if (get_option('_enable_instant_page') === 'yes') {
+		// 	$this->enableInstantPage();
+		// }
 
-		if (get_option('_enable_smooth_scroll') === 'yes') {
-			$this->enableSmoothScroll();
-		}
+		// if (get_option('_enable_smooth_scroll') === 'yes') {
+		// 	$this->enableSmoothScroll();
+		// }
 
-		// The function of lazy loading images
-		if (get_option('_enable_lazy_loading_images') === 'yes') {
-			$this->enableLazyLoadingImages();
-		}
-
-		if (get_option('_enable_advanced_resource_hints') === 'yes') {
-			$this->addAdvancedResourceHints();
-		}
+		// if (get_option('_enable_lazy_loading_images') === 'yes') {
+		// 	$this->enableLazyLoadingImages();
+		// }
 
 		if (get_option('_enable_optimize_images') === 'yes') {
 			add_filter('wp_get_attachment_image_attributes', [$this, 'optimizeImages'], 10, 3);
@@ -107,44 +102,40 @@ class Optimize
 		});
 	}
 
-	public function enableInstantPage()
-	{
-		add_action('wp_enqueue_scripts', function () {
-			wp_enqueue_script('instantpage', get_stylesheet_directory_uri() . '/../resources/scripts/admin/lib/instantpage.js', array(), '5.7.0', true);
-		});
-	}
+	// BUNDLED INTO THEME.JS - No longer needed as separate file
+	// public function enableInstantPage()
+	// {
+	// 	add_action('wp_enqueue_scripts', function () {
+	// 		wp_enqueue_script('instantpage', get_template_directory_uri() . '/resources/scripts/admin/lib/instantpage.js', array(), '5.7.0', true);
+	// 	});
+	// }
 
-	public function enableSmoothScroll()
-	{
-		add_action('wp_enqueue_scripts', function () {
-			wp_enqueue_script('smooth-scroll', get_stylesheet_directory_uri() . '/../resources/scripts/admin/lib/smooth-scroll.min.js', array(), '1.4.16', true);
-		});
-	}
+	// BUNDLED INTO THEME.JS - No longer needed as separate file
+	// public function enableSmoothScroll()
+	// {
+	// 	add_action('wp_enqueue_scripts', function () {
+	// 		wp_enqueue_script('smooth-scroll', get_template_directory_uri() . '/resources/scripts/admin/lib/smooth-scroll.min.js', array(), '1.4.16', true);
+	// 	});
+	// }
 
-	public function enableLazyLoadingImages()
-	{
-		if (!is_admin()) {
-			wp_add_inline_script('jquery', '
-				jQuery(document).ready(function($) {
-					$("img").addClass("lazyload").each(function() {
-						var dataSrc = $(this).attr("src");
-						$(this).attr("data-src", dataSrc).removeAttr("src");
-					});
-				});
-			');
-			wp_enqueue_script( 'lazyload', get_stylesheet_directory_uri() . '/../resources/scripts/admin/lib/lazysizes.min.js', array('jquery'), '5.3.2', true);
-		}
-	}
+	// BUNDLED INTO THEME.JS - No longer needed as separate file
+	// LazyLoad functionality now handled by bundled lazysizes library
+	// public function enableLazyLoadingImages()
+	// {
+	// 	if (!is_admin()) {
+	// 		wp_add_inline_script('jquery', '
+	// 			jQuery(document).ready(function($) {
+	// 				$("img").addClass("lazyload").each(function() {
+	// 					var dataSrc = $(this).attr("src");
+	// 					$(this).attr("data-src", dataSrc).removeAttr("src");
+	// 				});
+	// 			});
+	// 		');
+	// 		wp_enqueue_script( 'lazyload', get_template_directory_uri() . '/resources/scripts/admin/lib/lazysizes.min.js', array('jquery'), '5.3.2', true);
+	// 	}
+	// }
 
-    /**
-     * Thêm resource hint (preload, preconnect, ...)
-     */
-    public function addAdvancedResourceHints()
-    {
-        add_action('wp_head', function () {
-            // Có thể thêm các resource hint tại đây
-        }, 1);
-    }
+
 
     /**
      * Tối ưu hóa thuộc tính ảnh (lazy loading, alt, dimension)
@@ -188,6 +179,12 @@ class Optimize
     public function registerServiceWorker()
     {
         if (!is_admin() && !is_user_logged_in()) {
+            $sw_path = get_template_directory() . '/dist/sw.js';
+            
+            // Only register if SW file exists
+            if (!file_exists($sw_path)) {
+                return;
+            }
             ?>
             <script>
                 if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {

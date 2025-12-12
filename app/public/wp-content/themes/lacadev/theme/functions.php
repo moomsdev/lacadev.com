@@ -106,6 +106,7 @@ add_action('after_setup_theme', function () {
 
     // Load advanced optimization modules
     require_once APP_APP_SETUP_DIR . 'assets.php';
+    require_once APP_APP_SETUP_DIR . 'performance.php';
 
     // Load Gutenberg blocks
     $blocks_dir = APP_APP_SETUP_DIR . '/blocks';
@@ -115,70 +116,9 @@ add_action('after_setup_theme', function () {
     }
 });
 
-// =============================================================================
-// PERFORMANCE OPTIMIZATIONS
-// =============================================================================
 
-// Remove emoji support
-add_action('init', static function () {
-    remove_action('wp_head', 'print_emoji_detection_script', 7);
-    remove_action('admin_print_scripts', 'print_emoji_detection_script');
-    remove_action('wp_print_styles', 'print_emoji_styles');
-    remove_action('admin_print_styles', 'print_emoji_styles');
-    remove_filter('the_content_feed', 'wp_staticize_emoji');
-    remove_filter('comment_text_rss', 'wp_staticize_emoji');
-    remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
 
-    add_filter('tiny_mce_plugins', static function ($plugins) {
-        return is_array($plugins) ? array_diff($plugins, ['wpemoji']) : [];
-    });
 
-    add_filter('wp_resource_hints', static function ($urls, $relation_type) {
-        if ('dns-prefetch' === $relation_type) {
-            $emoji_svg_url = apply_filters('emoji_svg_url', 'https://s.w.org/images/core/emoji/2/svg/');
-            $urls = array_diff($urls, [$emoji_svg_url]);
-        }
-        return $urls;
-    }, 10, 2);
-});
-
-// Optimize style loading
-add_filter('style_loader_tag', function ($html, $handle) {
-    return str_replace("media='all' />", 'media="all" rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">', $html);
-}, 10, 2);
-
-// Optimize image sizes by removing unnecessary defaults
-function optimize_image_sizes($sizes)
-{
-    // Remove default WordPress sizes that are rarely used
-    unset($sizes['medium_large']); // 768px
-    unset($sizes['1536x1536']);    // 2x Medium Large
-    unset($sizes['2048x2048']);    // 2x Large
-
-    // Keep 'thumbnail', 'medium', 'large' as they are standard
-    return $sizes;
-}
-add_filter('intermediate_image_sizes_advanced', 'optimize_image_sizes');
-
-// =============================================================================
-// EDITOR CUSTOMIZATIONS
-// =============================================================================
-
-function tinymce_allow_unsafe_link_target($mceInit)
-{
-    $mceInit['allow_unsafe_link_target'] = true;
-    return $mceInit;
-}
-
-// =============================================================================
-// SCRIPTS & STYLES
-// =============================================================================
-
-function my_theme_enqueue_scripts()
-{
-    wp_localize_script('my-theme-script', 'ajaxurl', admin_url('admin-ajax.php'));
-}
-add_action('wp_enqueue_scripts', 'my_theme_enqueue_scripts');
 
 // =============================================================================
 // AUTOLOAD COMPONENTS
@@ -203,85 +143,90 @@ foreach ($folders as $folder) {
 }
 
 // =============================================================================
-// AJAX SEARCH
+// AJAX SEARCH (Optimized with Security & Caching)
 // =============================================================================
 
+/**
+ * Improved AJAX search with security and caching
+ */
 function ajax_search()
 {
-    // Kiểm tra nếu là request AJAX và có tham số 's'
-    if (isset($_GET['s'])) {
-        $search_query = sanitize_text_field($_GET['s']);
-
-        $args = array(
-            'post_type' => ['post', 'service', 'blog'], // Loại post bạn muốn tìm kiếm (có thể là 'post', 'page', hoặc loại post tùy chỉnh)
-            'posts_per_page' => 10, // Số lượng bài viết bạn muốn lấy
-            's' => $search_query,
-        );
-
-        $query = new WP_Query($args);
-
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                // Output HTML cho từng bài viết
-                echo '<div class="search-result-item">';
-                echo '<a href="' . get_permalink() . '">';
-                echo '<h4>' . get_the_title() . '</h4>';
-                echo '</a>';
-                echo '</div>';
-            }
-        } else {
-            echo '<div class="no-results">' . __('Không có kết quả', 'laca') . '</div>';
-        }
-        wp_reset_postdata();
+    // Security check: verify nonce
+    check_ajax_referer('theme_search_nonce', 'nonce');
+    
+    // Sanitize search query
+    $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
+    
+    if (empty($search_query) || strlen($search_query) < 2) {
+        wp_send_json_error(['message' => __('Vui lòng nhập ít nhất 2 ký tự', 'laca')]);
     }
-    die(); // Dừng script tại đây
+    
+    // Create cache key - include user ID for personalized results if needed
+    $cache_key = 'ajax_search_' . md5($search_query . get_current_user_id());
+    
+    // Try to get cached results
+    $cached_results = get_transient($cache_key);
+    if ($cached_results !== false) {
+        echo $cached_results;
+        wp_die();
+    }
+    
+    // Start output buffering to capture results for caching
+    ob_start();
+    
+    // Query arguments
+    $args = array(
+        'post_type' => ['post', 'service', 'blog'],
+        'posts_per_page' => 10,
+        's' => $search_query,
+        'post_status' => 'publish', // Only published posts
+        'no_found_rows' => true, // Performance optimization
+        'update_post_meta_cache' => false, // Performance optimization
+        'update_post_term_cache' => false, // Performance optimization
+    );
+    
+    $query = new WP_Query($args);
+    
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            // Output HTML with proper escaping
+            echo '<div class="search-result-item">';
+            echo '<a href="' . esc_url(get_permalink()) . '">';
+            echo '<h4>' . esc_html(get_the_title()) . '</h4>';
+            echo '</a>';
+            echo '</div>';
+        }
+    } else {
+        echo '<div class="no-results">' . esc_html__('Không có kết quả', 'laca') . '</div>';
+    }
+    
+    wp_reset_postdata();
+    
+    // Get buffered output
+    $output = ob_get_clean();
+    
+    // Cache results for 60 seconds
+    set_transient($cache_key, $output, 60);
+    
+    echo $output;
+    wp_die();
 }
 
 add_action('wp_ajax_nopriv_ajax_search', 'ajax_search');
 add_action('wp_ajax_ajax_search', 'ajax_search');
-function custom_ajax_script()
+/**
+ * Localize AJAX search data (script bundled in theme.js)
+ */
+function custom_ajax_search_script()
 {
-    ?>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            var searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    var searchQuery = this.value;
-
-                    if (searchQuery.length > 2) {
-                        var params = new URLSearchParams({
-                            action: 'ajax_search',
-                            s: searchQuery
-                        });
-
-                        fetch('<?php echo admin_url('admin-ajax.php'); ?>?' + params.toString())
-                            .then(function(response) {
-                                return response.text();
-                            })
-                            .then(function(html) {
-                                var resultsContainer = document.querySelector('.modal-body .search-results');
-                                if (resultsContainer) {
-                                    resultsContainer.innerHTML = html;
-                                }
-                            })
-                            .catch(function(err) {
-                                console.error('Search error:', err);
-                            });
-                    } else {
-                        var resultsContainer = document.querySelector('.modal-body .search-results');
-                        if (resultsContainer) {
-                            resultsContainer.innerHTML = '';
-                        }
-                    }
-                });
-            }
-        });
-    </script>
-    <?php
+    // Script is bundled in theme.js, just localize the data
+    wp_localize_script('theme-js-bundle', 'themeSearch', [
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('theme_search_nonce'),
+    ]);
 }
-add_action('wp_footer', 'custom_ajax_script');
+add_action('wp_enqueue_scripts', 'custom_ajax_search_script');
 
 // =============================================================================
 // CUSTOM POST TYPES

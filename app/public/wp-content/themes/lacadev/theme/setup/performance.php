@@ -21,7 +21,6 @@ class ThemePerformance
 
         // Advanced caching
         add_action('template_redirect', [self::class, 'set_cache_headers']);
-        add_action('wp_head', [self::class, 'add_advanced_resource_hints'], 1);
 
         // Database optimizations
         add_action('init', [self::class, 'optimize_database_queries']);
@@ -93,6 +92,8 @@ class ThemePerformance
             }
         }
     }
+
+
 
     /**
      * Optimize database queries
@@ -228,6 +229,12 @@ class ThemePerformance
     public static function register_service_worker()
     {
         if (!is_admin() && !is_user_logged_in()) {
+            $sw_path = get_template_directory() . '/dist/sw.js';
+            
+            // Only register if SW file exists
+            if (!file_exists($sw_path)) {
+                return;
+            }
             ?>
             <script>
                 if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {

@@ -1,9 +1,10 @@
 /**
  * The external dependencies.
  */
-const {ProvidePlugin, WatchIgnorePlugin} = require('webpack');
+const {WatchIgnorePlugin} = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin').WebpackManifestPlugin;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /**
  * The internal dependencies.
@@ -50,14 +51,19 @@ const plugins = [
             utils.distImagesPath('sprite@2x.png'),
         ],
     }),
-    new ProvidePlugin({
-        $     : 'jquery',
-        jQuery: 'jquery',
-    }),
+    // Note: jQuery is provided by WordPress as external, don't use ProvidePlugin
     miniCss,
     spriteSmith,
     browsersync,
     new ManifestPlugin(),
+    new CopyWebpackPlugin({
+        patterns: [
+            {
+                from: utils.srcScriptsPath('sw.js'),
+                to: utils.distPath('sw.js'),
+            },
+        ],
+    }),
 ];
 
 /**
