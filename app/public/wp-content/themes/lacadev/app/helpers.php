@@ -34,7 +34,7 @@ new \App\Settings\RequirePlugins();
 new \App\Settings\AdminSettings();
 new \App\Settings\AutoDownloadImage();
 new \App\Settings\ThemeSettings();
-new \App\Settings\MMSTools\Optimize();
+new \App\Settings\LacaTools\Optimize();
 
 // phpcs:disable
 /**

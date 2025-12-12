@@ -280,19 +280,19 @@ abstract class AbstractPostType
 		return [
 			'name'                  => $this->pluralName,
 			'singular_name'         => $this->singularName,
-			'add_new'               => __('Add new', 'laca'),
-			'add_new_item'          => __('Add new post ' . $this->singularName, 'laca'),
-			'edit_item'             => __('Edit post', 'laca'),
-			'new_item'              => __('New post', 'laca'),
-			'view_item'             => __('View post', 'laca'),
+			'add_new'               => __('Add new ' . $this->singularName, 'laca'),
+			'add_new_item'          => __('Add new ' . $this->singularName, 'laca'),
+			'edit_item'             => __('Edit ' . $this->singularName, 'laca'),
+			'new_item'              => __('New ' . $this->singularName, 'laca'),
+			'view_item'             => __('View ' . $this->singularName, 'laca'),
 			'search_items'          => __('Search', 'laca'),
 			'not_found'             => __('Not found', 'laca'),
 			'not_found_in_trash'    => __('Not found in trash', 'laca'),
 			'parent_item_colon'     => __('Parent:', 'laca'),
-			'all_items'             => __('All posts', 'laca'),
+			'all_items'             => __('All ' . $this->pluralName, 'laca'),
 			'archives'              => __($this->pluralName, 'laca'),
-			'insert_into_item'      => __('Insert posts', 'laca'),
-			'uploaded_to_this_item' => __('Uploaded to this posts', 'laca'),
+			'insert_into_item'      => __('Insert ' . $this->pluralName, 'laca'),
+			'uploaded_to_this_item' => __('Uploaded to this ' . $this->pluralName, 'laca'),
 			'featured_image'        => __('Featured image', 'laca'),
 			'set_featured_image'    => __('Set featured image', 'laca'),
 			'remove_featured_image' => __('Remove featured image', 'laca'),
@@ -312,46 +312,64 @@ abstract class AbstractPostType
 
 		$filename = __DIR__ . '/../../../theme/archive' . $postType . '.php';
 		if (!file_exists($filename)) {
-			file_put_contents($filename, '<?php get_header() ?>
-<?php theBreadcrumb() ?>
-<div class="content">
-    <div class="container">
-        <div class="page-content">
-            <div class="content-wrapper">
-                <?php if($currentPage->have_posts()) : ?>
-                    <?php while($currentPage->have_posts()) : $currentPage->the_post(); ?>
-                        <?php the_content(); ?>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-                <?php wp_reset_postdata(); ?>
-                <?php wp_reset_query(); ?>
-            </div>
-        </div>
-    </div>
-</div>
-<?php get_footer() ?>');
+			file_put_contents($filename, '
+			<?php
+				/**
+				 * App Layout: layouts/app.php
+				 *
+				 * This is the template that is used for displaying all posts by default.
+				 *
+				 * @link    https://codex.wordpress.org/Template_Hierarchy
+				 *
+				 * @package WPEmergeTheme
+				 */
+
+				theBreadcrumb();
+			?>
+			<div class="archive-content">
+				<div class="container">
+					<div class="wrapper-content">
+						<?php
+						if (have_posts()) :
+							while (have_posts()) : the_post();
+								get_template_part("template-parts/loop","post");
+							endwhile;
+							wp_reset_postdata();
+						endif;
+						thePagination();
+						?>
+					</div>
+				</div>
+			</div>
+			');
 		}
 
 		$filename = __DIR__ . '/../../../theme/single' . $postType . '.php';
 		if (!file_exists($filename)) {
-			file_put_contents($filename, '<?php get_header() ?>
-<?php theBreadcrumb() ?>
-<div class="content">
-    <div class="container">
-        <div class="page-content">
-            <div class="gm-content-wrapper">
-                <?php if($currentPage->have_posts()) : ?>
-                    <?php while($currentPage->have_posts()) : $currentPage->the_post(); ?>
-                        <?php the_content(); ?>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-                <?php wp_reset_postdata(); ?>
-                <?php wp_reset_query(); ?>
-            </div>
-        </div>
-    </div>
-</div>
-<?php get_footer() ?>');
+			file_put_contents($filename, '
+			<?php
+				/**
+				 * App Layout: layouts/app.php
+				 *
+				 * This is the template that is used for displaying all posts by default.
+				 *
+				 * @link    https://codex.wordpress.org/Template_Hierarchy
+				 *
+				 * @package WPEmergeTheme
+				 */
+
+				theBreadcrumb();
+			?>
+			<main class="single-content">
+				<div class="container">
+					<div class="wrapper-content">
+						<?php
+						theContent();
+						?>
+					</div>
+				</div>
+			</main>
+			');
 		}
 	}
 
@@ -441,58 +459,4 @@ abstract class AbstractPostType
 		//                                  Field::make('checkbox', 'abcd', __('Tin nóng', 'laca')),
 		//                              ]);
 	}
-
-	// Metabox ban do
-	public function addMetaBoxBanDo()
-	{
-		add_action('add_meta_boxes', function () {
-			add_meta_box('mms_meta_map_box', __('Vị trí trên bản đồ', 'laca'), [$this, 'hienThiMetaBoxBanDo'], $this->post_type, 'normal', 'high');
-		});
-
-		add_action('save_post', function ($postId) {
-			if (array_key_exists('geo_json_code', $_POST)) {
-				updatePostMeta($postId, '_geo_json_code', $_POST['geo_json_code']);
-			}
-		});
-
-		add_action('rest_api_init', function () {
-			register_rest_field($this->post_type, 'geo_json_code', [
-				'schema'       => null,
-				'get_callback' => function ($object) {
-					//get the id of the post object array
-					$post_id = $object['id'];
-
-					//return the post meta
-					return get_post_meta($post_id, '_geo_json_code', true);
-				},
-			]);
-		});
-	}
-
-	public function hienThiMetaBoxBanDo($post)
-	{
-		$apiKey = 'AIzaSyAqe2bYYRe6NFAlEIxW0ty-mrSWbAY3wdc';
-		wp_enqueue_script('mms-map-libraries', 'https://maps.googleapis.com/maps/api/js?key=' . $apiKey . '&libraries=geometry,places,drawing', [], '1.0', true);
-		wp_enqueue_script('mms-map-control', adminAsset('js/mms-meta-box-ban-do.js'), [], '1.0', true);
-		$geoJsonCode = get_post_meta($post->ID, '_geo_json_code', true); ?>
-		<div id="gm_map"></div>
-		<textarea id="geo_json_code" name="geo_json_code" style="height:700px;width:100%;resize:none"><?php echo $geoJsonCode ?></textarea>
-		<script>
-			jQuery(function() {
-				gmInitMap('gm_map', {
-					debug: true,
-					limitOverlays: 1,
-					supportedColors: ['#1e90ff', '#ff1493', '#32cd32', '#ff8c00', '#4b0082'],
-					drawingMode: false,
-					drawingModes: [
-						google.maps.drawing.OverlayType.POLYLINE,
-						google.maps.drawing.OverlayType.POLYGON,
-						google.maps.drawing.OverlayType.RECTANGLE,
-						google.maps.drawing.OverlayType.CIRCLE,
-						google.maps.drawing.OverlayType.MARKER
-					]
-				}, true);
-			});
-		</script>
-		<?php }
 }

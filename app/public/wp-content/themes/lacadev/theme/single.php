@@ -9,6 +9,15 @@
  * @package WPEmergeTheme
  */
 
-Theme::partial('loop', 'single');
 ?>
+
+<div class="single-content">
+	<div class="container">
+		<div class="wrapper-content">
+			<?php
+			theContent();
+			?>
+		</div>
+	</div>
+</div>
 

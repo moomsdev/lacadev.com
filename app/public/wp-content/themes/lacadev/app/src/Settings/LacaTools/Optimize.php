@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Settings\MMSTools;
+namespace App\Settings\LacaTools;
 
 class Optimize
 {

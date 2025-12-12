@@ -201,7 +201,6 @@ function thePagination($query = null) {
     }
 }
 
-
 /**
  * Tạo breadcrumb
  */
@@ -273,4 +272,3 @@ function theLanguageSwitcher($showName = true, $showFlag = false) {
       echo '</ul>';
   }
 }
-

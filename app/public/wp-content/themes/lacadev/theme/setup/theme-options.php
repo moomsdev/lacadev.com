@@ -12,7 +12,7 @@
 use Carbon_Fields\Container\Container;
 use Carbon_Fields\Field\Field;
 
-$optionsPage = Container::make('theme_options', __('MMS Theme', 'laca'))
+$optionsPage = Container::make('theme_options', __('Laca Theme', 'laca'))
 	->set_page_file('app-theme-options.php')
 	->set_page_menu_position(3)
 	->add_tab(__('Branding | Thương hiệu', 'laca'), [

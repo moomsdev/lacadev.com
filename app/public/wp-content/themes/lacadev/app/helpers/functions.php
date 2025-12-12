@@ -422,8 +422,8 @@ function moomsdev_check_spam_form_cf7($html)
     return $html;
 }
 
-add_action('wpcf7_posted_data', 'mms_check_spam_form_cf7_vaild');
-function mms_check_spam_form_cf7_vaild($posted_data)
+add_action('wpcf7_posted_data', 'laca_check_spam_form_cf7_vaild');
+function laca_check_spam_form_cf7_vaild($posted_data)
 {
     $submission = WPCF7_Submission::get_instance();
     if (!empty($posted_data['moomsdev'])) {

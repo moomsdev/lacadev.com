@@ -83,7 +83,7 @@
                                     'theme_location' => 'main-menu',
                                     'menu_class'     => 'main-menu',
                                     'container'      => false,
-                                    'walker'         => new MMS_Menu_Walker(),
+                                    'walker'         => new Laca_Menu_Walker(),
                                 ]);
                             echo '</nav>';
                             ?>

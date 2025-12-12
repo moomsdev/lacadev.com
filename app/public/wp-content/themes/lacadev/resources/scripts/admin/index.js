@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
 (function($) {
     'use strict';
 
-    const MMSDashboard = {
+    const LacaDashboard = {
         init: function() {
             this.bindEvents();
             this.loadDashboardData();
@@ -141,14 +141,14 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         loadDashboardData: function() {
             if (!$('body').hasClass('index-php')) return;
-            if (typeof mmsDashboard === 'undefined') return;
+            if (typeof lacaDashboard === 'undefined') return;
             $.ajax({
-                url: mmsDashboard.ajaxurl,
+                url: lacaDashboard.ajaxurl,
                 type: 'POST',
-                data: { action: 'mms_get_dashboard_data', nonce: mmsDashboard.nonce },
+                data: { action: 'laca_get_dashboard_data', nonce: lacaDashboard.nonce },
                 success: function(response) {
                     if (response && response.success) {
-                        MMSDashboard.updateDashboardData(response.data);
+                        LacaDashboard.updateDashboardData(response.data);
                     }
                 }
             });
@@ -177,24 +177,24 @@ document.addEventListener('DOMContentLoaded', function () {
             const action = $this.data('action');
             if (!action) return;
             e.preventDefault();
-            MMSDashboard.performQuickAction(action);
+            LacaDashboard.performQuickAction(action);
         },
         performQuickAction: function(action) {
-            if (typeof mmsDashboard === 'undefined') return;
+            if (typeof lacaDashboard === 'undefined') return;
             $.ajax({
-                url: mmsDashboard.ajaxurl,
+                url: lacaDashboard.ajaxurl,
                 type: 'POST',
-                data: { action: 'mms_quick_action', quick_action: action, nonce: mmsDashboard.nonce },
-                beforeSend: function() { $('.action-item[data-action="' + action + '"]').addClass('mms-loading'); },
-                complete: function() { $('.action-item[data-action="' + action + '"]').removeClass('mms-loading'); }
+                data: { action: 'laca_quick_action', quick_action: action, nonce: lacaDashboard.nonce },
+                beforeSend: function() { $('.action-item[data-action="' + action + '"]').addClass('laca-loading'); },
+                complete: function() { $('.action-item[data-action="' + action + '"]').removeClass('laca-loading'); }
             });
         },
         refreshStats: function(e) {
             e.preventDefault();
             const $button = $(this);
-            $button.addClass('mms-loading');
-            MMSDashboard.loadDashboardData();
-            setTimeout(function() { $button.removeClass('mms-loading'); }, 1000);
+            $button.addClass('laca-loading');
+            LacaDashboard.loadDashboardData();
+            setTimeout(function() { $button.removeClass('laca-loading'); }, 1000);
         },
         showHealthDetails: function(e) {
             const healthType = $(this).data('health-type');
@@ -206,13 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const $this = $(this);
                 const title = $this.attr('title');
                 if (title && typeof $this.tooltip === 'function') {
-                    $this.tooltip({ position: { my: 'left+15 center', at: 'right center' }, tooltipClass: 'mms-tooltip' });
+                    $this.tooltip({ position: { my: 'left+15 center', at: 'right center' }, tooltipClass: 'laca-tooltip' });
                 }
             });
         }
     };
 
-    $(document).ready(function() { MMSDashboard.init(); });
-    window.MMSDashboard = MMSDashboard;
+    $(document).ready(function() { LacaDashboard.init(); });
+    window.LacaDashboard = LacaDashboard;
 
 })(jQuery);

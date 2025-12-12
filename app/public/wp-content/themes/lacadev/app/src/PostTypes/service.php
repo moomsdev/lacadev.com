@@ -4,7 +4,6 @@ namespace App\PostTypes;
 
 use Carbon_Fields\Container\Container;
 use Carbon_Fields\Field;
-use mms\Abstracts\AbstractPostType;
 
 class service extends \App\Abstracts\AbstractPostType
 {
@@ -20,7 +19,7 @@ class service extends \App\Abstracts\AbstractPostType
             'page-attributes',
         ];
 
-        $this->menuIcon         = 'dashicons-admin-generic'; //https://developer.wordpress.org/resource/dashicons/
+        $this->menuIcon         = 'dashicons-admin-generic';
         // $this->menuIcon = get_template_directory_uri() . '/images/custom-icon.png';
         $this->post_type        = 'service';
         $this->singularName     = $this->pluralName = __('Service', 'laca');
@@ -29,9 +28,6 @@ class service extends \App\Abstracts\AbstractPostType
         parent::__construct();
     }
 
-    /**
-     * Document: https://docs.carbonfields.net/#/containers/post-meta
-     */
     public function metaFields()
     {
         // Container::make('post_meta', __('Information | Thông tin', 'laca'))

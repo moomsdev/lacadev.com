@@ -1,18 +1,24 @@
-<?php get_header() ?>
-<?php theBreadcrumb() ?>
-<div class="content">
-    <div class="container">
-        <div class="page-content">
-            <div class="gm-content-wrapper">
-                <?php if($currentPage->have_posts()) : ?>
-                    <?php while($currentPage->have_posts()) : $currentPage->the_post(); ?>
-                        <?php the_content(); ?>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-                <?php wp_reset_postdata(); ?>
-                <?php wp_reset_query(); ?>
-            </div>
-        </div>
-    </div>
-</div>
-<?php get_footer() ?>
+
+			<?php
+				/**
+				 * App Layout: layouts/app.php
+				 *
+				 * This is the template that is used for displaying all posts by default.
+				 *
+				 * @link    https://codex.wordpress.org/Template_Hierarchy
+				 *
+				 * @package WPEmergeTheme
+				 */
+
+				theBreadcrumb();
+			?>
+			<main class="single-content">
+				<div class="container">
+					<div class="wrapper-content">
+						<?php
+						theContent();
+						?>
+					</div>
+				</div>
+			</main>
+			

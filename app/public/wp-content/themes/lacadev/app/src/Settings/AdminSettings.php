@@ -480,8 +480,8 @@ class AdminSettings
 	public function createAdminOptions()
 	{
 		add_action('carbon_fields_register_fields', static function () {
-			$options = Container::make('theme_options', __('MMS Admin', 'laca'))
-				->set_page_file(__('mms-admin', 'laca'))
+			$options = Container::make('theme_options', __('Laca Admin', 'laca'))
+				->set_page_file(__('laca-admin', 'laca'))
 				->set_page_menu_position(3)
 				->add_tab(__('ADMIN', 'laca'), [
 					Field::make('checkbox', 'is_maintenance', __('Bật chế độ bảo trì', 'laca')) 
@@ -541,7 +541,7 @@ class AdminSettings
 
 			Container::make('theme_options', __('Tools', 'laca'))
 			->set_page_parent($options)
-			->set_page_file(__('mms-tools', 'laca'))
+			->set_page_file(__('laca-tools', 'laca'))
 			->add_tab(__('Optimization', 'laca'), [
 				// Disable unnecessary items
 				Field::make( 'separator', 'title_disable_unnecessary_items', __( 'Disable unnecessary items' ) ),
@@ -701,7 +701,7 @@ class AdminSettings
 			
 			Container::make('theme_options', __('Login Socials', 'laca'))
 			->set_page_parent($options)
-			->set_page_file(__('mms-login-socials', 'laca'))
+			->set_page_file(__('laca-login-socials', 'laca'))
 			->add_tab(__('Google', 'laca'), [
 				Field::make('checkbox', 'enable_login_google', __('Bật Login Google', 'laca')),
 				Field::make('text', 'google_client_id', __('Client ID', 'laca'))

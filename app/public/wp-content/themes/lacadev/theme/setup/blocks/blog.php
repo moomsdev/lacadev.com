@@ -44,7 +44,7 @@ Block::make(__('Block blog', 'laca'))
             ->set_types([
                 [
                     'type'      => 'post',
-                    'post_type' => 'blog',
+                    'post_type' => 'post',
                 ]
             ])
             ->set_conditional_logic([

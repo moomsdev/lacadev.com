@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
  *
  * @since 0.1
  */
-class MMS_Menu_Walker extends Walker_Nav_Menu
+class Laca_Menu_Walker extends Walker_Nav_Menu
 {
     /**
      * Starts the list before the elements are added.
