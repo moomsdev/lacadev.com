@@ -102,10 +102,14 @@ module.exports = {
         minimizer: [
             new TerserPlugin({
                 parallel: true,
+                extractComments: false,
                 terserOptions: {
                     compress: {
-                        drop_console: true
-                    }
+                        drop_console: true,
+                    },
+                    format: {
+                        comments: false,
+                    },
                 }
             })
         ],

@@ -154,7 +154,7 @@ function app_action_login_enqueue_assets()
     Assets::enqueueScript(
         'theme-login-js-bundle',
         $template_dir . '/dist/login.js',
-        ['jquery'],
+        [],
         true
     );
 
@@ -182,7 +182,7 @@ function app_action_editor_enqueue_assets()
     Assets::enqueueScript(
         'theme-editor-js-bundle',
         $template_dir . '/dist/editor.js',
-        ['jquery'],
+        [],
         true
     );
 
@@ -263,6 +263,12 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
     $critical_styles = [
         'theme-css-bundle'
     ];
+
+    // If critical CSS file exists (inlined in header), load main bundle asynchronously
+    if (file_exists(get_template_directory() . '/dist/styles/critical.css')) {
+        $non_critical_styles[] = 'theme-css-bundle';
+        $critical_styles = array_diff($critical_styles, ['theme-css-bundle']);
+    }
 
     if (in_array($handle, $non_critical_styles)) {
         // Load non-critical CSS asynchronously

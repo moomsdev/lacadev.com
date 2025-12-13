@@ -9,14 +9,11 @@ if (!defined('ABSPATH')) {
 // =============================================================================
 // SECURITY & PERMISSIONS
 // =============================================================================
-
-define('ALLOW_UNFILTERED_UPLOADS', true);
 define('SUPER_USER', ['lacadev']);
 
 // =============================================================================
 // THEME INFORMATION
 // =============================================================================
-
 define('AUTHOR', [
     'name' => 'La Cà Dev',
     'email' => 'mooms.dev@gmail.com',
@@ -142,79 +139,6 @@ foreach ($folders as $folder) {
     }
 }
 
-// =============================================================================
-// AJAX SEARCH (Optimized with Security & Caching)
-// =============================================================================
-
-/**
- * Improved AJAX search with security and caching
- */
-function ajax_search()
-{
-    // Security check: verify nonce
-    check_ajax_referer('theme_search_nonce', 'nonce');
-    
-    // Sanitize search query
-    $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-    
-    if (empty($search_query) || strlen($search_query) < 2) {
-        wp_send_json_error(['message' => __('Vui lòng nhập ít nhất 2 ký tự', 'laca')]);
-    }
-    
-    // Create cache key - include user ID for personalized results if needed
-    $cache_key = 'ajax_search_' . md5($search_query . get_current_user_id());
-    
-    // Try to get cached results
-    $cached_results = get_transient($cache_key);
-    if ($cached_results !== false) {
-        echo $cached_results;
-        wp_die();
-    }
-    
-    // Start output buffering to capture results for caching
-    ob_start();
-    
-    // Query arguments
-    $args = array(
-        'post_type' => ['post', 'service', 'blog'],
-        'posts_per_page' => 10,
-        's' => $search_query,
-        'post_status' => 'publish', // Only published posts
-        'no_found_rows' => true, // Performance optimization
-        'update_post_meta_cache' => false, // Performance optimization
-        'update_post_term_cache' => false, // Performance optimization
-    );
-    
-    $query = new WP_Query($args);
-    
-    if ($query->have_posts()) {
-        while ($query->have_posts()) {
-            $query->the_post();
-            // Output HTML with proper escaping
-            echo '<div class="search-result-item">';
-            echo '<a href="' . esc_url(get_permalink()) . '">';
-            echo '<h4>' . esc_html(get_the_title()) . '</h4>';
-            echo '</a>';
-            echo '</div>';
-        }
-    } else {
-        echo '<div class="no-results">' . esc_html__('Không có kết quả', 'laca') . '</div>';
-    }
-    
-    wp_reset_postdata();
-    
-    // Get buffered output
-    $output = ob_get_clean();
-    
-    // Cache results for 60 seconds
-    set_transient($cache_key, $output, 60);
-    
-    echo $output;
-    wp_die();
-}
-
-add_action('wp_ajax_nopriv_ajax_search', 'ajax_search');
-add_action('wp_ajax_ajax_search', 'ajax_search');
 /**
  * Localize AJAX search data (script bundled in theme.js)
  */

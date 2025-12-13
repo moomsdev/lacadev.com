@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Theme header partial.
@@ -8,6 +11,7 @@
  * @package WPEmergeTheme
  */
 ?>
+
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> data-theme="light">
 
@@ -34,15 +38,28 @@
 	<link rel="manifest" href="<?php theAsset('favicon/manifest.json'); ?>">
 	<meta name="msapplication-TileColor" content="#ffffff">
 	<meta name="msapplication-TileImage" content="<?php theAsset('favicon/ms-icon-144x144.png'); ?>">
-	<meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <?php
+    $critical_css_path = get_template_directory() . '/dist/styles/critical.css';
+    if (file_exists($critical_css_path)) {
+        echo '<style id="critical-css">' . file_get_contents($critical_css_path) . '</style>';
+    }
+    ?>
 </head>
 
 <body <?php body_class(); ?>>
-	<?php
-	app_shim_wp_body_open();
+    <?php
+    app_shim_wp_body_open();
+    ?>
 
-	if (is_home() || is_front_page()) :
-		echo '<h1 class="site-name hidden">' . get_bloginfo('name') . '</h1>';
+	<!-- Skip to content link for accessibility -->
+	<a class="skip-link screen-reader-text" href="#main-content">
+		<?php esc_html_e('Skip to content', 'laca'); ?>
+	</a>
+
+	<?php
+	if (is_home() || is_front_page()):
+		echo '<h1 class="site-name screen-reader-text">' . esc_html(get_bloginfo('name')) . '</h1>';
 	endif;
 	?>
 
@@ -91,10 +108,14 @@
 
                         <div class="language-search">
                             <!-- search -->
-                            <div class="search-icon">
-                                <button class="search-icon__btn">
-                                    <span class="iconify" data-icon="lucide:search-code"></span>
-                                </button>
+                            <div class="header__bottom-search">
+                                <div class="header__bottom-search-inner">
+                                    <form class="search-box">
+                                        <input type="text" placeholder="<?php echo esc_attr__('Tìm kiếm ...', 'laca'); ?>"/>
+                                        <button type="reset"></button>
+                                        <div class="search-results"></div>
+                                    </form>
+                                </div>
                             </div>
                             <!-- multi language -->
                             <?php theLanguageSwitcher(); ?>

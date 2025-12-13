@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * AJAX Search Handler
@@ -7,6 +10,9 @@ add_action('wp_ajax_nopriv_ajax_search', 'mms_ajax_search');
 add_action('wp_ajax_ajax_search', 'mms_ajax_search');
 
 function mms_ajax_search() {
+    // Security check
+    check_ajax_referer('theme_search_nonce', 'nonce');
+
     // Get search query
     $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
     
@@ -58,6 +64,7 @@ function mms_ajax_search() {
             'posts_per_page' => 5,
             's' => $search_query,
             'post_status' => 'publish',
+            'no_found_rows' => true, // Optimization
         ]);
         
         if ($products->have_posts()) {

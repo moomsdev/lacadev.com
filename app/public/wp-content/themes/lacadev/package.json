@@ -14,7 +14,9 @@
     "lint-fix": "run-s -cl lint-fix:wpcs lint-fix:scripts lint-fix:styles",
     "i18n": "run-s -cl i18n:textdomain i18n:pot",
     "release": "run-s -cl build release:zip",
-    "release:zip": "node resources/build/release/release.js"
+    "release": "run-s -cl build release:zip",
+    "release:zip": "node resources/build/release/release.js",
+    "critical": "critical http://localhost:8000 --base dist --width 1300 --height 900 --target styles/critical.css --extract"
   },
   "browserslist": [
     "last 3 versions"
@@ -70,6 +72,8 @@
     "stylelint-config-recommended-scss": "^3.2.0",
     "stylelint-order": "^0.8.1",
     "stylelint-scss": "^3.1.0",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "stylelint-scss": "^3.1.0",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "critical": "^7.0.3"
   }
 }

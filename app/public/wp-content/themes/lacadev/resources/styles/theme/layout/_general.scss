@@ -249,10 +249,12 @@ p:empty {
 }
 
 .container {
-  margin: 0 auto;
-  @include minWidth($xl) {
-    max-width: $container-mw !important;
-  }
+  width: 100%;
+  max-width: $container-mw;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .container-fluid {
