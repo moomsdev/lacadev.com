@@ -279,6 +279,37 @@ function updatePostThumbnailId() {
 }
 
 // -----------------------------------------------------------------------------
+// AJAX: Remove Post Thumbnail
+// -----------------------------------------------------------------------------
+/**
+ * Xóa thumbnail (ảnh đại diện) cho post qua Ajax.
+ *
+ * @action wp_ajax_nopriv_remove_post_thumbnail
+ * @action wp_ajax_remove_post_thumbnail
+ */
+add_action('wp_ajax_nopriv_remove_post_thumbnail', 'removePostThumbnail');
+add_action('wp_ajax_remove_post_thumbnail', 'removePostThumbnail');
+
+function removePostThumbnail() {
+    // Kiểm tra nonce để bảo vệ CSRF
+    check_ajax_referer('update_post_thumbnail', 'nonce');
+    
+    // Kiểm tra tham số post_id
+    if (empty($_POST['post_id'])) {
+        wp_send_json_error(['message' => 'Missing post ID.']);
+    }
+
+    $postId = absint($_POST['post_id']);
+
+    // Xóa thumbnail bằng hàm delete_post_thumbnail
+    if (delete_post_thumbnail($postId)) {
+        wp_send_json_success(['message' => 'Thumbnail removed.']);
+    } else {
+        wp_send_json_error(['message' => 'Failed to remove thumbnail.']);
+    }
+}
+
+// -----------------------------------------------------------------------------
 // AJAX: Gửi form liên hệ (Contact Form)
 // -----------------------------------------------------------------------------
 /**

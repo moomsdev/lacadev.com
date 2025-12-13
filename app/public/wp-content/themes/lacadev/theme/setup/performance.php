@@ -93,8 +93,6 @@ class ThemePerformance
         }
     }
 
-
-
     /**
      * Optimize database queries
      */

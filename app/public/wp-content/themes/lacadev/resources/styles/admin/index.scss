@@ -11,9 +11,37 @@ html :where(.wp-block) {
 }
 
 .featured_image.column-featured_image {
-    a {
-        display: block;
+    a:not(.remove-thumbnail) {
+        display: block !important;
+        background-color: #fff;
     }
+
+    a.remove-thumbnail {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        width: 13px;
+        height: 13px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #F15D4F;
+        color: #fff;
+        border-radius: 50%;
+        border: 1px solid #F15D4F;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: #fff;
+            color: #F15D4F;
+        }
+
+        svg {
+            width: 50%;
+            height: 50%;
+        }
+    }
+
     img {
         width: 100%;
         aspect-ratio: 16 / 10;

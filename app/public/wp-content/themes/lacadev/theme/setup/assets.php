@@ -104,9 +104,36 @@ function app_action_admin_enqueue_assets()
     Assets::enqueueScript(
         'theme-admin-js-bundle',
         $template_dir . '/dist/admin.js',
-        ['jquery'],
+        [], // No jQuery dependency - pure vanilla JS
         true
     );
+
+    /**
+     * Localize admin script data with nonce for AJAX requests and i18n strings
+     */
+    wp_localize_script('theme-admin-js-bundle', 'ajaxurl_params', [
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('update_post_thumbnail'),  // Must match backend check_ajax_referer
+    ]);
+
+    /**
+     * Localize i18n strings for admin JavaScript
+     */
+    wp_localize_script('theme-admin-js-bundle', 'adminI18n', [
+        // Thumbnail removal
+        'removeThumbnailTitle' => __('Remove Thumbnail?', 'lacadev'),
+        'removeThumbnailText' => __('Are you sure you want to remove this featured image?', 'lacadev'),
+        'removeThumbnailConfirm' => __('Yes, remove it', 'lacadev'),
+        'removeThumbnailCancel' => __('Cancel', 'lacadev'),
+        'removedTitle' => __('Removed!', 'lacadev'),
+        'removedText' => __('Featured image has been removed.', 'lacadev'),
+        'errorTitle' => __('Error!', 'lacadev'),
+        'failedRemove' => __('Failed to remove thumbnail.', 'lacadev'),
+        
+        // UI labels
+        'chooseImage' => __('Choose image', 'lacadev'),
+        'setFeaturedImage' => __('Set featured image', 'lacadev'),
+    ]);
 
     // Enqueue front-end styles in admin area
     //  Assets::enqueueStyle('theme-css-bundle', $template_dir . '/dist/styles/theme.css');

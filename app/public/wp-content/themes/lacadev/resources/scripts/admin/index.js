@@ -3,8 +3,8 @@ import "./custom_thumbnail_support.js";
 import Swal from "sweetalert2";
 window.Swal = Swal;
 
-// ===== Migrate logic from resources/admin/js/admin.js =====
-let scripts = {
+// ===== Vanilla JS - No jQuery dependency =====
+const scripts = {
   frame: null,
   init: function () {
     this.frame = wp.media({
@@ -16,23 +16,30 @@ let scripts = {
     });
   },
   disableTheGrid: function () {
-    jQuery("form#posts-filter").append(`
-            <div class="gm-loader" style="position:absolute;z-index:99999999;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background-color:rgba(192,192,192,0.51);color:#000000">
-                Updating
-            </div>
-        `);
+    const form = document.querySelector("form#posts-filter");
+    if (!form) return;
+    
+    form.insertAdjacentHTML('beforeend', `
+      <div class="gm-loader" style="position:absolute;z-index:99999999;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background-color:rgba(192,192,192,0.51);color:#000000">
+        Updating
+      </div>
+    `);
   },
   enableTheGrid: function () {
-    jQuery("form#posts-filter").find(".gm-loader").remove();
+    const loader = document.querySelector("form#posts-filter .gm-loader");
+    if (loader) loader.remove();
   },
 };
 
 // Xử lý khi nhấn vào nút thay đổi ảnh đại diện bài viết
-jQuery(document).on("click", "[data-trigger-change-thumbnail-id]", function () {
-  let postId = jQuery(this).data("post-id");
-  let thisButton = jQuery(this);
+document.addEventListener("click", function (e) {
+  const trigger = e.target.closest("[data-trigger-change-thumbnail-id]");
+  if (!trigger) return;
 
-  let frame = wp.media({
+  const postId = trigger.dataset.postId;
+  const thisButton = trigger;
+
+  const frame = wp.media({
     title: "Select image",
     button: {
       text: "Use this image",
@@ -41,40 +48,49 @@ jQuery(document).on("click", "[data-trigger-change-thumbnail-id]", function () {
   });
 
   frame.on("select", function () {
-    let attachment = frame.state().get("selection").first().toJSON();
-    let attachmentId = attachment.id;
-    let originalImageUrl = attachment.url || null;
+    const attachment = frame.state().get("selection").first().toJSON();
+    const attachmentId = attachment.id;
+    const originalImageUrl = attachment.url || null;
 
     scripts.disableTheGrid();
 
-    jQuery
-      .post(
-        "/wp-admin/admin-ajax.php",
-        {
-          action: "update_post_thumbnail_id",
-          post_id: postId,
-          attachment_id: attachmentId,
-        },
-        function (response) {
-          if (response.success === true) {
-            let imgElement = thisButton.find("img");
+    // Get WordPress nonce if available
+    const nonce = typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '';
 
-            if (imgElement.length) {
-              // Nếu có ảnh, cập nhật src
-              imgElement.attr("src", originalImageUrl);
-            } else {
-              // Nếu không có ảnh, thay thế text bằng ảnh mới
-              thisButton
-                .find(".no-image-text")
-                .replaceWith(`<img src="${originalImageUrl}" alt="Thumbnail">`);
-            }
-          } else {
-            alert(response.data.message);
+    fetch("/wp-admin/admin-ajax.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "update_post_thumbnail_id",
+        post_id: postId,
+        attachment_id: attachmentId,
+        nonce: nonce,  // Add WordPress nonce for security
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success === true) {
+          // Find the parent TD cell to replace entire content
+          const tdCell = thisButton.closest('td');
+          
+          if (tdCell) {
+            // Replace entire cell content with thumbnail + remove button (same as PHP output)
+            tdCell.innerHTML = `
+              <div style='position:relative;display:inline-block;'>
+                <a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${postId}' style='display:block;border:1px solid #ddd;padding:2px;background:#fff;'>
+                  <img src='${originalImageUrl}' style='max-width:80px;max-height:80px;display:block;' alt='Thumbnail'/>
+                </a>
+                <a href='javascript:void(0)' data-trigger-remove-thumbnail data-post-id='${postId}' style='position:absolute;top:-8px;right:-8px;width:20px;height:20px;background:#dc3232;color:#fff;border-radius:50%;text-align:center;line-height:20px;text-decoration:none;font-size:12px;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,0.2);' title='Remove thumbnail'>×</a>
+              </div>
+            `;
           }
-          scripts.enableTheGrid();
+        } else {
+          alert(data.data?.message || "Failed to update image.");
         }
-      )
-      .fail(function () {
+        scripts.enableTheGrid();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
         alert("Failed to update image.");
         scripts.enableTheGrid();
       });
@@ -83,13 +99,86 @@ jQuery(document).on("click", "[data-trigger-change-thumbnail-id]", function () {
   frame.open();
 });
 
+// Xử lý khi nhấn nút X để xóa thumbnail
+document.addEventListener("click", function (e) {
+  const removeBtn = e.target.closest("[data-trigger-remove-thumbnail]");
+  if (!removeBtn) return;
+
+  const postId = removeBtn.dataset.postId;
+  
+  // Use SweetAlert2 for confirmation
+  Swal.fire({
+    title: adminI18n.removeThumbnailTitle,
+    text: adminI18n.removeThumbnailText,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: adminI18n.removeThumbnailConfirm,
+    cancelButtonText: adminI18n.removeThumbnailCancel
+  }).then((result) => {
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    const nonce = typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '';
+
+    fetch("/wp-admin/admin-ajax.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "remove_post_thumbnail",
+        post_id: postId,
+        nonce: nonce,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success === true) {
+          // Replace thumbnail with "Choose image" button
+          const container = removeBtn.closest('td');
+          if (container) {
+            container.innerHTML = `<a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${postId}'><div class='no-image-text'>${adminI18n.chooseImage}</div></a>`;
+          }
+          
+          // Show success message
+          Swal.fire({
+            title: adminI18n.removedTitle,
+            text: adminI18n.removedText,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            title: adminI18n.errorTitle,
+            text: data.data?.message || adminI18n.failedRemove,
+            icon: 'error'
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        Swal.fire({
+          title: adminI18n.errorTitle,
+          text: adminI18n.failedRemove,
+          icon: 'error'
+        });
+      });
+  });
+});
+
 // Khi trang tải, kiểm tra ảnh đại diện
-jQuery(document).ready(function () {
-  const postId = jQuery("input#post_ID").val();
-  if (postId) {
-    jQuery.post("/wp-admin/admin-ajax.php", {
-      action: "mm_get_attachment_url_thumbnail",
-      attachmentID: postId,
+document.addEventListener("DOMContentLoaded", function () {
+  const postIdInput = document.querySelector("input#post_ID");
+  if (postIdInput && postIdInput.value) {
+    fetch("/wp-admin/admin-ajax.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "mm_get_attachment_url_thumbnail",
+        attachmentID: postIdInput.value,
+      }),
     });
   }
 });
@@ -124,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// ===== Migrate logic from resources/scripts/admin/dashboard.js =====
-(function($) {
+// ===== LacaDashboard - Vanilla JS conversion =====
+(function() {
     'use strict';
 
     const LacaDashboard = {
@@ -134,85 +223,143 @@ document.addEventListener('DOMContentLoaded', function () {
             this.loadDashboardData();
             this.initTooltips();
         },
+        
         bindEvents: function() {
-            $(document).on('click', '.action-item', this.handleQuickAction);
-            $(document).on('click', '.refresh-stats', this.refreshStats);
-            $(document).on('click', '.health-item', this.showHealthDetails);
-        },
-        loadDashboardData: function() {
-            if (!$('body').hasClass('index-php')) return;
-            if (typeof lacaDashboard === 'undefined') return;
-            $.ajax({
-                url: lacaDashboard.ajaxurl,
-                type: 'POST',
-                data: { action: 'laca_get_dashboard_data', nonce: lacaDashboard.nonce },
-                success: function(response) {
-                    if (response && response.success) {
-                        LacaDashboard.updateDashboardData(response.data);
-                    }
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('.action-item') || e.target.closest('.action-item')) {
+                    this.handleQuickAction(e);
+                }
+                if (e.target.matches('.refresh-stats') || e.target.closest('.refresh-stats')) {
+                    this.refreshStats(e);
+                }
+                if (e.target.matches('.health-item') || e.target.closest('.health-item')) {
+                    this.showHealthDetails(e);
                 }
             });
         },
+        
+        loadDashboardData: function() {
+            if (!document.body.classList.contains('index-php')) return;
+            if (typeof lacaDashboard === 'undefined') return;
+            
+            fetch(lacaDashboard.ajaxurl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'laca_get_dashboard_data',
+                    nonce: lacaDashboard.nonce
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.success) {
+                    LacaDashboard.updateDashboardData(data.data);
+                }
+            })
+            .catch(error => console.error('Dashboard load error:', error));
+        },
+        
         updateDashboardData: function(data) {
             if (data.stats) this.updateStats(data.stats);
             if (data.activity) this.updateActivity(data.activity);
             if (data.health) this.updateHealth(data.health);
         },
+        
         updateStats: function(stats) {
-            Object.keys(stats).forEach(function(key) {
-                const $statNumber = $('.stat-item').eq(Object.keys(stats).indexOf(key)).find('.stat-number');
-                if ($statNumber.length) {
-                    $statNumber.text(stats[key]);
+            const statItems = document.querySelectorAll('.stat-item');
+            Object.keys(stats).forEach((key, index) => {
+                const statNumber = statItems[index]?.querySelector('.stat-number');
+                if (statNumber) {
+                    statNumber.textContent = stats[key];
                 }
             });
         },
+        
         updateActivity: function(activity) {
             // no-op for now
         },
+        
         updateHealth: function(health) {
             // no-op for now
         },
+        
         handleQuickAction: function(e) {
-            const $this = $(this);
-            const action = $this.data('action');
+            const actionItem = e.target.closest('.action-item');
+            if (!actionItem) return;
+            
+            const action = actionItem.dataset.action;
             if (!action) return;
+            
             e.preventDefault();
-            LacaDashboard.performQuickAction(action);
+            this.performQuickAction(action);
         },
+        
         performQuickAction: function(action) {
             if (typeof lacaDashboard === 'undefined') return;
-            $.ajax({
-                url: lacaDashboard.ajaxurl,
-                type: 'POST',
-                data: { action: 'laca_quick_action', quick_action: action, nonce: lacaDashboard.nonce },
-                beforeSend: function() { $('.action-item[data-action="' + action + '"]').addClass('laca-loading'); },
-                complete: function() { $('.action-item[data-action="' + action + '"]').removeClass('laca-loading'); }
+            
+            const actionButton = document.querySelector(`.action-item[data-action="${action}"]`);
+            
+            fetch(lacaDashboard.ajaxurl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'laca_quick_action',
+                    quick_action: action,
+                    nonce: lacaDashboard.nonce
+                })
+            })
+            .then(() => {
+                if (actionButton) actionButton.classList.remove('laca-loading');
+            })
+            .catch(error => {
+                console.error('Quick action error:', error);
+                if (actionButton) actionButton.classList.remove('laca-loading');
             });
+            
+            if (actionButton) actionButton.classList.add('laca-loading');
         },
+        
         refreshStats: function(e) {
             e.preventDefault();
-            const $button = $(this);
-            $button.addClass('laca-loading');
-            LacaDashboard.loadDashboardData();
-            setTimeout(function() { $button.removeClass('laca-loading'); }, 1000);
+            const button = e.target.closest('.refresh-stats');
+            if (!button) return;
+            
+            button.classList.add('laca-loading');
+            this.loadDashboardData();
+            setTimeout(() => button.classList.remove('laca-loading'), 1000);
         },
+        
         showHealthDetails: function(e) {
-            const healthType = $(this).data('health-type');
+            const healthItem = e.target.closest('.health-item');
+            if (!healthItem) return;
+            
+            const healthType = healthItem.dataset.healthType;
             if (!healthType) return;
+            
             e.preventDefault();
+            // Implement health details modal here if needed
         },
+        
         initTooltips: function() {
-            $('.stat-item, .action-item, .health-item').each(function() {
-                const $this = $(this);
-                const title = $this.attr('title');
-                if (title && typeof $this.tooltip === 'function') {
-                    $this.tooltip({ position: { my: 'left+15 center', at: 'right center' }, tooltipClass: 'laca-tooltip' });
+            // Tooltips would need a vanilla JS tooltip library or native implementation
+            // For now, we can use title attribute which browsers show natively
+            const tooltipItems = document.querySelectorAll('.stat-item, .action-item, .health-item');
+            tooltipItems.forEach(item => {
+                if (item.getAttribute('title')) {
+                    // Native browser tooltip will work with title attribute
+                    // If custom tooltip needed, implement here
                 }
             });
         }
     };
 
-    $(document).ready(function() { LacaDashboard.init(); });
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => LacaDashboard.init());
+    } else {
+        LacaDashboard.init();
+    }
+    
     window.LacaDashboard = LacaDashboard;
 
-})(jQuery);
+})();

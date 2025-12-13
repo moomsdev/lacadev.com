@@ -80,6 +80,18 @@ const plugins = [
                 from: utils.srcScriptsPath('sw.js'),
                 to: utils.distPath('sw.js'),
             },
+            {
+                from: utils.srcScriptsPath('lib/instantpage.js'),
+                to: utils.distPath('instantpage.js'),
+            },
+            {
+                from: utils.srcScriptsPath('lib/smooth-scroll.min.js'),
+                to: utils.distPath('smooth-scroll.min.js'),
+            },
+            {
+                from: utils.srcScriptsPath('lib/lazysizes.min.js'),
+                to: utils.distPath('lazysizes.min.js'),
+            },
         ],
     }),
 ];

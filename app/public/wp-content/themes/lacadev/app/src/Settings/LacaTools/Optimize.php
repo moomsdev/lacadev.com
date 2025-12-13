@@ -31,18 +31,17 @@ class Optimize
 			$this->disableEmoji();
 		}
 
-		// BUNDLED INTO THEME.JS - These libraries are now included in the main bundle
-		// if (get_option('_enable_instant_page') === 'yes') {
-		// 	$this->enableInstantPage();
-		// }
+		if (get_option('_enable_instant_page') === 'yes') {
+			$this->enableInstantPage();
+		}
 
-		// if (get_option('_enable_smooth_scroll') === 'yes') {
-		// 	$this->enableSmoothScroll();
-		// }
+		if (get_option('_enable_smooth_scroll') === 'yes') {
+			$this->enableSmoothScroll();
+		}
 
-		// if (get_option('_enable_lazy_loading_images') === 'yes') {
-		// 	$this->enableLazyLoadingImages();
-		// }
+		if (get_option('_enable_lazy_loading_images') === 'yes') {
+			$this->enableLazyLoadingImages();
+		}
 
 		if (get_option('_enable_optimize_images') === 'yes') {
 			add_filter('wp_get_attachment_image_attributes', [$this, 'optimizeImages'], 10, 3);
@@ -102,40 +101,34 @@ class Optimize
 		});
 	}
 
-	// BUNDLED INTO THEME.JS - No longer needed as separate file
-	// public function enableInstantPage()
-	// {
-	// 	add_action('wp_enqueue_scripts', function () {
-	// 		wp_enqueue_script('instantpage', get_template_directory_uri() . '/resources/scripts/admin/lib/instantpage.js', array(), '5.7.0', true);
-	// 	});
-	// }
+	public function enableInstantPage()
+	{
+		add_action('wp_enqueue_scripts', function () {
+			wp_enqueue_script('instantpage', get_template_directory_uri() . '/dist/instantpage.js', array(), '5.7.0', true);
+		});
+	}
 
-	// BUNDLED INTO THEME.JS - No longer needed as separate file
-	// public function enableSmoothScroll()
-	// {
-	// 	add_action('wp_enqueue_scripts', function () {
-	// 		wp_enqueue_script('smooth-scroll', get_template_directory_uri() . '/resources/scripts/admin/lib/smooth-scroll.min.js', array(), '1.4.16', true);
-	// 	});
-	// }
+	public function enableSmoothScroll()
+	{
+		add_action('wp_enqueue_scripts', function () {
+			wp_enqueue_script('smooth-scroll', get_template_directory_uri() . '/dist/smooth-scroll.min.js', array(), '1.4.16', true);
+		});
+	}
 
-	// BUNDLED INTO THEME.JS - No longer needed as separate file
-	// LazyLoad functionality now handled by bundled lazysizes library
-	// public function enableLazyLoadingImages()
-	// {
-	// 	if (!is_admin()) {
-	// 		wp_add_inline_script('jquery', '
-	// 			jQuery(document).ready(function($) {
-	// 				$("img").addClass("lazyload").each(function() {
-	// 					var dataSrc = $(this).attr("src");
-	// 					$(this).attr("data-src", dataSrc).removeAttr("src");
-	// 				});
-	// 			});
-	// 		');
-	// 		wp_enqueue_script( 'lazyload', get_template_directory_uri() . '/resources/scripts/admin/lib/lazysizes.min.js', array('jquery'), '5.3.2', true);
-	// 	}
-	// }
-
-
+	public function enableLazyLoadingImages()
+	{
+		if (!is_admin()) {
+			wp_add_inline_script('jquery', '
+				jQuery(document).ready(function($) {
+					$("img").addClass("lazyload").each(function() {
+						var dataSrc = $(this).attr("src");
+						$(this).attr("data-src", dataSrc).removeAttr("src");
+					});
+				});
+			');
+			wp_enqueue_script('lazyload', get_template_directory_uri() . '/dist/lazysizes.min.js', array('jquery'), '5.3.2', true);
+		}
+	}
 
     /**
      * Tối ưu hóa thuộc tính ảnh (lazy loading, alt, dimension)

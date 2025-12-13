@@ -440,8 +440,27 @@ abstract class AbstractPostType
 	{
 		switch ($column) {
 			case 'featured_image':
-				$thumbnailUrl = get_the_post_thumbnail_url($postId);
-				echo "<a href='javascript:' data-trigger-change-thumbnail-id data-post-id='{$postId}'><img src='{$thumbnailUrl}'/></a>";
+				$thumbnailUrl = get_the_post_thumbnail_url($postId, 'thumbnail');
+				
+				if ($thumbnailUrl) {
+					// Has thumbnail - show image with remove button
+					echo "<div style='position:relative;display:inline-block;'>";
+					echo "<a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='{$postId}'>";
+					echo "<img src='" . esc_url($thumbnailUrl) . "' style='max-width:80px;max-height:80px;display:block;' alt='Thumbnail'/>";
+					echo "</a>";
+					// Remove button (X)
+					echo "<a class='remove-thumbnail' href='javascript:void(0)' data-trigger-remove-thumbnail data-post-id='{$postId}' title='Remove thumbnail'>
+							<svg viewBox='0 0 12 12'>
+								<path d='M11 1L1 11M1 1l10 10' stroke='currentColor' stroke-width='2' stroke-linecap='round'/>
+							</svg>
+						</a>";
+					echo "</div>";
+					} else {
+					// No thumbnail - show WordPress-style "Set featured image" link
+					echo "<a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='{$postId}'";
+					echo "<div class='no-image-text'>Choose image</div>";
+					echo "</a>";
+				}
 				break;
 		}
 	}
