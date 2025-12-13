@@ -39,7 +39,6 @@ class AdminSettings
 		$this->customizeAdminBar();
 		$this->resizeOriginalImageAfterUpload();
 		$this->renameUploadFileName();
-		$this->addCustomResources();
 		$this->addCustomExtensionsInMediaUpload();
 
 		if (get_option('_disable_admin_confirm_email') === 'yes') {
@@ -287,12 +286,7 @@ class AdminSettings
 		});
 	}
 
-	public function addCustomResources()
-	{
-		add_action('admin_enqueue_scripts', static function ($hook) {
-			wp_enqueue_script('jquery_repeater', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js');
-		});
-	}
+	// Removed: addCustomResources() - jQuery Repeater was never used
 
 	public function disableChangeAdminEmailRequireConfirm()
 	{
