@@ -152,35 +152,4 @@ class ThemeSettings {
             echo carbon_get_theme_option('footer_scripts');
         }, PHP_INT_MAX);
     }
-
-    /**
-     * Load custom path javascript file
-     *
-     * @param $files
-     */
-    public function LoadCustomJavascriptFile($files) {
-        $count = 1;
-        wp_enqueue_script('mooms-google-map', 'https://maps.googleapis.com/maps/api/js?key=' . apply_filters('carbon_fields_map_field_api_key', true) . '&libraries=geometry,places,drawing', [], '0.1.0', true);
-
-        foreach ($files as $file) {
-            $scriptHandle = 'gaumap-css-' . $count;
-            wp_enqueue_script($scriptHandle, $file, [], '0.1.0', true);
-            $count++;
-        }
-    }
-
-    /**
-     * Load custom path css file
-     *
-     * @param $files
-     */
-    public function loadCustomStyleSheetFiles($files) {
-        $count = 1;
-        foreach ($files as $file) {
-            wp_enqueue_style('gaumap-css-' . $count, $file, [], '0.1.0');
-            $count++;
-        }
-
-        wp_enqueue_style($count, get_stylesheet_directory_uri() . '/style.css', [], '0.1.0');
-    }
 }

@@ -402,14 +402,6 @@ function contactform_dequeue_scripts()
 }
 add_action('wp_enqueue_scripts', 'contactform_dequeue_scripts', 99);
 
-add_action('wp_default_scripts', function ($scripts) {
-    if (!is_admin() && isset($scripts->registered['jquery'])) {
-        $script = $scripts->registered['jquery'];
-        if ($script->deps) {
-            $script->deps = array_diff($script->deps, ['jquery-migrate']);
-        }
-    }
-});
 
 // =============================================================================
 // CONTACT FORM 7 SPAM PROTECTION

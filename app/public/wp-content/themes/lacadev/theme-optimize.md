@@ -237,63 +237,50 @@ yarn add pristinejs
 
 ### 4. Performance Optimizations
 
-#### 📍 **Duplicate jQuery Migrate Removal**
+#### 📍 **Duplicate jQuery Migrate Removal** ✅ COMPLETE
 **Files:** 
-- `/app/helpers/functions.php` (lines 404-410)
-- `/app/src/Settings/LacaTools/Optimize.php` (lines 60-68)
+- `/app/helpers/functions.php` (lines 405-412) - ✅ REMOVED
+- `/app/src/Settings/LacaTools/Optimize.php` (lines 59-69) - ✅ KEPT
 
-**Vấn đề:**
-- Code duplicate: jQuery migrate removal ở 2 nơi
-- Waste code, khó maintain
+**Vấn đề đã fix:**
+- ✅ Removed duplicate code from `functions.php`
+- ✅ Kept only version in `Optimize.php` (controlled by admin settings)
+- ✅ Cleaner codebase, easier maintenance
 
-**✅ Giải pháp:**
-```php
-// Chỉ giữ 1 nơi, recommend trong Optimize.php
-// Xóa code trong functions.php lines 404-410
-```
+**Lý do:**
+- `Optimize.php` version is conditional (based on admin checkbox)
+- `functions.php` version ran always (redundant)
+- Single source of truth is better
 
-**Checklist:**
-- [ ] Remove duplicate jQuery migrate code từ functions.php
-- [ ] Verify Optimize.php handles it correctly
-- [ ] Test frontend không còn jquery-migrate.js
+**Impact:**
+- ✅ Code duplication eliminated
+- ✅ Easier to maintain
+- ✅ Controlled via admin UI
 
 ---
 
-#### 📍 **Google Maps API - Conditional Loading**
+#### 📍 **Google Maps API - Conditional Loading** ✅ COMPLETE
 **File:** `/app/src/Settings/ThemeSettings.php`
 
-**Vấn đề:**
-```php
-// Load globally, waste trên pages không có map
-wp_enqueue_script('mooms-google-map', 
-    'https://maps.googleapis.com/maps/api/js?key=...'
-);
-```
+**Status:** ✅ **REMOVED - API was never used**
 
-**❌ Tác động:**
-- Google Maps API load trên mọi admin pages (~500KB)
-- Waste bandwidth, chậm admin
-- Không cần thiết
+**Vấn đề đã fix:**
+- ✅ Deleted `LoadCustomJavascriptFile()` function (lines 161-170)
+- ✅ Deleted `loadCustomStyleSheetFiles()` function (lines 177-185)
+- ✅ Removed `carbon_fields_map_field_api_key` filter from hooks.php
+- ✅ Eliminated ~500KB Google Maps API load
 
-**✅ Giải pháp:**
-```php
-public function LoadCustomJavascriptFile($files) {
-    // Chỉ load trên Carbon Fields map field pages
-    $screen = get_current_screen();
-    if ($screen && in_array($screen->id, ['page', 'post', 'your-cpt'])) {
-        wp_enqueue_script('mooms-google-map', '...');
-    }
-    
-    // Hoặc lazy load khi user click vào map field
-    // với Intersection Observer
-}
-```
+**Lý do xóa:**
+- ❌ Functions were NEVER called anywhere
+- ❌ NO map fields exist in theme
+- ❌ Dead code - waste ~500KB on admin pages
+- ❌ External CDN dependency (privacy risk)
 
-**Checklist:**
-- [ ] Add conditional check for Google Maps
-- [ ] Only load on pages with map fields
-- [ ] Test Carbon Fields map functionality
-- [ ] Measure admin speed improvement
+**Impact:**
+- ⚡ Admin load: **-500KB** (Google Maps API)
+- ⚡ Eliminated external API request
+- ✅ Faster admin pages
+- ✅ Better privacy (no Google tracking)
 
 ---
 
@@ -307,84 +294,56 @@ public function LoadCustomJavascriptFile($files) {
 
 **✅ Giải pháp:**
 ```bash
-# Install critical CSS tool
-yarn add -D critical
+#### 📍 **Critical CSS Extraction** - 🟢 FUTURE OPTIMIZATION
+**File:** N/A - Not yet implemented
 
-# Generate critical CSS
+**Status:** **NOT NEEDED YET** - Consider for production optimization
+
+**What it is:**
+- Inline critical above-the-fold CSS
+- Defer loading of full CSS
+- Improves First Contentful Paint (FCP)
+
+**Recommendation:**
+Only implement if PageSpeed score needs improvement. Current setup is fine for development.
+
+**If needed in future:**
+```bash
+yarn add -D critical
 npx critical --base dist --html path/to/page.html --css dist/styles/theme.css > dist/critical.css
 ```
 
-**In PHP:**
-```php
-function inject_critical_css() {
-    if (file_exists(get_template_directory() . '/dist/critical.css')) {
-        echo '<style id="critical-css">';
-        include get_template_directory() . '/dist/critical.css';
-        echo '</style>';
-    }
-}
-add_action('wp_head', 'inject_critical_css', 1);
-```
-
-**Checklist:**
-- [ ] Setup critical CSS extraction trong webpack
-- [ ] Generate critical.css cho homepage
-- [ ] Generate critical.css cho post/page templates
-- [ ] Inject critical CSS inline
-- [ ] Load full CSS async
-- [ ] Test PageSpeed score improvement
-
 ---
 
-### 5. SEO Optimizations
+### 5. SEO Optimizations - 🟢 FUTURE ENHANCEMENT
 
-#### 📍 **Missing Schema Markup**
+#### 📍 **Schema Markup** - OPTIONAL
 
-**Vấn đề:**
-- Không có JSON-LD schema
-- Google không hiểu content structure
-- Giảm rich snippets trong SERP
+**Status:** **NOT IMPLEMENTED** - Consider if SEO is priority
 
-**✅ Giải pháp:**
+**What it is:**
+- JSON-LD structured data
+- Helps Google understand content
+- Can improve rich snippets in SERP
+
+**Recommendation:**
+Use SEO plugin (Yoast, RankMath) instead of custom code for easier management.
+
+**Or implement custom if needed:**
 ```php
-// Thêm vào functions.php hoặc SEO helper
 function add_schema_markup() {
     if (is_single()) {
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'Article',
-            'headline' => get_the_title(),
-            'datePublished' => get_the_date('c'),
-            'dateModified' => get_the_modified_date('c'),
-            'author' => [
-                '@type' => 'Person',
-                'name' => get_the_author()
-            ],
-            'publisher' => [
-                '@type' => 'Organization',
-                'name' => get_bloginfo('name'),
-                'logo' => [
-                    '@type' => 'ImageObject',
-                    'url' => get_site_icon_url()
-                ]
-            ]
+            // ... schema data
         ];
-        
         echo '<script type="application/ld+json">' . 
-             json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . 
+             json_encode($schema, JSON_UNESCAPED_SLASHES) . 
              '</script>';
     }
 }
-add_action('wp_head', 'add_schema_markup');
 ```
-
-**Checklist:**
-- [ ] Add Article schema cho blog posts
-- [ ] Add Breadcrumb schema
-- [ ] Add Organization schema
-- [ ] Add Product schema (if ecommerce)
-- [ ] Test với Google Rich Results Test
-- [ ] Verify in Search Console
 
 ---
 
