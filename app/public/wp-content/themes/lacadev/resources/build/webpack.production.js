@@ -198,6 +198,7 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                             sourceMap: false,
+                            api: 'modern-compiler',
                         }
                     }
                 ]

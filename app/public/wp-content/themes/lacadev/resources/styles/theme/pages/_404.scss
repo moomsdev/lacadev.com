@@ -1,15 +1,6 @@
 @use "../utilities/variables.scss" as *;
 @use "../utilities/mixin.scss" as *;
 
-.error404 {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
 .page-404 {
   padding: 0 1.5rem;
   position: absolute;
@@ -24,15 +15,44 @@
 
   .inner {
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+
+    @include maxWidth($md) {
+      grid-template-columns: 1fr;
+    }
   }
 
   h1 {
-    font-size: clamp(5rem, 10vw, 9rem);
+    display: block;
+    line-height: 1em;
     font-weight: bold;
+    text-transform: uppercase;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 2px var(--primary-color);
+
+    @include resFont(8, 13);
+
+    @include maxWidth($md) {
+      text-align: center;
+    }
   }
 
   h2 {
+    margin: 1rem 0;
+    display: block;
     font-weight: bold;
+
+    @include maxWidth($md) {
+      text-align: center;
+    }
+  }
+
+  p {
+    @include maxWidth($md) {
+      text-align: center;
+    }
   }
 
   .btn {

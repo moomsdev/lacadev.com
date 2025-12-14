@@ -69,15 +69,15 @@ if (!defined('ABSPATH')) {
 		<div class="btn-outline btn-outline-2"></div>
 		<label class="darkmode-icon">
 			<input type="checkbox" 
-				   aria-label="<?php esc_attr_e('Chuyển chế độ tối', 'laca'); ?>" 
+				   aria-label="<?php esc_attr_e('Chuyển chế độ tối/sáng', 'laca'); ?>" 
 				   role="switch" 
-				   aria-checked="false" />
-			<span class="screen-reader-text"><?php esc_html_e('Chuyển chế độ tối/sáng', 'laca'); ?></span>
+				   aria-checked="false"/>
 			<div></div>
 		</label>
 	</div>
 
 	<div class="wrapper" id="swup">
+        <?php if (!is_404()) : ?>
 		<header id="header">
 			<div class="container">
                 <div class="header-inner">
@@ -139,3 +139,4 @@ if (!defined('ABSPATH')) {
                 </div>
 			</div>
 		</header>
+        <?php endif; ?>

@@ -203,3 +203,59 @@ add_action('login_form', function () {
     </div>
     <?php
 });
+
+/**
+ * Set welcome alert flag on login
+ */
+add_action('wp_login', 'mm_set_login_alert_flag', 10, 2);
+function mm_set_login_alert_flag($user_login, $user) {
+    set_transient('show_welcome_alert_' . $user->ID, true, 60);
+}
+
+/**
+ * Inject welcome alert script in admin
+ */
+add_action('admin_enqueue_scripts', 'mm_inject_login_alert_script', 20);
+function mm_inject_login_alert_script() {
+    $user_id = get_current_user_id();
+    if (get_transient('show_welcome_alert_' . $user_id)) {
+        delete_transient('show_welcome_alert_' . $user_id);
+        $user = get_userdata($user_id);
+        
+        // Get current hour in 24-hour format
+        $current_hour = (int) current_time('H');
+        $current_day = strtolower(current_time('l')); // lower case full day name
+        
+        $title = '';
+        $message = '';
+        
+        // Check for weekend first
+        if ($current_day === 'saturday' || $current_day === 'sunday') {
+            $title = __('Cuối tuần vui vẻ, ', 'laca') . $user->display_name;
+            $message = sprintf(__('Hãy làm việc nhẹ nhàng và thư giãn nhé.', 'laca'), $user->display_name);
+        } else {
+            // Weekday logic
+            if ($current_hour >= 5 && $current_hour < 12) {
+                // Morning (5:00 - 11:59)
+                $title = sprintf(__('Chào buổi sáng %s', 'laca'), $user->display_name);
+                $message = __('Nhớ uống một tách cà phê trước khi bắt đầu nhé! ☕', 'laca');
+            } elseif ($current_hour >= 12 && $current_hour < 18) {
+                // Afternoon (12:00 - 17:59)
+                $title = sprintf(__('Chào buổi chiều %s', 'laca'), $user->display_name);
+                $message = __('Giữ vững năng lượng để hoàn thành nốt công việc nào! ☀️', 'laca');
+            } else {
+                // Evening/Night (18:00 - 4:59)
+                $title = sprintf(__('Chào buổi tối %s', 'laca'), $user->display_name);
+                $message = __('Đừng làm việc quá khuya nhé! 🌙', 'laca');
+            }
+        }
+        
+        $script = "
+            localStorage.setItem('show_alert', JSON.stringify({
+                title: '" . esc_js($title) . "',
+                message: '" . esc_js($message) . "'
+            }));
+        ";
+        wp_add_inline_script('theme-admin-js-bundle', $script, 'before');
+    }
+}

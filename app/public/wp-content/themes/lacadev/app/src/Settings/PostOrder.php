@@ -84,11 +84,13 @@ class PostOrder {
         
         // Post/Term list pages
         if ($this->shouldLoadSortable()) {
-            // post-order.js is bundled into admin.js
-            // Check if admin.js is already enqueued
-            if (!wp_script_is('laca-admin-js', 'enqueued')) {
+            $handle = 'theme-admin-js-bundle';
+            
+            // Check if main admin script is enqueued
+            if (!wp_script_is($handle, 'enqueued')) {
+                // If not, enqueue it (though it should be by assets.php)
                 wp_enqueue_script(
-                    'laca-admin-js',
+                    $handle,
                     get_template_directory_uri() . '/dist/admin.js',
                     [],
                     wp_get_theme()->get('Version'),
@@ -96,8 +98,8 @@ class PostOrder {
                 );
             }
             
-            // Always localize script even if already enqueued
-            wp_localize_script('laca-admin-js', 'lacaPostOrder', [
+            // Localize script
+            wp_localize_script($handle, 'lacaPostOrder', [
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('laca_post_order_nonce'),
             ]);
@@ -157,23 +159,11 @@ class PostOrder {
         
         $ids = array_map('intval', $data['post']);
         
-        // Get current menu_order values
-        $menu_orders = [];
-        foreach ($ids as $id) {
-            $result = $wpdb->get_var($wpdb->prepare(
-                "SELECT menu_order FROM {$wpdb->posts} WHERE ID = %d",
-                $id
-            ));
-            $menu_orders[] = (int) $result;
-        }
-        
-        sort($menu_orders);
-        
-        // Update with new order
+        // Update with new order (sequential)
         foreach ($ids as $position => $id) {
             $wpdb->update(
                 $wpdb->posts,
-                ['menu_order' => $menu_orders[$position]],
+                ['menu_order' => $position],
                 ['ID' => $id],
                 ['%d'],
                 ['%d']
@@ -203,23 +193,11 @@ class PostOrder {
         
         $ids = array_map('intval', $data['post']);
         
-        // Get current term_order values
-        $term_orders = [];
-        foreach ($ids as $id) {
-            $result = $wpdb->get_var($wpdb->prepare(
-                "SELECT term_order FROM {$wpdb->terms} WHERE term_id = %d",
-                $id
-            ));
-            $term_orders[] = (int) $result;
-        }
-        
-        sort($term_orders);
-        
-        // Update with new order
+        // Update with new order (sequential)
         foreach ($ids as $position => $id) {
             $wpdb->update(
                 $wpdb->terms,
-                ['term_order' => $term_orders[$position]],
+                ['term_order' => $position],
                 ['term_id' => $id],
                 ['%d'],
                 ['%d']
