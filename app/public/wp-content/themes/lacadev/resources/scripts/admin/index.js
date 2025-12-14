@@ -1,7 +1,33 @@
 import "@styles/admin";
 import "./custom_thumbnail_support.js";
+
+// Custom Post Order - Drag & Drop
+import './post-order.js';
+
 import Swal from "sweetalert2";
 window.Swal = Swal;
+
+// ===== Login Success Alert =====
+document.addEventListener('DOMContentLoaded', function() {
+    const showAlert = localStorage.getItem('show_alert');
+    if (showAlert) {
+        try {
+            const alert = JSON.parse(showAlert);
+            Swal.fire({
+                title: alert.title,
+                text: alert.message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 5000,
+                timerProgressBar: true
+            });
+            localStorage.removeItem('show_alert');
+        } catch (e) {
+            console.error('Error parsing show_alert:', e);
+            localStorage.removeItem('show_alert');
+        }
+    }
+});
 
 // ===== Vanilla JS - No jQuery dependency =====
 const scripts = {

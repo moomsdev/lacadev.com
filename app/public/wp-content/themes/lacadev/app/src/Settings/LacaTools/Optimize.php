@@ -42,18 +42,6 @@ class Optimize
 		if (get_option('_enable_lazy_loading_images') === 'yes') {
 			$this->enableLazyLoadingImages();
 		}
-
-		if (get_option('_enable_optimize_images') === 'yes') {
-			add_filter('wp_get_attachment_image_attributes', [$this, 'optimizeImages'], 10, 3);
-		}	
-
-		if (get_option('_enable_optimize_content_images') === 'yes') {
-			add_filter('the_content', [$this, 'optimizeContentImages'], 10, 1);
-		}
-
-		if (get_option('_enable_register_service_worker') === 'yes') {
-			$this->registerServiceWorker();
-		}
 	}
 
 	public function disableUseJqueryMigrate()

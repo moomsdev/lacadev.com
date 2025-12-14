@@ -114,7 +114,7 @@ class AdminSettings
 				<div style="position: relative;">
 					<div style="text-align:center">
 						<a target="_blank" href="<?php echo AUTHOR['website'] ?>" title="<?php echo AUTHOR['name'] ?>">
-							<img style="width:100%" src="<?php echo get_site_url() . '/wp-content/themes/mooms_dev/resources/images/dev/moomsdev-black.png' ?>" alt="<?php echo AUTHOR['name'] ?>" title="<?php echo AUTHOR['name'] ?>">
+							<img style="width:100%" src="<?php echo get_site_url() . '/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png' ?>" alt="<?php echo AUTHOR['name'] ?>" title="<?php echo AUTHOR['name'] ?>">
 						</a>
 					</div>
 					<h2 style="text-align:center;"><?php echo AUTHOR['name'] ?></h2>
@@ -204,7 +204,7 @@ class AdminSettings
 		add_action('admin_bar_menu', static function ($wp_admin_bar) use ($author) {
 			$args = [
 				'id'    => 'logo_author',
-				'title' => '<img src="' . get_site_url() . "/wp-content/themes/mooms_dev/resources/images/dev/moomsdev-white.png" . '" style="height: 1rem; padding-top:.3rem;" alt="' . AUTHOR['name'] . '">',
+				'title' => '<img src="' . get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-white.png" . '" style="height: 1rem; padding-top:.3rem;" alt="' . AUTHOR['name'] . '">',
 				'href'  => $author['website'],
 				'meta'  => [
 					'target' => '_blank',
@@ -317,7 +317,7 @@ class AdminSettings
 								<div style="position: relative;">
 									<div style="text-align:center">
 										<a target="_blank" href="' . AUTHOR['website'] . '">
-											<img style="width:50%" src="' .  get_site_url() . "/wp-content/themes/mooms_dev/resources/images/dev/moomsdev-black.png" . '" alt="' . AUTHOR['name'] . '">
+											<img style="width:50%" src="' .  get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png" . '" alt="' . AUTHOR['name'] . '">
 										</a>
 									</div>
 									<h1 style="text-align: center; text-transform: uppercase">Sorry, you do not have access to this content</h1>
@@ -334,7 +334,7 @@ class AdminSettings
                     <div style="position: relative;">
                         <div style="text-align:center">
                             <a target="_blank" href="' . AUTHOR['website'] . '" title="' . AUTHOR['name'] . '">
-                                <img style="width:100%" src="' .  get_site_url() . "/wp-content/themes/mooms_dev/resources/images/dev/moomsdev-black.png" . ' ?>" alt="' . AUTHOR['name'] . '" title="' . AUTHOR['name'] . '">
+                                <img style="width:100%" src="' .  get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png" . ' ?>" alt="' . AUTHOR['name'] . '" title="' . AUTHOR['name'] . '">
                             </a>
                         </div>
                         <div style="margin-top:1rem; display: flex; flex-wrap: wrap; column-gap: 15px; justify-content: space-between;">
@@ -468,8 +468,6 @@ class AdminSettings
 			remove_menu_page('edit-comments.php');
 		});
 	}
-
-
 
 	public function createAdminOptions()
 	{

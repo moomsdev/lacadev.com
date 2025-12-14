@@ -4,6 +4,9 @@
 // @import "../theme/layout/_general.scss";
 // @import "../shared/introjs.css";
 
+// Custom Post Order
+@import 'post-order';
+
 html :where(.wp-block) {
     max-width: 120rem;
     position: relative;

@@ -19,10 +19,6 @@ class Security
             $this->disableRestApi();
         }
 
-        if (get_option('_disable_xml_rpc') === 'yes') {
-            $this->disableXmlRpc();
-        }
-
         if (get_option('_disable_wp_embed') === 'yes') {
             $this->disableWpEmbed();
         }
@@ -33,38 +29,6 @@ class Security
 
         if (get_option('_disable_x_pingback') === 'yes') {
             $this->disableXPingback();
-        }
-
-        if (get_option('_enable_remove_wordpress_bloat') === 'yes') {
-            $this->removeWordpressBloat();
-        }
-
-        if (get_option('_enable_optimize_database_queries') === 'yes') {
-            $this->optimizeDatabaseQueries();   
-        }
-
-        if (get_option('_enable_optimize_sql_queries') === 'yes') {
-            $this->optimizeSqlQueries();
-        }
-
-        if (get_option('_enable_optimize_memory_usage') === 'yes') {
-            $this->optimizeMemoryUsage();
-        }
-
-        if (get_option('_enable_cleanup_memory') === 'yes') {
-            $this->cleanupMemory();
-        }
-
-        if (get_option('_enable_set_cache_headers') === 'yes') {
-            $this->setCacheHeaders();
-        }
-
-        if (get_option('_enable_compression') === 'yes') {
-            $this->enableCompression();
-        }
-
-        if (get_option('_enable_performance_monitoring') === 'yes') {
-            $this->addPerformanceMonitoring();
         }
     }
 

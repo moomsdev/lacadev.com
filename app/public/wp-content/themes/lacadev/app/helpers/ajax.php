@@ -4,12 +4,39 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Rate limiting helper for AJAX requests
+ */
+function lacadev_check_rate_limit($action_name, $limit = 20, $period = 60) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $transient_key = 'rate_limit_' . $action_name . '_' . md5($ip);
+    $request_count = get_transient($transient_key);
+    
+    if ($request_count === false) {
+        set_transient($transient_key, 1, $period);
+        return true;
+    }
+    
+    if ($request_count >= $limit) {
+        wp_send_json_error([
+            'message' => __('Quá nhiều requests. Vui lòng thử lại sau.', 'laca')
+        ], 429);
+        exit;
+    }
+    
+    set_transient($transient_key, $request_count + 1, $period);
+    return true;
+}
+
+/**
  * AJAX Search Handler
  */
 add_action('wp_ajax_nopriv_ajax_search', 'mms_ajax_search');
 add_action('wp_ajax_ajax_search', 'mms_ajax_search');
 
 function mms_ajax_search() {
+    // Rate limiting: 20 requests per minute
+    lacadev_check_rate_limit('ajax_search', 20, 60);
+    
     // Security check
     check_ajax_referer('theme_search_nonce', 'nonce');
 

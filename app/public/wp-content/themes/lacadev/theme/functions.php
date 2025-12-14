@@ -101,9 +101,20 @@ add_action('after_setup_theme', function () {
     require_once APP_APP_SETUP_DIR . 'menus.php';
     require_once APP_APP_SETUP_DIR . 'ajax.php';
 
+    // Load security & SEO (Phase 1 improvements)
+    require_once APP_APP_SETUP_DIR . 'security.php';
+    require_once APP_APP_SETUP_DIR . 'seo.php';
+
+    // Load image optimization (Phase 2 improvements)
+    require_once APP_APP_SETUP_DIR . 'image-optimization.php';
+
     // Load advanced optimization modules
     require_once APP_APP_SETUP_DIR . 'assets.php';
     require_once APP_APP_SETUP_DIR . 'performance.php';
+    
+    // Load Custom Post Order
+    require_once APP_APP_DIR . 'src/Settings/PostOrder.php';
+    new \App\Settings\PostOrder();
 
     // Load Gutenberg blocks
     $blocks_dir = APP_APP_SETUP_DIR . '/blocks';

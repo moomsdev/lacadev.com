@@ -14,7 +14,6 @@
     "lint-fix": "run-s -cl lint-fix:wpcs lint-fix:scripts lint-fix:styles",
     "i18n": "run-s -cl i18n:textdomain i18n:pot",
     "release": "run-s -cl build release:zip",
-    "release": "run-s -cl build release:zip",
     "release:zip": "node resources/build/release/release.js",
     "critical": "critical http://localhost:8000 --base dist --width 1300 --height 900 --target styles/critical.css --extract"
   },
@@ -60,20 +59,24 @@
     "browser-sync": "^2.23.7",
     "browser-sync-webpack-plugin": "^2.2.2",
     "copy-webpack-plugin": "^13.0.1",
+    "critical": "^7.0.3",
     "cssnano": "^7.1.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.8.2",
+    "image-minimizer-webpack-plugin": "^4.1.4",
+    "imagemin": "^9.0.1",
+    "imagemin-gifsicle": "^7.0.0",
+    "imagemin-pngquant": "^10.0.0",
+    "imagemin-svgo": "^11.0.1",
     "node-wp-i18n": "^1.2.1",
     "shelljs": "^0.8.3",
     "stylelint": "^9.2.1",
     "stylelint-config-recommended-scss": "^3.2.0",
     "stylelint-order": "^0.8.1",
     "stylelint-scss": "^3.1.0",
-    "stylelint-scss": "^3.1.0",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "critical": "^7.0.3"
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

@@ -65,9 +65,15 @@ function initToggleDarkMode() {
 
   // Handle theme toggle
   if (toggleInput) {
+    // Set initial ARIA state
+    toggleInput.setAttribute('aria-checked', initialTheme === 'dark');
+    
     toggleInput.addEventListener("change", (event) => {
       const isDark = event.target.checked;
       const newTheme = isDark ? "dark" : "light";
+      
+      // Update ARIA state
+      toggleInput.setAttribute('aria-checked', isDark);
 
       if (document.startViewTransition) {
         document.startViewTransition(() => {
@@ -101,6 +107,12 @@ function initMenu() {
 
   if ($menuBtn) {
       $menuBtn.onclick = function (e) {
+        const isExpanded = navMenu.classList.contains("actived");
+        
+        // Update ARIA states
+        $menuBtn.setAttribute('aria-expanded', !isExpanded);
+        $menuBtn.setAttribute('aria-label', isExpanded ? 'Mở menu' : 'Đóng menu');
+        
         navMenu.classList.toggle("actived");
         document.body.classList.toggle("overflow-hidden");
 

@@ -33,11 +33,17 @@ function mm_user_login()
     ], false);
 
     if (is_wp_error($user)) {
-        return $user->get_error_message();
+        wp_send_json_error($user->get_error_message());
     }
 
-    echo '<script>localStorage.setItem("show_alert", JSON.stringify({title: "' . __('Xin chào, ', 'laca') . $user->user_email . '", message: "Chúc mừng bạn đã đăng nhập thành công"})); window.location.href = "' . $_POST['redirect_to'] . '";</script>';
-    return '';
+    // Return success with alert data for AJAX handler
+    wp_send_json_success([
+        'redirect' => $_POST['redirect_to'],
+        'alert' => [
+            'title' => __('Xin chào, ', 'laca') . $user->user_email,
+            'message' => __('Chúc mừng bạn đã đăng nhập thành công', 'laca')
+        ]
+    ]);
 }
 
 add_action('wp_ajax_nopriv_user_register', 'mm_user_register');

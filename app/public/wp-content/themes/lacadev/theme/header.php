@@ -68,7 +68,11 @@ if (!defined('ABSPATH')) {
 		<div class="btn-outline btn-outline-1"></div>
 		<div class="btn-outline btn-outline-2"></div>
 		<label class="darkmode-icon">
-			<input type="checkbox" />
+			<input type="checkbox" 
+				   aria-label="<?php esc_attr_e('Chuyển chế độ tối', 'laca'); ?>" 
+				   role="switch" 
+				   aria-checked="false" />
+			<span class="screen-reader-text"><?php esc_html_e('Chuyển chế độ tối/sáng', 'laca'); ?></span>
 			<div></div>
 		</label>
 	</div>
@@ -90,11 +94,14 @@ if (!defined('ABSPATH')) {
                         <div class="logo-menu">
                             <span class="circle"></span>
                             <?php
-                            echo '<nav class="nav-menu">	<button id="btn-hamburger">
+                            echo '<nav class="nav-menu" aria-label="' . esc_attr__('Menu chính', 'laca') . '">	<button id="btn-hamburger" 
+                                        aria-label="' . esc_attr__('Mở menu', 'laca') . '" 
+                                        aria-expanded="false" 
+                                        aria-controls="main-menu">
                                     <div class="line-1"></div>
                                     <div class="line-2"></div>
                                     <div class="line-3"></div>
-                                </button></button>';
+                                </button>';
                             
                                 wp_nav_menu([
                                     'theme_location' => 'main-menu',
@@ -110,10 +117,17 @@ if (!defined('ABSPATH')) {
                             <!-- search -->
                             <div class="header__bottom-search">
                                 <div class="header__bottom-search-inner">
-                                    <form class="search-box">
-                                        <input type="text" placeholder="<?php echo esc_attr__('Tìm kiếm ...', 'laca'); ?>"/>
-                                        <button type="reset"></button>
-                                        <div class="search-results"></div>
+                                    <form class="search-box" role="search" aria-label="<?php esc_attr_e('Tìm kiếm', 'laca'); ?>">
+                                        <label for="search-input" class="screen-reader-text"><?php esc_html_e('Từ khóa tìm kiếm', 'laca'); ?></label>
+                                        <input type="text" 
+                                               id="search-input"
+                                               placeholder="<?php echo esc_attr__('Tìm kiếm ...', 'laca'); ?>" 
+                                               aria-label="<?php esc_attr_e('Nhập từ khóa tìm kiếm', 'laca'); ?>"/>
+                                        <button type="reset" aria-label="<?php esc_attr_e('Xóa tìm kiếm', 'laca'); ?>"></button>
+                                        <div class="search-results" 
+                                             role="status" 
+                                             aria-live="polite" 
+                                             aria-atomic="true"></div>
                                     </form>
                                 </div>
                             </div>

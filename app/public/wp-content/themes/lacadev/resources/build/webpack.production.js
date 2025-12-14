@@ -111,6 +111,31 @@ module.exports = {
                         comments: false,
                     },
                 }
+            }),
+            new (require('image-minimizer-webpack-plugin')).default({
+                minimizer: {
+                    implementation: require('image-minimizer-webpack-plugin').imageminMinify,
+                    options: {
+                        plugins: [
+                            ['mozjpeg', { quality: 85, progressive: true }],
+                            ['pngquant', { quality: [0.7, 0.9], speed: 4 }],
+                            ['gifsicle', { optimizationLevel: 3 }],
+                            ['svgo', {
+                                plugins: [
+                                    {
+                                        name: 'preset-default',
+                                        params: {
+                                            overrides: {
+                                                removeViewBox: false,
+                                                cleanupIDs: false,
+                                            },
+                                        },
+                                    },
+                                ],
+                            }],
+                        ],
+                    },
+                },
             })
         ],
         splitChunks: {
