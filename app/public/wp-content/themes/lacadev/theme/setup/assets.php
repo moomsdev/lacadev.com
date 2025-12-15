@@ -31,6 +31,28 @@ function app_action_theme_enqueue_assets()
     }
 
     /**
+     * Vendors bundle (contains all node_modules dependencies)
+     * Only exists in production build (yarn build), not in dev mode (yarn dev)
+     * 
+     * NOTE: dist/ is in the theme root directory (parent of /theme/ subdirectory)
+     * So we need to go up one level from get_template_directory()
+     */
+    $vendors_deps = [];
+    $theme_root = dirname(get_template_directory());  // Go up one level to theme root
+    $vendors_path = $theme_root . '/dist/vendors.js';
+    
+    // Build URL manually: get base theme URI and go up one level, then add /dist/vendors.js
+    // This avoids the /theme/ subdirectory issue
+    $base_uri = get_template_directory_uri();  // e.g. http://lacadev.local/wp-content/themes/lacadev/theme
+    $theme_uri = dirname($base_uri);           // e.g. http://lacadev.local/wp-content/themes/lacadev
+    $vendors_url = $theme_uri . '/dist/vendors.js';
+    
+    if (file_exists($vendors_path)) {
+        wp_enqueue_script('theme-vendors-js', $vendors_url, [], $version, true);
+        $vendors_deps = ['theme-vendors-js'];
+    }
+
+    /**
      * Main JavaScript bundle (deferred)
      */
     Assets::enqueueScript('theme-js-bundle', $template_dir . '/dist/theme.js', [], true);
@@ -97,6 +119,28 @@ function app_action_admin_enqueue_assets()
         'theme-admin-css-bundle',
         $template_dir . '/dist/styles/admin.css'
     );
+    Assets::enqueueStyle(
+        'theme-editor-css-bundle',
+        $template_dir . '/dist/styles/editor.css'
+    );
+
+    /**
+     * Enqueue vendors.js if exists (same fix as frontend)
+     * CRITICAL: Load in head (false) to ensure it's available before admin.js
+     */
+    $admin_deps = [];
+    $theme_root = dirname(get_template_directory());
+    $vendors_path = $theme_root . '/dist/vendors.js';
+    
+    if (file_exists($vendors_path)) {
+        $base_uri = get_template_directory_uri();
+        $theme_uri = dirname($base_uri);
+        $vendors_url = $theme_uri . '/dist/vendors.js';
+        
+        // Load in <head> without defer to ensure Swal is available
+        wp_enqueue_script('theme-vendors-js', $vendors_url, [], wp_get_theme()->get('Version'), false);
+        $admin_deps = ['theme-vendors-js'];
+    }
 
     /**
      * Enqueue scripts.
@@ -104,7 +148,7 @@ function app_action_admin_enqueue_assets()
     Assets::enqueueScript(
         'theme-admin-js-bundle',
         $template_dir . '/dist/admin.js',
-        [], // No jQuery dependency - pure vanilla JS
+        $admin_deps,
         true
     );
 
@@ -211,6 +255,7 @@ function app_action_add_favicon()
  */
 add_filter('script_loader_tag', function ($tag, $handle, $src) {
     // Scripts to defer (non-critical)
+    // NOTE: theme-vendors-js is NOT deferred - it must load blocking to ensure Swal/dependencies are available
     $defer_scripts = [
         'theme-js-bundle',
         'theme-admin-js-bundle',
@@ -308,3 +353,6 @@ add_filter('wp_resource_hints', function ($hints, $relation_type) {
 
 // Hook vào action để enqueue assets thông qua function có sẵn thay vì thêm action mới
 add_action('wp_enqueue_scripts', 'app_action_theme_enqueue_assets');
+add_action('admin_enqueue_scripts', 'app_action_admin_enqueue_assets');
+add_action('login_enqueue_scripts', 'app_action_login_enqueue_assets');
+add_action('enqueue_block_editor_assets', 'app_action_editor_enqueue_assets'); // For Gutenberg editor

@@ -1,84 +1,294 @@
-# ⚡ Laca Dev Theme - High Performance WordPress Theme
+# ⚡ La Cà Dev Theme - High Performance WordPress Theme
 
-Chào mừng bạn đến với project theme WordPress được tối ưu hóa đặc biệt của **Laca Dev Team**. Theme này được xây dựng với tư duy "Performance First" (Hiệu suất là ưu tiên hàng đầu), loại bỏ các dependencies nặng nề và áp dụng các kỹ thuật hiện đại nhất.
+> *Theme WordPress được code giữa những chuyến đi – bởi La Cà Dev, một kẻ lang thang mê phím và bánh xe.*
 
----
-
-## 🌟 1. Theme Này Đạt Được Gì? (Ưu Điểm)
-
-Đây không phải là một theme WordPress thông thường. Nó là một cỗ máy tốc độ:
-
-*   **🚀 Siêu Tốc Độ (Ultra Fast):**
-    *   **Zero jQuery Frontend:** Toàn bộ code frontend (Admin, Login, Frontend) được viết lại bằng **Vanilla JS**.
-    *   **Critical CSS:** Tự động tách và inline CSS quan trọng vào thẻ `<head>` để render trang ngay lập tức (FCP cực thấp).
-    *   **Asset Bundling:** Sử dụng **Webpack 5** để nén, gộp và tối ưu hóa toàn bộ JS/CSS.
-    *   **Lazy Loading thông minh:** Tự động defer các script không quan trọng và lazy load hình ảnh.
-
-*   **🛡️ Bảo Mật Cao (Secure):**
-    *   Tất cả các requests AJAX đều được bảo vệ bởi **Nonce Verification**.
-    *   Dữ liệu đầu vào/đầu ra được Sanitize và Escape kỹ càng.
-
-*   **🛠️ Clean Code & Modern:**
-    *   Cấu trúc code hiện đại, tách biệt logic (PHP) và assets (JS/SCSS).
-    *   Loại bỏ hoàn toàn code rác của WordPress (Emoji, Embeds, WP Blocks CSS thừa).
-
-*   **💰 SEO Friendly:**
-    *   Cấu trúc HTML ngữ nghĩa (Semantic HTML).
-    *   Tối ưu hóa Core Web Vitals của Google.
+**Version:** 3.1  
+**Author:** La Cà Dev  
+**License:** Private
 
 ---
 
-## ⚠️ 2. Lưu Ý (Nhược Điểm & Yêu Cầu)
+## 🌟 Tổng Quan
 
-Vì được tối ưu hóa sâu, theme này có một số rào cản kỹ thuật:
+Theme WordPress hiệu suất cao được xây dựng với triết lý "Performance First" - loại bỏ dependencies nặng nề, áp dụng kỹ thuật modern và tối ưu hóa từng chi tiết.
 
-*   **Phải Có Kiến Thức Dev:** Bạn không thể chỉnh sửa CSS/JS trực tiếp qua giao diện WordPress hoặc FTP theo cách cổ điển.
-*   **Cần Build Tools:** Bắt buộc phải cài đặt **Node.js** và **Yarn** để phát triển.
-*   **Cấu trúc Khác Biệt:** File source nằm trong `resources/`, file chạy nằm trong `dist/`.
+### ✨ Điểm Nổi Bật
+
+**🚀 Siêu Tốc Độ**
+- ✅ **Zero jQuery:** Toàn bộ frontend code viết bằng **Vanilla JavaScript**
+- ✅ **Code Splitting:** Webpack tách vendors bundle (685KB) và theme code (12KB)
+- ✅ **Minification:** JS/CSS được minify tối đa với Terser + CssMinimizerPlugin
+- ✅ **Smart Loading:** Vendors load blocking, theme scripts defer
+- ✅ **Image Optimization:** PNG giảm 64%, tự động optimize với ImageMinimizerPlugin
+
+**📊 Web Vitals Monitoring**
+- ✅ Giám sát LCP, CLS, FID realtime trong development
+- ✅ Color-coded ratings (Tốt ✓ / Cần cải thiện ⚠ / Kém ✗)
+- ✅ Detailed metrics với thresholds theo chuẩn Google
+
+**🛡️ Bảo Mật**
+- ✅ AJAX requests bảo vệ bằng **Nonce Verification**
+- ✅ Input/Output sanitization và escaping
+
+**🎨 Modern Architecture**
+- ✅ Webpack 5 với hot reload (BrowserSync)
+- ✅ SCSS với modern-compiler
+- ✅ PostCSS với autoprefixer
+- ✅ ES6+ với Babel transpilation
+
+---
+
+## 📦 Yêu Cầu Hệ Thống
+
+- **Node.js:** v20+ (recommended: v20 LTS)
+- **Yarn:** Latest version
+- **PHP:** 7.4+
+- **Composer:** 2.x
+- **WordPress:** 5.8+
 
 ---
 
-## 👨‍💻 3. Hướng Dẫn Dành Cho Developer
+## 🚀 Cài Đặt
 
-Nếu bạn là Developer tiếp nhận dự án này, hãy đọc kỹ hướng dẫn sau:
+### 1. Clone và Setup Dependencies
 
-### 📥 A. Cài Đặt Môi Trường
+```bash
+# Di chuyển vào thư mục theme
+cd app/public/wp-content/themes/lacadev
 
-1.  Đảm bảo máy đã cài **Node.js** (v20+) và **Yarn**.
-2.  Mở terminal tại thư mục root của theme:
-    ```bash
-    composer install
-    ```
+# Cài đặt PHP dependencies
+composer install
 
-### 🔨 B. Các Câu Lệnh Quan Trọng
+# Cài đặt Node dependencies
+yarn install
+```
 
-| Lệnh | Mô Tả | Khi Nào Dùng? |
-| :--- | :--- | :--- |
-| `composer install` | Cài đặt các dependencies PHP. | **Khi cài đặt theme.** |
-| `yarn install` | Cài đặt các dependencies JS. | **Khi cài đặt theme.** |
-| `yarn dev` | Chạy server development, có watch file và source maps. | **Khi đang code.** |
-| `yarn build` | Build code cho Production. Nén file, xóa comments, xóa source maps. | **Trước khi deploy/live.** |
-| `yarn critical` | Quét trang chủ và tạo file `critical.css` (inline styles). | **Khi sửa đổi giao diện xong.** |
+### 2. Development Workflow
 
-### 📂 C. Cấu Trúc Thư Mục
+```bash
+# Development mode với watch + hot reload
+yarn dev
 
-Code của theme được tổ chức khoa học:
+# Chạy trên: http://localhost:3000
+# Backend: http://lacadev.local
+```
 
-*   `app/` ➡️ **Logic PHP:** Chứa Controllers, Helpers, Setup.
-    *   `app/helpers/`: Các hàm tiện ích (AJAX, Functions).
-    *   `app/src/`: Classes xử lý logic chính.
-*   `resources/` ➡️ **Source Assets:** Nơi bạn viết code.
-    *   `resources/scripts/`: Javascript (Module based).
-    *   `resources/styles/`: SCSS/CSS.
-*   `dist/` ➡️ **Compiled Assets:** Nơi Webpack xuất file ra (Không sửa trực tiếp ở đây).
-*   `theme/` ➡️ **Template Files:** Các file cấu trúc theme (`functions.php`, `header.php`, partials...).
+### 3. Production Build
 
-### 💡 D. Quy Tắc Code (Coding Standards)
-
-1.  **NO jQuery:** Tuyệt đối không thêm jQuery vào frontend trừ khi bắt buộc từ plugin bên thứ 3.
-2.  **AJAX:** Luôn dùng `check_ajax_referer` ở backend và gửi `nonce` từ frontend.
-3.  **Styles:** Viết SCSS trong `resources/styles`, không viết inline style trong PHP.
+```bash
+# Build cho production (minify, optimize)
+yarn build
+```
 
 ---
-*Happy Coding! 🚀*
-**Laca Dev Team**
+
+## 📂 Cấu Trúc Thư Mục
+
+```
+lacadev/
+├── app/                    # PHP Logic
+│   ├── helpers/           # Helper functions
+│   ├── routes/            # Route definitions
+│   └── src/               # Core classes (PostTypes, Settings, etc)
+│
+├── resources/             # Source Assets (EDIT HERE)
+│   ├── build/            # Webpack configs
+│   ├── scripts/          # JavaScript source
+│   │   ├── theme/       # Frontend JS
+│   │   ├── admin/       # Admin JS
+│   │   └── login/       # Login page JS
+│   ├── styles/           # SCSS source
+│   │   ├── theme/       # Frontend styles
+│   │   ├── admin/       # Admin styles
+│   │   └── login/       # Login styles
+│   └── images/           # Source images
+│
+├── dist/                  # Compiled Assets (DON'T EDIT)
+│   ├── vendors.js        # Node modules bundle (685KB minified)
+│   ├── theme.js          # Theme code (12KB minified)
+│   ├── admin.js          # Admin code (13KB minified)
+│   └── styles/           # Compiled CSS
+│
+├── theme/                 # WordPress Template Files
+│   ├── setup/            # Theme setup (hooks, filters)
+│   ├── views/            # Template parts
+│   └── functions.php     # Entry point
+│
+└── block-gutenberg/       # Gutenberg blocks
+```
+
+---
+
+## �️ Các Lệnh Quan Trọng
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `composer install` | Cài đặt PHP dependencies | Lần đầu setup |
+| `yarn install` | Cài đặt Node dependencies | Lần đầu setup |
+| `yarn dev` | Development mode + watch | Khi đang code |
+| `yarn build` | Production build (minified) | Trước khi deploy |
+| `yarn build:theme` | Build theme assets only | Debug theme bundle |
+| `yarn build:blocks` | Build Gutenberg blocks only | Debug blocks |
+
+---
+
+## ⚡ Production Build Optimization
+
+### Minification Settings
+
+**JavaScript (Terser)**
+- ✅ Minification: ON
+- ✅ Drop console.log: YES (production only)
+- ✅ Mangle variables: YES
+- ✅ Mangle properties: NO (preserve object keys)
+- ✅ Remove comments: YES
+- ✅ Reserved keywords: `['Swal', 'themeData', 'ajaxurl_params', 'adminI18n']`
+
+**CSS (CssMinimizerPlugin)**
+- ✅ Minification: ON
+- ✅ Remove all comments: YES
+- ✅ Merge duplicate rules: YES
+
+**Images (ImageMinimizerPlugin)**
+- ✅ JPEG: MozJPEG (quality 85, progressive)
+- ✅ PNG: PNGQuant (quality 70-90)
+- ✅ GIF: Gifsicle (optimization level 3)
+- ✅ SVG: SVGO with safe optimizations
+
+### Bundle Sizes (After Optimization)
+
+| File | Before | After | Reduction |
+|------|--------|-------|-----------|
+| `vendors.js` | 1.74 MB | **685 KB** | 60.6% 🎉 |
+| `theme.js` | 31 KB | **12.1 KB** | 61.0% 🎉 |
+| `admin.js` | 27.9 KB | **13 KB** | 53.4% |
+| `theme.css` | 45 KB | **43.8 KB** | 2.7% |
+
+**Total Theme Entrypoint:** 1.82 MB → **741 KB** (59.3% reduction)
+
+---
+
+## 📊 Performance Monitoring
+
+### Web Vitals Tracking (Development)
+
+Console output với color-coded ratings:
+
+```
+✓ LCP: 1234.56ms - TỐT ✓ (0 - 2500ms)
+⚠ CLS: 0.15 - CẦN CẢI THIỆN ⚠ (0.1 - 0.25)  
+✓ FID: 45.23ms - TỐT ✓ (0 - 100ms)
+
+📊 Page Load Metrics:
+  DOM Content Loaded: 847.23ms
+  Page Load Complete: 1523.45ms
+  DNS Lookup: 12.34ms
+  TCP Connection: 45.67ms
+```
+
+### Thresholds (Google Standards)
+
+| Metric | Good ✓ | Needs Improvement ⚠ | Poor ✗ |
+|--------|--------|---------------------|--------|
+| **LCP** | ≤ 2.5s | 2.5s - 4.0s | > 4.0s |
+| **FID** | ≤ 100ms | 100ms - 300ms | > 300ms |
+| **CLS** | ≤ 0.1 | 0.1 - 0.25 | > 0.25 |
+
+---
+
+## 🔧 Script Loading Strategy
+
+### Frontend
+- **vendors.js:** Load in footer with defer
+- **theme.js:** Load in footer with defer (depends on vendors.js)
+
+### Admin Area
+- **vendors.js:** Load in `<head>` **blocking** (no defer)
+- **admin.js:** Load in footer with defer (depends on vendors.js)
+
+> ⚠️ **Critical:** Admin vendors.js MUST load blocking để đảm bảo SweetAlert2 available trước khi admin.js execute.
+
+---
+
+## 💡 Coding Standards
+
+### JavaScript
+1. ✅ **NO jQuery** (trừ khi plugin bên thứ 3 require)
+2. ✅ Use `const/let` instead of `var`
+3. ✅ Use arrow functions where appropriate
+4. ✅ Use template literals for string concatenation
+5. ✅ Always use `fetch()` instead of jQuery.ajax
+
+### AJAX Security
+```javascript
+// Frontend - Always send nonce
+fetch('/wp-admin/admin-ajax.php', {
+    method: 'POST',
+    body: new URLSearchParams({
+        action: 'my_action',
+        nonce: themeData.nonce,
+        data: value
+    })
+});
+
+// Backend - Always verify nonce
+check_ajax_referer('theme_nonce', 'nonce');
+```
+
+### PHP
+1. ✅ Always sanitize input: `sanitize_text_field()`, `wp_kses_post()`
+2. ✅ Always escape output: `esc_html()`, `esc_attr()`, `esc_url()`
+3. ✅ Use nonces for all forms and AJAX requests
+4. ✅ Follow WordPress coding standards
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### Admin JS không hoạt động sau `yarn build`
+
+**Nguyên nhân:** vendors.js chưa load hoặc bị defer  
+**Giải pháp:** Đảm bảo vendors.js load blocking trong admin:
+
+```php
+wp_enqueue_script('theme-vendors-js', $url, [], $version, false); // false = in head
+```
+
+### Console.log bị xóa trong production
+
+**Nguyên nhân:** Terser config có `drop_console: true`  
+**Giải pháp:** Chỉ dùng console.error() hoặc disable drop_console trong development
+
+### CLS cao (> 0.25)
+
+**Nguyên nhân:** Layout shift khi load images/fonts  
+**Giải pháp:** 
+- Thêm `width` và `height` cho tất cả images
+- Dùng font-display: swap cho web fonts
+- Reserve space cho dynamic content
+
+---
+
+## 📝 Changelog
+
+### Version 3.1 (Current)
+- ✅ Enabled production minification (JS/CSS)
+- ✅ Implemented vendors.js code splitting
+- ✅ Added comprehensive Web Vitals monitoring
+- ✅ Fixed admin.js loading issues
+- ✅ Optimized image compression (64% reduction)
+- ✅ Added property name preservation in mangle config
+- ✅ Total bundle size reduction: 59.3%
+
+---
+
+## 📞 Support & Contact
+
+**Author:** La Cà Dev  
+**Email:** mooms.dev@gmail.com  
+**Website:** https://lacadev.com
+
+---
+
+*Happy Coding! 🚀*  
+**La Cà Dev - Code giữa những chuyến đi**

@@ -1,11 +1,36 @@
-/* ------------------------------------------------------------ *\
-    Settings
-\* ------------------------------------------------------------ */
+/**
+ * Editor-specific styles for Gutenberg blocks
+ * 
+ * Wraps block styles to work within Gutenberg editor context
+ */
 
-//@import '~@styles/shared/_config.scss';
-//@import '~@styles/shared/_variables.scss';
-//@import '~@styles/shared/_editor.scss';
+// Import theme utilities
+@use "../theme/utilities/variables.scss" as *;
+@use "../theme/utilities/mixin.scss" as *;
+@use "../theme/layout/general.scss" as *;
 
-/* ------------------------------------------------------------ *\
-    Editor
-\* ------------------------------------------------------------ */
+// Editor wrapper - ensures styles apply in Gutenberg context
+.editor-styles-wrapper,
+.block-editor-writing-flow {
+    // Import all block styles from theme
+    // Note: @use cannot be used inside selectors, must use @import
+    @import "../theme/layout/_blocks.scss";
+}
+
+// Fix for hidden image control buttons in InspectorControls
+.components-panel__body {
+    .editor-post-featured-image__actions {
+        // Override theme CSS that hides buttons
+        opacity: 1 !important;
+        bottom: auto !important;
+        padding: 0 !important;
+        position: relative !important;
+        
+        // Ensure buttons are visible and clickable
+        button {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+    }
+}

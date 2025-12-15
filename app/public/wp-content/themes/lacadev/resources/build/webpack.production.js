@@ -4,10 +4,12 @@
 const { ProvidePlugin, WatchIgnorePlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 /**
  * Internal dependencies.
@@ -98,23 +100,41 @@ const plugins = [
 
 module.exports = {
     optimization: {
-        minimize: true,
+        minimize: true, // Enable minification for production
         minimizer: [
             new TerserPlugin({
                 parallel: true,
                 extractComments: false,
                 terserOptions: {
                     compress: {
-                        drop_console: true,
+                        drop_console: true, // Remove console.log in production
+                        drop_debugger: true,
+                        pure_funcs: ['console.info', 'console.debug', 'console.warn'],
+                    },
+                    mangle: {
+                        // Rename variables but keep global functions safe
+                        reserved: ['globalFunctions', 'themeData', 'ajaxurl_params', 'adminI18n', 'Swal', 'LacaDashboard', 'lacaDashboard'],
+                        // CRITICAL: Don't mangle property names (breaks alert.title, data.success, etc)
+                        properties: false,
                     },
                     format: {
-                        comments: false,
+                        comments: false, // Remove all comments
                     },
                 }
             }),
-            new (require('image-minimizer-webpack-plugin')).default({
+            new CssMinimizerPlugin({
+                minimizerOptions: {
+                    preset: [
+                        'default',
+                        {
+                            discardComments: { removeAll: true },
+                        },
+                    ],
+                },
+            }),
+            new ImageMinimizerPlugin({
                 minimizer: {
-                    implementation: require('image-minimizer-webpack-plugin').imageminMinify,
+                    implementation: ImageMinimizerPlugin.imageminMinify,
                     options: {
                         plugins: [
                             ['mozjpeg', { quality: 85, progressive: true }],
