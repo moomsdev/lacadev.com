@@ -327,23 +327,23 @@ class AdminSettings
 
 	public function checkIsMaintenance()
 	{
-		add_action('after_setup_theme', static function () {
+        // Sử dụng template_redirect để chỉ ảnh hưởng Frontend
+        // Không ảnh hưởng wp-admin hoặc wp-login.php
+		add_action('template_redirect', static function () {
+            // 1. Kiểm tra option có đang bật không
 			if (get_option('_is_maintenance') === 'yes') {
-				wp_die('
+                
+                // 2. Nếu là Admin hoặc Editor thì CHO PHÉP truy cập để làm việc
+                if (current_user_can('edit_theme_options')) {
+                    return;
+                }
 
-                    <div style="position: relative;">
-                        <div style="text-align:center">
-                            <a target="_blank" href="' . AUTHOR['website'] . '" title="' . AUTHOR['name'] . '">
-                                <img style="width:100%" src="' .  get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png" . ' ?>" alt="' . AUTHOR['name'] . '" title="' . AUTHOR['name'] . '">
-                            </a>
-                        </div>
-                        <div style="margin-top:1rem; display: flex; flex-wrap: wrap; column-gap: 15px; justify-content: space-between;">
-                            <p><a style="font: normal normal 500 20px Montserrat; color: black; text-decoration: none;" href="tel: ' . str_replace(['.', ',', ' '], '', AUTHOR['phone_number']) . ' "> ' . AUTHOR['phone_number'] . ' </a></p>
-                            <p><a style="font: normal normal 500 20px Montserrat; color: black; text-decoration: none;" href="mailto:' . AUTHOR['email'] . '">' . AUTHOR['email'] . '</a></p>
-                            <p><a style="font: normal normal 500 20px Montserrat; color: black; text-decoration: none;" href="' . AUTHOR['website'] . '" target="_blank">' . AUTHOR['website'] . '</a></p>
-                        </div>
-                        <h2 style="font: normal normal 700 22px Montserrat; text-align:center">The system is currently under maintenance, please come back later.<br>Thank you</h2>
-                    </div>');
+                // 3. Chặn tất cả user khác và load template báo trì
+                // Sử dụng status_header + exit thay vì wp_die để render full custom UI
+                status_header(503);
+                nocache_headers();
+                include get_template_directory() . '/maintenance.php';
+                exit();
 			}
 		});
 	}

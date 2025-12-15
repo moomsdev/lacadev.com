@@ -19,7 +19,7 @@
     "i18n": "run-s -cl i18n:textdomain i18n:pot",
     "release": "run-s -cl build release:zip",
     "release:zip": "node resources/build/release/release.js",
-    "critical": "critical http://localhost:8000 --base dist --width 1300 --height 900 --target styles/critical.css --extract"
+    "critical": "critical http://lacadev.local --base dist --width 1300 --height 900 --target styles/critical.css --extract"
   },
   "browserslist": [
     "last 3 versions"
