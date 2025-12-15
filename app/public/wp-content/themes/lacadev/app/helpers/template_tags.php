@@ -43,6 +43,12 @@ function getFieldImageUrl($name, $w, $h) {
 
 function getPostThumbnailUrl($postId, $width = null, $height = null) {
     $defaultImage = getImageUrlById(getOption('default_image'), $width, $height);
+    
+    // If no default_image option is set, use theme default image
+    if (empty($defaultImage)) {
+        $defaultImage = get_template_directory_uri() . '/resources/images/default-img.webp';
+    }
+    
     try {
         $imageId = get_post_thumbnail_id($postId);
         if (empty($imageId)) {

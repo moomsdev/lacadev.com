@@ -99,7 +99,6 @@ add_action('after_setup_theme', function () {
     // Load theme components
     require_once APP_APP_SETUP_DIR . 'theme-support.php';
     require_once APP_APP_SETUP_DIR . 'menus.php';
-    require_once APP_APP_SETUP_DIR . 'ajax.php';
 
     // Load security & SEO (Phase 1 improvements)
     require_once APP_APP_SETUP_DIR . 'security.php';
@@ -116,17 +115,17 @@ add_action('after_setup_theme', function () {
     require_once APP_APP_DIR . 'src/Settings/PostOrder.php';
     new \App\Settings\PostOrder();
 
-    // Load Gutenberg blocks
-    $blocks_dir = APP_APP_SETUP_DIR . '/blocks';
-    $block_files = glob($blocks_dir . '/*.php');
-    foreach ($block_files as $block_file) {
-        require_once $block_file;
-    }
+    // Load Gutenberg blocks (Carbon Fields)
+    // $blocks_dir = APP_APP_SETUP_DIR . '/blocks';
+    // $block_files = glob($blocks_dir . '/*.php');
+    // foreach ($block_files as $block_file) {
+    //     require_once $block_file;
+    // }
+    
+    // Load ReactJS Gutenberg blocks
+    require_once APP_APP_SETUP_DIR . 'gutenberg-blocks.php';
+
 });
-
-
-
-
 
 // =============================================================================
 // AUTOLOAD COMPONENTS
