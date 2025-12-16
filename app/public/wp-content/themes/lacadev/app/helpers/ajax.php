@@ -101,18 +101,34 @@ function mms_ajax_search() {
     
     // Search Products (WooCommerce)
     if (!empty($organized_types['product']) && class_exists('WooCommerce')) {
-        $products = new WP_Query([
+        // First, get total count
+        $products_count_query = new WP_Query([
             'post_type' => 'product',
-            'posts_per_page' => 5,
+            'posts_per_page' => -1,
             's' => $search_query,
             'post_status' => 'publish',
-            'no_found_rows' => true, // Optimization
+            'fields' => 'ids', // Only get IDs for counting
+        ]);
+        $total_products = $products_count_query->found_posts;
+        wp_reset_postdata();
+        
+        // Then get limited results
+        $products = new WP_Query([
+            'post_type' => 'product',
+            'posts_per_page' => 2, // Only show 2 items
+            's' => $search_query,
+            'post_status' => 'publish',
+            'no_found_rows' => false,
+            'orderby' => 'date',
+            'order' => 'DESC',
         ]);
         
         if ($products->have_posts()) {
             $has_results = true;
+            $displayed_count = $products->post_count;
+            
             $html .= '<div class="search-results__section">';
-            $html .= '<h3 class="search-results__title"><strong>Sản phẩm liên quan:</strong></h3>';
+            $html .= '<h3 class="search-results__title"><strong>Sản phẩm liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_products . ' sản phẩm)</span>:</h3>';
             $html .= '<div class="search-results__list">';
             
             while ($products->have_posts()) {
@@ -135,17 +151,33 @@ function mms_ajax_search() {
     
     // Search Posts
     if (!empty($organized_types['post'])) {
-        $posts = new WP_Query([
+        // First, get total count
+        $posts_count_query = new WP_Query([
             'post_type' => 'post',
-            'posts_per_page' => 5,
+            'posts_per_page' => -1,
             's' => $search_query,
             'post_status' => 'publish',
+            'fields' => 'ids',
+        ]);
+        $total_posts = $posts_count_query->found_posts;
+        wp_reset_postdata();
+        
+        // Then get limited results
+        $posts = new WP_Query([
+            'post_type' => 'post',
+            'posts_per_page' => 2, // Only show 2 items
+            's' => $search_query,
+            'post_status' => 'publish',
+            'orderby' => 'date',
+            'order' => 'DESC',
         ]);
         
         if ($posts->have_posts()) {
             $has_results = true;
+            $displayed_count = $posts->post_count;
+            
             $html .= '<div class="search-results__section">';
-            $html .= '<h3 class="search-results__title"><strong>Bài viết liên quan:</strong></h3>';
+            $html .= '<h3 class="search-results__title"><strong>Bài viết liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_posts . ' bài viết)</span>:</h3>';
             $html .= '<div class="search-results__list">';
             
             while ($posts->have_posts()) {
@@ -168,17 +200,33 @@ function mms_ajax_search() {
     
     // Search Pages
     if (!empty($organized_types['page'])) {
-        $pages = new WP_Query([
+        // First, get total count
+        $pages_count_query = new WP_Query([
             'post_type' => 'page',
-            'posts_per_page' => 5,
+            'posts_per_page' => -1,
             's' => $search_query,
             'post_status' => 'publish',
+            'fields' => 'ids',
+        ]);
+        $total_pages = $pages_count_query->found_posts;
+        wp_reset_postdata();
+        
+        // Then get limited results
+        $pages = new WP_Query([
+            'post_type' => 'page',
+            'posts_per_page' => 2, // Only show 2 items
+            's' => $search_query,
+            'post_status' => 'publish',
+            'orderby' => 'date',
+            'order' => 'DESC',
         ]);
         
         if ($pages->have_posts()) {
             $has_results = true;
+            $displayed_count = $pages->post_count;
+            
             $html .= '<div class="search-results__section">';
-            $html .= '<h3 class="search-results__title"><strong>Trang liên quan:</strong></h3>';
+            $html .= '<h3 class="search-results__title"><strong>Trang liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_pages . ' trang)</span>:</h3>';
             $html .= '<div class="search-results__list">';
             
             while ($pages->have_posts()) {
@@ -202,20 +250,35 @@ function mms_ajax_search() {
     // Search Other Custom Post Types
     if (!empty($organized_types['other'])) {
         foreach ($organized_types['other'] as $custom_type) {
-            $custom_posts = new WP_Query([
+            // First, get total count
+            $custom_count_query = new WP_Query([
                 'post_type' => $custom_type,
-                'posts_per_page' => 3,
+                'posts_per_page' => -1,
                 's' => $search_query,
                 'post_status' => 'publish',
+                'fields' => 'ids',
+            ]);
+            $total_custom = $custom_count_query->found_posts;
+            wp_reset_postdata();
+            
+            // Then get limited results
+            $custom_posts = new WP_Query([
+                'post_type' => $custom_type,
+                'posts_per_page' => 2, // Only show 2 items
+                's' => $search_query,
+                'post_status' => 'publish',
+                'orderby' => 'date',
+                'order' => 'DESC',
             ]);
             
             if ($custom_posts->have_posts()) {
                 $has_results = true;
                 $post_type_obj = get_post_type_object($custom_type);
                 $type_label = $post_type_obj->labels->name;
+                $displayed_count = $custom_posts->post_count;
                 
                 $html .= '<div class="search-results__section">';
-                $html .= '<h3 class="search-results__title"><strong>' . esc_html($type_label) . ' liên quan:</strong></h3>';
+                $html .= '<h3 class="search-results__title"><strong>' . esc_html($type_label) . ' liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_custom . ')</span>:</h3>';
                 $html .= '<div class="search-results__list">';
                 
                 while ($custom_posts->have_posts()) {
@@ -491,11 +554,18 @@ function lacadev_load_more_search() {
         return;
     }
     
+    // Map post_type to template part
+    // Pages use 'post' template since loop-page.php doesn't exist
+    $template_slug = $post_type;
+    if ($post_type === 'page') {
+        $template_slug = 'post';
+    }
+    
     // Generate HTML
     ob_start();
     while ($query->have_posts()) {
         $query->the_post();
-        get_template_part('template-parts/loop', $post_type);
+        get_template_part('template-parts/loop', $template_slug);
     }
     wp_reset_postdata();
     $html = ob_get_clean();

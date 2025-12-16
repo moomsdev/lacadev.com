@@ -49,10 +49,33 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 				// Append new posts
 				if ( resultsContainer ) {
+					// Create a temporary container to parse the HTML
+					const tempDiv = document.createElement( 'div' );
+					tempDiv.innerHTML = data.data.html;
+					
+					// Count actual number of items being added
+					// Using .loop-service which is the actual class in loop-post.php
+					const newItemsCount = tempDiv.querySelectorAll( '.loop-service' ).length;
+					
+					// Append the new content
 					resultsContainer.insertAdjacentHTML(
 						'beforeend',
 						data.data.html
 					);
+					
+					// Update count display
+					const countSpan = section.querySelector( '.search-section__count' );
+					if ( countSpan ) {
+						const currentDisplayed = parseInt( countSpan.dataset.displayed, 10 );
+						const totalCount = parseInt( countSpan.dataset.total, 10 );
+						const newDisplayed = Math.min( currentDisplayed + newItemsCount, totalCount );
+						
+						countSpan.dataset.displayed = newDisplayed;
+						
+						// Update the text - simplified to just show numbers
+						const countText = `(hiển thị ${newDisplayed}/${totalCount})`;
+						countSpan.textContent = countText;
+					}
 				}
 
 				// Update button page number
@@ -72,6 +95,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				button.style.display = 'none';
 			}
 		} catch ( error ) {
+			console.error( 'Load more error:', error );
 			// Re-enable button on error
 			button.disabled = false;
 			button.textContent = originalText;

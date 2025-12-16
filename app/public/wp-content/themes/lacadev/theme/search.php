@@ -67,10 +67,15 @@ $search_query = get_search_query();
             
             if ($products->have_posts()) {
                 $has_results = true;
+                $total_products = $products->found_posts;
+                $displayed_products = ($paged_product - 1) * 8 + $products->post_count;
                 ?>
                 <section class="search-section search-section--products">
                     <h2 class="search-section__title">
-                        <strong><?php _e('Sản phẩm liên quan:', 'laca'); ?></strong>
+                        <strong><?php _e('Sản phẩm liên quan', 'laca'); ?></strong> 
+                        <span class="search-section__count" data-displayed="<?php echo $displayed_products; ?>" data-total="<?php echo $total_products; ?>">
+                            (hiển thị <?php echo $displayed_products; ?>/<?php echo $total_products; ?>)
+                        </span>:
                     </h2>
                     <div class="list-post">
                         <?php
@@ -86,7 +91,8 @@ $search_query = get_search_query();
                             <button class="load-more-btn btn btn-primary" 
                                     data-post-type="product" 
                                     data-search="<?php echo esc_attr($search_query); ?>" 
-                                    data-page="1">
+                                    data-page="1"
+                                    data-max-pages="<?php echo $products->max_num_pages; ?>">
                                 <?php _e('Xem thêm', 'laca'); ?>
                             </button>
                         </div>
@@ -109,10 +115,15 @@ $search_query = get_search_query();
             
             if ($posts->have_posts()) {
                 $has_results = true;
+                $total_posts = $posts->found_posts;
+                $displayed_posts = ($paged_post - 1) * 8 + $posts->post_count;
                 ?>
                 <section class="search-section search-section--posts">
                     <h2 class="search-section__title">
-                        <strong><?php _e('Bài viết liên quan:', 'laca'); ?></strong>
+                        <strong><?php _e('Bài viết liên quan', 'laca'); ?></strong> 
+                        <span class="search-section__count" data-displayed="<?php echo $displayed_posts; ?>" data-total="<?php echo $total_posts; ?>">
+                            (hiển thị <?php echo $displayed_posts; ?>/<?php echo $total_posts; ?>)
+                        </span>:
                     </h2>
                     <div class="list-post">
                         <?php
@@ -128,7 +139,8 @@ $search_query = get_search_query();
                             <button class="load-more-btn btn btn-primary" 
                                     data-post-type="post" 
                                     data-search="<?php echo esc_attr($search_query); ?>" 
-                                    data-page="1">
+                                    data-page="1"
+                                    data-max-pages="<?php echo $posts->max_num_pages; ?>">
                                 <?php _e('Xem thêm', 'laca'); ?>
                             </button>
                         </div>
@@ -151,10 +163,15 @@ $search_query = get_search_query();
             
             if ($pages->have_posts()) {
                 $has_results = true;
+                $total_pages = $pages->found_posts;
+                $displayed_pages = ($paged_page - 1) * 8 + $pages->post_count;
                 ?>
                 <section class="search-section search-section--pages">
                     <h2 class="search-section__title">
-                        <strong><?php _e('Trang liên quan:', 'laca'); ?></strong>
+                        <strong><?php _e('Trang liên quan', 'laca'); ?></strong> 
+                        <span class="search-section__count" data-displayed="<?php echo $displayed_pages; ?>" data-total="<?php echo $total_pages; ?>">
+                            (hiển thị <?php echo $displayed_pages; ?>/<?php echo $total_pages; ?>)
+                        </span>:
                     </h2>
                     <div class="list-post">
                         <?php
@@ -170,7 +187,8 @@ $search_query = get_search_query();
                             <button class="load-more-btn btn btn-primary" 
                                     data-post-type="page" 
                                     data-search="<?php echo esc_attr($search_query); ?>" 
-                                    data-page="1">
+                                    data-page="1"
+                                    data-max-pages="<?php echo $pages->max_num_pages; ?>">
                                 <?php _e('Xem thêm', 'laca'); ?>
                             </button>
                         </div>
@@ -198,10 +216,15 @@ $search_query = get_search_query();
                     $has_results = true;
                     $post_type_obj = get_post_type_object($custom_type);
                     $type_label = $post_type_obj->labels->name;
+                    $total_custom = $custom_posts->found_posts;
+                    $displayed_custom = ($paged_custom - 1) * 8 + $custom_posts->post_count;
                     ?>
                     <section class="search-section search-section--<?php echo esc_attr($custom_type); ?>">
                         <h2 class="search-section__title">
-                            <strong><?php printf(__('%s liên quan:', 'laca'), esc_html($type_label)); ?></strong>
+                            <strong><?php printf(__('%s liên quan', 'laca'), esc_html($type_label)); ?></strong> 
+                            <span class="search-section__count" data-displayed="<?php echo $displayed_custom; ?>" data-total="<?php echo $total_custom; ?>">
+                                (hiển thị <?php echo $displayed_custom; ?>/<?php echo $total_custom; ?>)
+                            </span>:
                         </h2>
                         <div class="list-post">
                             <?php
@@ -217,7 +240,8 @@ $search_query = get_search_query();
                                 <button class="load-more-btn btn btn-primary" 
                                         data-post-type="<?php echo esc_attr($custom_type); ?>" 
                                         data-search="<?php echo esc_attr($search_query); ?>" 
-                                        data-page="1">
+                                        data-page="1"
+                                        data-max-pages="<?php echo $custom_posts->max_num_pages; ?>">
                                     <?php _e('Xem thêm', 'laca'); ?>
                                 </button>
                             </div>
