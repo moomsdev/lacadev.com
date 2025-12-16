@@ -4,6 +4,7 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
+	useBlockProps, // ← Thêm useBlockProps
 } from '@wordpress/block-editor';
 import { PanelBody, TextControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -18,6 +19,11 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	if ( ! blockID ) {
 		setAttributes( { blockID: clientId } );
 	}
+
+	// Get block props for proper Gutenberg integration
+	const blockProps = useBlockProps( {
+		className: 'block-about editor-view',
+	} );
 
 	return (
 		<>
@@ -122,7 +128,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<section className="block-about editor-view">
+			<section { ...blockProps }>
 				<div className="block-about__head">
 					<div className="scroll-circle">
 						<svg viewBox="0 0 200 200">

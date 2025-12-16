@@ -34,13 +34,11 @@ $image_id = isset($about_image['id']) ? $about_image['id'] : 0;
             <div class="arrow"></div>
         </div>
 
-        <?php if ($image_id) : ?>
+        <?php if ($image_id || !empty($about_image['url'])) : ?>
             <div class="block-about__img">
                 <figure>
                     <?php 
-                    // Sử dụng wp_get_attachment_image để tự động tối ưu
-                    // 'mobile' = 480px base, WordPress tự động thêm srcset, WebP, lazy loading
-                    echo wp_get_attachment_image($image_id, 'mobile', false, [
+                    theResponsiveImage($image_id, 'mobile', [
                         'alt' => isset($about_image['alt']) && $about_image['alt'] ? $about_image['alt'] : esc_attr($about_title),
                         'loading' => 'lazy',
                         'fetchpriority' => 'high', // Ưu tiên tải nếu above the fold
