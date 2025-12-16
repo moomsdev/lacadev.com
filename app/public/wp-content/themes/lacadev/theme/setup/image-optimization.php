@@ -11,25 +11,31 @@ if (!defined('ABSPATH')) {
 
 /**
  * Register custom image sizes for responsive images
+ * Priority 1 để chạy RẤT SỚM, trước khi helpers/functions.php can thiệp
  */
-add_action('after_setup_theme', function() {
-    // Mobile sizes
+add_action('init', function() {
+    // FORCE register sizes
     add_image_size('mobile', 480, 9999, false);
     add_image_size('mobile-2x', 960, 9999, false);
-    
-    // Tablet sizes
     add_image_size('tablet', 768, 9999, false);
     add_image_size('tablet-2x', 1536, 9999, false);
+}, 1);
+
+/**
+ * Control which image sizes to generate
+ * Chỉ tạo mobile và tablet, bỏ thumbnail mặc định
+ */
+add_filter('intermediate_image_sizes_advanced', function($sizes, $metadata) {
+    // Xóa thumbnail 150x150
+    unset($sizes['thumbnail']);
+    unset($sizes['medium']);
+    unset($sizes['medium_large']);
+    unset($sizes['large']);
+    unset($sizes['1536x1536']);
+    unset($sizes['2048x2048']);
     
-    // Desktop sizes
-    add_image_size('desktop', 1200, 9999, false);
-    add_image_size('desktop-2x', 2400, 9999, false);
-    
-    // Thumbnail variations
-    add_image_size('thumb-small', 150, 150, true);
-    add_image_size('thumb-medium', 300, 300, true);
-    add_image_size('thumb-large', 600, 600, true);
-});
+    return $sizes;
+}, 999, 2);
 
 /**
  * Enable WebP support in WordPress
@@ -61,7 +67,7 @@ add_filter('file_is_displayable_image', function($result, $path) {
 }, 10, 2);
 
 /**
- * Auto-generate WebP version on image upload
+ * Auto-generate WebP version and DELETE originals
  * Note: Requires GD or Imagick with WebP support
  */
 add_filter('wp_generate_attachment_metadata', function($metadata, $attachment_id) {
@@ -76,21 +82,89 @@ add_filter('wp_generate_attachment_metadata', function($metadata, $attachment_id
     if (!function_exists('imagewebp')) {
         return $metadata;
     }
+
+    // Skip if already WebP
+    $file_info = pathinfo($file);
+    if (isset($file_info['extension']) && strtolower($file_info['extension']) === 'webp') {
+        return $metadata;
+    }
     
-    // Generate WebP for main image
-    lacadev_generate_webp_image($file);
+    // Skip SVG (vector) and GIF (animation) - keep original
+    $ext = strtolower($file_info['extension']);
+    if (in_array($ext, ['svg', 'gif'])) {
+        return $metadata;
+    }
     
-    // Generate WebP for all sizes
+    // WordPress đã tạo xong TẤT CẢ sizes ở đây (JPG/PNG)
+    // Bây giờ convert chúng sang WebP
+    
+    // 1. Convert ALL intermediate sizes FIRST
+    $sizes_to_delete = []; // Track files to delete later
+    
     if (isset($metadata['sizes']) && is_array($metadata['sizes'])) {
-        $upload_dir = wp_upload_dir();
         $base_dir = dirname($file);
         
         foreach ($metadata['sizes'] as $size => $size_data) {
             $size_file = $base_dir . '/' . $size_data['file'];
+            $size_file_info = pathinfo($size_file);
+            
+            // Skip if already WebP
+            if (strtolower($size_file_info['extension']) === 'webp') {
+                continue;
+            }
+            
+            $size_webp_path = $base_dir . '/' . $size_file_info['filename'] . '.webp';
+            
             if (file_exists($size_file)) {
-                lacadev_generate_webp_image($size_file);
+                $size_converted = lacadev_generate_webp_image($size_file, $size_webp_path);
+                
+                if ($size_converted) {
+                    // Track for deletion
+                    $sizes_to_delete[] = $size_file;
+                    
+                    // Update metadata for this size
+                    $metadata['sizes'][$size]['file'] = $size_file_info['filename'] . '.webp';
+                    $metadata['sizes'][$size]['mime-type'] = 'image/webp';
+                    
+                    // Update filesize for this size
+                    if (file_exists($size_webp_path)) {
+                        $metadata['sizes'][$size]['filesize'] = filesize($size_webp_path);
+                    }
+                }
             }
         }
+    }
+    
+    // 2. Convert Main Image LAST
+    $webp_path = $file_info['dirname'] . '/' . $file_info['filename'] . '.webp';
+    $converted = lacadev_generate_webp_image($file, $webp_path);
+    
+    if ($converted) {
+        // Update metadata file path
+        $metadata['file'] = str_replace($file_info['basename'], $file_info['filename'] . '.webp', $metadata['file']);
+        
+        // Update filesize in metadata
+        if (file_exists($webp_path)) {
+            $metadata['filesize'] = filesize($webp_path);
+        }
+        
+        // Update attachment file path to WebP
+        update_attached_file($attachment_id, $webp_path);
+        
+        // Update post mime type
+        wp_update_post([
+            'ID' => $attachment_id,
+            'post_mime_type' => 'image/webp',
+            'guid' => str_replace($file_info['basename'], $file_info['filename'] . '.webp', get_the_guid($attachment_id))
+        ]);
+        
+        // NOW it's safe to delete originals
+        @unlink($file); // Delete main JPG/PNG
+    }
+    
+    // Delete all intermediate size originals
+    foreach ($sizes_to_delete as $file_to_delete) {
+        @unlink($file_to_delete);
     }
     
     return $metadata;
@@ -99,40 +173,28 @@ add_filter('wp_generate_attachment_metadata', function($metadata, $attachment_id
 /**
  * Helper function to generate WebP image
  */
-function lacadev_generate_webp_image($file) {
-    $file_path = $file;
-    $file_info = pathinfo($file_path);
-    
-    // Skip if already WebP
-    if (isset($file_info['extension']) && strtolower($file_info['extension']) === 'webp') {
+function lacadev_generate_webp_image($source_path, $destination_path) {
+    if (!file_exists($source_path)) {
         return false;
-    }
-    
-    // WebP output path
-    $webp_path = $file_info['dirname'] . '/' . $file_info['filename'] . '.webp';
-    
-    // Skip if WebP already exists
-    if (file_exists($webp_path)) {
-        return true;
     }
     
     // Load image based on type
     $image = false;
-    $extension = strtolower($file_info['extension']);
+    $info = getimagesize($source_path);
+    $mime = $info['mime'];
     
-    switch ($extension) {
-        case 'jpg':
-        case 'jpeg':
-            $image = @imagecreatefromjpeg($file_path);
+    switch ($mime) {
+        case 'image/jpeg':
+            $image = @imagecreatefromjpeg($source_path);
             break;
-        case 'png':
-            $image = @imagecreatefrompng($file_path);
+        case 'image/png':
+            $image = @imagecreatefrompng($source_path);
             // Preserve transparency
             imagealphablending($image, false);
             imagesavealpha($image, true);
             break;
-        case 'gif':
-            $image = @imagecreatefromgif($file_path);
+        case 'image/gif':
+            $image = @imagecreatefromgif($source_path);
             break;
     }
     
@@ -140,45 +202,14 @@ function lacadev_generate_webp_image($file) {
         return false;
     }
     
-    // Generate WebP with 85% quality (good balance)
-    $result = imagewebp($image, $webp_path, 85);
+    // Generate WebP with 75% quality
+    $result = imagewebp($image, $destination_path, 75);
     
     // Free memory
     imagedestroy($image);
     
     return $result;
 }
-
-/**
- * Add WebP source to images with <picture> element
- */
-add_filter('wp_get_attachment_image', function($html, $attachment_id, $size, $icon, $attr) {
-    // Skip if not an image
-    if (!wp_attachment_is_image($attachment_id)) {
-        return $html;
-    }
-    
-    $image_url = wp_get_attachment_image_url($attachment_id, $size);
-    if (!$image_url) {
-        return $html;
-    }
-    
-    // Get WebP URL
-    $webp_url = preg_replace('/\.(jpg|jpeg|png|gif)$/i', '.webp', $image_url);
-    
-    // Check if WebP file exists
-    $webp_path = str_replace(wp_upload_dir()['baseurl'], wp_upload_dir()['basedir'], $webp_url);
-    
-    if (file_exists($webp_path)) {
-        // Wrap with picture element
-        $html = '<picture>'
-            . '<source srcset="' . esc_url($webp_url) . '" type="image/webp">'
-            . $html
-            . '</picture>';
-    }
-    
-    return $html;
-}, 10, 5);
 
 /**
  * Add responsive srcset to images
@@ -201,8 +232,7 @@ add_filter('wp_get_attachment_image_attributes', function($attr, $attachment, $s
         'mobile-2x' => '960w',
         'tablet' => '768w',
         'tablet-2x' => '1536w',
-        'desktop' => '1200w',
-        'desktop-2x' => '2400w',
+        // Desktop/Laptop dùng ảnh gốc (full size)
     ];
     
     foreach ($sizes_config as $size_name => $width) {
@@ -212,9 +242,15 @@ add_filter('wp_get_attachment_image_attributes', function($attr, $attachment, $s
         }
     }
     
+    // Add full size image for desktop/laptop
+    $full_url = wp_get_attachment_image_url($attachment->ID, 'full');
+    if ($full_url) {
+        $srcset[] = esc_url($full_url) . ' 2048w';
+    }
+    
     if (!empty($srcset)) {
         $attr['srcset'] = implode(', ', $srcset);
-        $attr['sizes'] = '(max-width: 480px) 480px, (max-width: 768px) 768px, (max-width: 1200px) 1200px, 2400px';
+        $attr['sizes'] = '(max-width: 480px) 480px, (max-width: 768px) 768px, 100vw';
     }
     
     return $attr;
@@ -241,9 +277,9 @@ add_filter('wp_get_attachment_image_attributes', function($attr, $attachment, $s
  * Optimize image quality on upload
  */
 add_filter('jpeg_quality', function($quality) {
-    return 85; // Good balance between quality and file size
+    return 75; // Reduced to 75% as requested
 });
 
 add_filter('wp_editor_set_quality', function($quality) {
-    return 85;
+    return 75;
 });

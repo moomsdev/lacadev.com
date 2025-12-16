@@ -82,6 +82,9 @@ WPEmerge::alias('Theme', \WPEmergeTheme\Facades\Theme::class);
 // Load helpers
 require_once APP_APP_DIR . 'helpers.php';
 
+// Load responsive image helpers (NEW - for automatic srcset/sizes)
+require_once APP_APP_DIR . 'helpers/responsive-images.php';
+
 // Bootstrap Theme
 Theme::bootstrap(require APP_APP_DIR . 'config.php');
 

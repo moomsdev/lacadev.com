@@ -68,18 +68,28 @@ function lacadev_register_custom_blocks() {
         $block_json = $blocks_dir . '/' . $block . '/block.json';
         
         if (file_exists($block_json)) {
-            $result = register_block_type_from_metadata(
-                $block_json,
-                [
-                    'editor_script' => 'lacadev-gutenberg-blocks',
-                    // Styles come from theme's compiled CSS (dist/styles/theme.css and dist/styles/editor.css)
-                    // No need to register block-specific styles
-                ]
-            );
+            // Check if block has render.php for dynamic rendering
+            $render_php = $blocks_dir . '/' . $block . '/render.php';
+            $block_args = [
+                'editor_script' => 'lacadev-gutenberg-blocks',
+                // Styles come from theme's compiled CSS (dist/styles/theme.css and dist/styles/editor.css)
+                // No need to register block-specific styles
+            ];
+            
+            // Add render callback if render.php exists
+            if (file_exists($render_php)) {
+                $block_args['render_callback'] = function($attributes, $content) use ($render_php) {
+                    ob_start();
+                    require $render_php;
+                    return ob_get_clean();
+                };
+            }
+            
+            $result = register_block_type_from_metadata($block_json, $block_args);
             
             if ($result) {
                 $registered_count++;
-                error_log('Registered block: ' . $block);
+                error_log('Registered block: ' . $block . (file_exists($render_php) ? ' (dynamic)' : ' (static)'));
             }
         }
     }
