@@ -60,7 +60,7 @@
   padding-bottom: 100% / $ratio;
 
   @supports (aspect-ratio: 16/9) {
-    aspest-ratio: $ratio;
+    aspect-ratio: $ratio;
     height: initial;
     padding-bottom: initial;
   }

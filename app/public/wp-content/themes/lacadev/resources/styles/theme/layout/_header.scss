@@ -85,16 +85,6 @@ header {
     justify-content: space-between;
   }
 
-  .hidden {
-    display: none;
-  }
-
-  .head-menu {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
   .language-search {
     display: flex;
     align-items: center;
@@ -102,12 +92,10 @@ header {
   }
 
   .logo-menu {
-    display: flex;
-    align-items: center;
-    display: flex;
-    align-items: center;
     position: relative;
-
+    display: flex;
+    align-items: center;
+    
     .circle {
       width: 3.6rem;
       height: 3.6rem;
@@ -115,12 +103,6 @@ header {
       background-color: transparent;
       border: 0.5rem solid $primaryColor;
     }
-  }
-
-  .language-search {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
   }
 
   #btn-hamburger {
@@ -213,7 +195,6 @@ header {
 
         &:hover  ul.sub-menu {
           visibility: visible;
-          transform: translateX(0);
           opacity: 1;
           -webkit-transform: translateZ(0) perspective(1px);
           transform: translateZ(0) perspective(1px);

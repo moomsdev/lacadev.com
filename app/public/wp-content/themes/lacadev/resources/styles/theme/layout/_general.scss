@@ -228,15 +228,6 @@ textarea {
   }
 }
 
-button,
-input,
-textarea {
-  vertical-align: top;
-  outline: 0;
-  transition: background-color 0.25s, border-color 0.25s, color 0.25s,
-    box-shadow 0.25s;
-}
-
 button {
   border: 0;
   background-color: transparent;
@@ -277,13 +268,12 @@ p:empty {
 }
 
 .full-width {
-  width: calc(100vw - 3px);
-  // width: 100vw;
   position: relative;
   left: 50%;
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
+  width: calc(100vw - 3px);
 }
 
 .no-gap-row {

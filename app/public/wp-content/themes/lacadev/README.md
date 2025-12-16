@@ -55,6 +55,31 @@ Tự động quét trang chủ và tạo CSS inline cho phần hiển thị đ�
 - `yarn build` sẽ tự động xóa `console.log` và nén code tối đa.
 - Nếu code Admin lỗi, kiểm tra xem tên biến có bị đổi (mangle) sai không trong `webpack.production.js`.
 
+### 4. Kiểm tra lỗi
+
+#### 1. Để kiểm tra lỗi (Check):
+Mở terminal tại thư mục theme và chạy các lệnh sau:
+
+-   **Kiểm tra tất cả:**
+    `yarn lint`
+
+-   **Chỉ kiểm tra CSS/SCSS (Giao diện):**
+    `yarn lint:styles`
+    
+-   **Chỉ kiểm tra JS/React:**
+    `yarn lint:scripts`
+
+#### 2. Để TỰ ĐỘNG SỬA lỗi (Auto Fix):
+Các công cụ này còn có khả năng tự sửa các lỗi cơ bản (như thụt đầu dòng sai, thiếu dấu chấm phẩy...):
+
+-   **Sửa tất cả:**
+    `yarn lint-fix`
+    
+-   **Chỉ sửa lỗi CSS/SCSS:**
+    `yarn lint-fix:styles`
+    
+-   **Chỉ sửa lỗi JS:**
+    `yarn lint-fix:scripts`
 ---
 *Author: La Cà Dev - Code giữa những chuyến đi*
 Email: mooms.dev@gmail.com

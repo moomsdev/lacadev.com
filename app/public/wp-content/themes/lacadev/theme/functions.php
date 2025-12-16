@@ -110,7 +110,7 @@ add_action('after_setup_theme', function () {
     // Load advanced optimization modules
     require_once APP_APP_SETUP_DIR . 'assets.php';
     require_once APP_APP_SETUP_DIR . 'performance.php';
-    
+
     // Load Custom Post Order
     require_once APP_APP_DIR . 'src/Settings/PostOrder.php';
     new \App\Settings\PostOrder();
@@ -121,7 +121,7 @@ add_action('after_setup_theme', function () {
     // foreach ($block_files as $block_file) {
     //     require_once $block_file;
     // }
-    
+
     // Load ReactJS Gutenberg blocks
     require_once APP_APP_SETUP_DIR . 'gutenberg-blocks.php';
 
@@ -163,7 +163,8 @@ add_action('wp_enqueue_scripts', 'custom_ajax_search_script');
 /**
  * Register custom query vars for search pagination
  */
-function lacadev_register_search_query_vars($vars) {
+function lacadev_register_search_query_vars($vars)
+{
     $vars[] = 'paged_post';
     $vars[] = 'paged_page';
     $vars[] = 'paged_product';

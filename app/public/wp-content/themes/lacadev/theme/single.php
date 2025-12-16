@@ -8,16 +8,12 @@
  *
  * @package WPEmergeTheme
  */
-
 ?>
 
 <div class="single-content">
 	<div class="container">
 		<div class="wrapper-content">
-			<?php
-			theContent();
-			?>
+			<?php theContent(); ?>
 		</div>
 	</div>
 </div>
-

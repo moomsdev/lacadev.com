@@ -84,22 +84,18 @@ body.login {
 
       input#user_login,
       input#user_pass {
-        display: block;
-        appearance: none;
-        outline: 0;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        background-color: rgba(255, 255, 255, 0.2);
-
-        border-radius: 2.5rem;
         padding: 10px 15px;
         margin: 0 auto 10px auto;
         display: block;
+        font: 300 18px;
         text-align: center;
-        font-size: 18px;
         color: white;
-
+        outline: 0;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 2.5rem;
         transition-duration: 0.25s;
-        font-weight: 300;
+        appearance: none;
 
         &:hover {
           background-color: fade(white, 40%);

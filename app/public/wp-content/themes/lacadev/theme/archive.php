@@ -16,9 +16,10 @@ theBreadcrumb();
 	<div class="container">
 		<div class="wrapper-content">
 			<?php
-			if (have_posts()) :
-				while (have_posts()) : the_post();
-					get_template_part('template-parts/loop','post');
+			if (have_posts()):
+				while (have_posts()):
+					the_post();
+					get_template_part('template-parts/loop', 'post');
 				endwhile;
 				wp_reset_postdata();
 			endif;

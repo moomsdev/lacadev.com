@@ -1,13 +1,7 @@
-// @import "../theme/utilities/_variables.scss";
-// @import "../theme/utilities/_mixin.scss";
-// @import "../theme/blocks/**.scss";
-// @import "../theme/layout/_general.scss";
-// @import "../shared/introjs.css";
-
 // Custom Post Order
 @use 'post-order';
 
-html :where(.wp-block) {
+html:where(.wp-block) {
   max-width: 120rem;
   position: relative;
   overflow: hidden;
