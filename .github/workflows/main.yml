@@ -52,6 +52,9 @@ jobs:
       - name: Install Node Dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Create config.json from dist
+        run: cp config.json.dist config.json
+
       - name: Run Build
         run: yarn build
         
