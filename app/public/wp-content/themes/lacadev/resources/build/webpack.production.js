@@ -16,7 +16,6 @@ const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
  */
 const utils = require('./lib/utils');
 const configLoader = require('./config-loader');
-const spriteSmith = require('./spritesmith');
 const postcss = require('./postcss');
 
 /**
@@ -57,7 +56,6 @@ const plugins = [
         // jQuery: 'jquery'
     }),
     miniCss,
-    spriteSmith,
     // TEMPORARILY DISABLED: imagemin-webpack-plugin has compatibility issues with Webpack 5
     // Will use compress-images-webpack-plugin or sharp later
     // new ImageminPlugin({

@@ -11,7 +11,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
  */
 const utils = require('./lib/utils');
 const configLoader = require('./config-loader');
-const spriteSmith = require('./spritesmith');
 const postcss = require('./postcss');
 const browsersync = require('./browsersync');
 
@@ -45,15 +44,8 @@ const miniCss = new MiniCssExtractPlugin({
  * Setup webpack plugins.
  */
 const plugins = [
-    new WatchIgnorePlugin({
-        paths: [
-            utils.distImagesPath('sprite.png'),
-            utils.distImagesPath('sprite@2x.png'),
-        ],
-    }),
     // Note: jQuery is provided by WordPress as external, don't use ProvidePlugin
     miniCss,
-    spriteSmith,
     browsersync,
     new ManifestPlugin(),
     new CopyWebpackPlugin({
