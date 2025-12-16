@@ -105,6 +105,7 @@ module.exports = {
             new TerserPlugin({
                 parallel: true,
                 extractComments: false,
+                exclude: /\.min\.js$/, // Don't minify already minified files
                 terserOptions: {
                     compress: {
                         drop_console: true, // Remove console.log in production
