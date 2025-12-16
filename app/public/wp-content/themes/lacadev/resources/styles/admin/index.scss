@@ -1,10 +1,14 @@
 // Custom Post Order
-@use 'post-order';
+@use "post-order";
 
 html:where(.wp-block) {
   max-width: 120rem;
   position: relative;
   overflow: hidden;
+}
+
+body.wp-admin {
+  font-size: 13px !important;
 }
 
 .featured_image.column-featured_image {
@@ -22,15 +26,15 @@ html:where(.wp-block) {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #F15D4F;
+    background-color: #f15d4f;
     color: #fff;
     border-radius: 50%;
-    border: 1px solid #F15D4F;
+    border: 1px solid #f15d4f;
     transition: all 0.3s ease;
 
     &:hover {
       background: #fff;
-      color: #F15D4F;
+      color: #f15d4f;
     }
 
     svg {
@@ -51,10 +55,6 @@ html:where(.wp-block) {
     border: 1px dashed;
     aspect-ratio: 16 / 10;
   }
-}
-
-.banner-block {
-  height: auto !important;
 }
 
 .subsubsub {
@@ -88,4 +88,10 @@ button[data-toggle="password-toggle"] {
 #wp-auth-check-wrap .wp-auth-check-close {
   color: #fff !important;
   z-index: 99;
+}
+
+.metabox-holder-disabled .accordion-section-content,
+.metabox-holder-disabled .accordion-section-title,
+.metabox-holder-disabled .postbox {
+  opacity: 1 !important;
 }

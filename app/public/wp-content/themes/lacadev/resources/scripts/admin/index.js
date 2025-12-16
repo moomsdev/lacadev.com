@@ -114,10 +114,14 @@ document.addEventListener( 'click', function ( e ) {
 						// Replace entire cell content with thumbnail + remove button (same as PHP output)
 						tdCell.innerHTML = `
               <div style='position:relative;display:inline-block;'>
-                <a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${ postId }' style='display:block;border:1px solid #ddd;padding:2px;background:#fff;'>
+                <a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${ postId }'>
                   <img src='${ originalImageUrl }' style='max-width:80px;max-height:80px;display:block;' alt='Thumbnail'/>
                 </a>
-                <a href='javascript:void(0)' data-trigger-remove-thumbnail data-post-id='${ postId }' style='position:absolute;top:-8px;right:-8px;width:20px;height:20px;background:#dc3232;color:#fff;border-radius:50%;text-align:center;line-height:20px;text-decoration:none;font-size:12px;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,0.2);' title='Remove thumbnail'>×</a>
+                <a class='remove-thumbnail' href='javascript:void(0)' data-trigger-remove-thumbnail data-post-id='${ postId }' title='Remove thumbnail'>
+									<svg viewBox='0 0 12 12'>
+                    <path d='M11 1L1 11M1 1l10 10' stroke='currentColor' stroke-width='2' stroke-linecap='round'/>
+                	</svg>
+								</a>
               </div>
             `;
 					}
@@ -151,7 +155,7 @@ document.addEventListener( 'click', function ( e ) {
 		text: adminI18n.removeThumbnailText,
 		icon: 'warning',
 		showCancelButton: true,
-		confirmButtonColor: '#dc3545',
+		confirmButtonColor: '#F15D4F',
 		cancelButtonColor: '#6c757d',
 		confirmButtonText: adminI18n.removeThumbnailConfirm,
 		cancelButtonText: adminI18n.removeThumbnailCancel,
