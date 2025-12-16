@@ -37,7 +37,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('app/public/wp-content/themes/lacadev/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('app/public/wp-content/themes/lacadev/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
@@ -48,8 +48,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
-          cache-dependency-path: app/public/wp-content/themes/lacadev/yarn.lock
 
       - name: Install Node Dependencies
         run: yarn install --frozen-lockfile
