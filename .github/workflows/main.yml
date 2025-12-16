@@ -58,7 +58,6 @@ jobs:
       - name: Run Build
         run: yarn build
         
-      # Note: The 'lint' script in package.json calls 'lint:wpcs' etc., which are currently missing.
-      # Once you add them, you can uncomment the next step:
-      # - name: Run Lint
-      #   run: yarn lint
+      # Note: The 'lint' script in package.json calls 'lint:wpcs' etc.
+      - name: Run Lint
+        run: yarn lint
