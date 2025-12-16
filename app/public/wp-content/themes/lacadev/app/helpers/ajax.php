@@ -28,6 +28,25 @@ function lacadev_check_rate_limit($action_name, $limit = 20, $period = 60) {
 }
 
 /**
+ * Improve search: ONLY search in title, accent-insensitive (Vietnamese support)
+ */
+function lacadev_improve_search_relevance($search, $wp_query) {
+    global $wpdb;
+    
+    if (empty($wp_query->query_vars['s'])) {
+        return $search;
+    }
+    
+    $search_term = $wpdb->esc_like($wp_query->query_vars['s']);
+    
+    // Search ONLY in post_title with accent-insensitive collation
+    // utf8mb4_unicode_ci ignores accents: "se" matches "sẽ", "sê", "sế", etc.
+    $search = " AND ({$wpdb->posts}.post_title COLLATE utf8mb4_unicode_ci LIKE '%{$search_term}%')";
+    
+    return $search;
+}
+
+/**
  * AJAX Search Handler
  */
 add_action('wp_ajax_nopriv_ajax_search', 'mms_ajax_search');
@@ -43,15 +62,11 @@ function mms_ajax_search() {
     // Get search query
     $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
     
-    // Minimum search length
-    if (strlen($search_query) < 2) {
-        wp_send_json_error(['message' => 'Vui lòng nhập ít nhất 2 ký tự']);
-        return;
-    }
+    // Add search relevance filter (title-only, accent-insensitive)
+    add_filter('posts_search', 'lacadev_improve_search_relevance', 10, 2);
     
     $html = '';
     $has_results = false;
-    $default_img = get_template_directory_uri() . '/resources/images/placeholder.png';
     
     // Get all public post types
     $post_types = get_post_types(['public' => true], 'objects');
@@ -102,11 +117,10 @@ function mms_ajax_search() {
             
             while ($products->have_posts()) {
                 $products->the_post();
-                $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
                 
                 $html .= '<a href="' . esc_url(get_permalink()) . '" class="search-results__item">';
                 $html .= '<div class="search-results__image">';
-                $html .= '<img src="' . esc_url($thumbnail ?: $default_img) . '" alt="' . esc_attr(get_the_title()) . '">';
+                $html .= getResponsivePostThumbnail(get_the_ID(), 'mobile', ['alt' => get_the_title()]);
                 $html .= '</div>';
                 $html .= '<div class="search-results__content">';
                 $html .= '<h4 class="search-results__item-title">' . esc_html(get_the_title()) . '</h4>';
@@ -136,11 +150,10 @@ function mms_ajax_search() {
             
             while ($posts->have_posts()) {
                 $posts->the_post();
-                $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
                 
                 $html .= '<a href="' . esc_url(get_permalink()) . '" class="search-results__item">';
                 $html .= '<div class="search-results__image">';
-                $html .= '<img src="' . esc_url($thumbnail ?: $default_img) . '" alt="' . esc_attr(get_the_title()) . '">';
+                $html .= getResponsivePostThumbnail(get_the_ID(), 'mobile', ['alt' => get_the_title()]);
                 $html .= '</div>';
                 $html .= '<div class="search-results__content">';
                 $html .= '<h4 class="search-results__item-title">' . esc_html(get_the_title()) . '</h4>';
@@ -170,11 +183,10 @@ function mms_ajax_search() {
             
             while ($pages->have_posts()) {
                 $pages->the_post();
-                $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
                 
                 $html .= '<a href="' . esc_url(get_permalink()) . '" class="search-results__item">';
                 $html .= '<div class="search-results__image">';
-                $html .= '<img src="' . esc_url($thumbnail ?: $default_img) . '" alt="' . esc_attr(get_the_title()) . '">';
+                $html .= getResponsivePostThumbnail(get_the_ID(), 'mobile', ['alt' => get_the_title()]);
                 $html .= '</div>';
                 $html .= '<div class="search-results__content">';
                 $html .= '<h4 class="search-results__item-title">' . esc_html(get_the_title()) . '</h4>';
@@ -208,11 +220,10 @@ function mms_ajax_search() {
                 
                 while ($custom_posts->have_posts()) {
                     $custom_posts->the_post();
-                    $thumbnail = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
                     
                     $html .= '<a href="' . esc_url(get_permalink()) . '" class="search-results__item">';
                     $html .= '<div class="search-results__image">';
-                    $html .= '<img src="' . esc_url($thumbnail ?: $default_img) . '" alt="' . esc_attr(get_the_title()) . '">';
+                    $html .= getResponsivePostThumbnail(get_the_ID(), 'mobile', ['alt' => get_the_title()]);
                     $html .= '</div>';
                     $html .= '<div class="search-results__content">';
                     $html .= '<h4 class="search-results__item-title">' . esc_html(get_the_title()) . '</h4>';
@@ -232,6 +243,9 @@ function mms_ajax_search() {
         $html .= '<p>Không tìm thấy kết quả nào cho "<strong>' . esc_html($search_query) . '</strong>"</p>';
         $html .= '</div>';
     }
+    
+    // Remove search filter after use
+    remove_filter('posts_search', 'lacadev_improve_search_relevance', 10);
     
     // Return HTML
     echo $html;
@@ -429,4 +443,68 @@ function ajaxGetPage() {
     get_template_part('page');
     $content = ob_get_clean();
     wp_send_json_success($content);
+}
+
+// -----------------------------------------------------------------------------
+// AJAX: Load More Search Results
+// -----------------------------------------------------------------------------
+/**
+ * Load more search results for specific post type
+ *
+ * @action wp_ajax_nopriv_load_more_search
+ * @action wp_ajax_load_more_search
+ */
+add_action('wp_ajax_nopriv_load_more_search', 'lacadev_load_more_search');
+add_action('wp_ajax_load_more_search', 'lacadev_load_more_search');
+
+function lacadev_load_more_search() {
+    // Security check
+    check_ajax_referer('theme_search_nonce', 'nonce');
+    
+    // Get parameters
+    $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : '';
+    $search_query = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+    $paged = isset($_POST['paged']) ? absint($_POST['paged']) : 1;
+    
+    if (empty($post_type) || empty($search_query)) {
+        wp_send_json_error(['message' => 'Missing parameters']);
+        return;
+    }
+    
+    // Add search filter (title-only, accent-insensitive)
+    add_filter('posts_search', 'lacadev_improve_search_relevance', 10, 2);
+    
+    // Query posts
+    $query = new WP_Query([
+        'post_type' => $post_type,
+        'posts_per_page' => 8,
+        's' => $search_query,
+        'post_status' => 'publish',
+        'paged' => $paged,
+    ]);
+    
+    // Remove search filter
+    remove_filter('posts_search', 'lacadev_improve_search_relevance', 10);
+    
+    if (!$query->have_posts()) {
+        wp_send_json_error(['message' => 'No more posts']);
+        return;
+    }
+    
+    // Generate HTML
+    ob_start();
+    while ($query->have_posts()) {
+        $query->the_post();
+        get_template_part('template-parts/loop', $post_type);
+    }
+    wp_reset_postdata();
+    $html = ob_get_clean();
+    
+    // Return response
+    wp_send_json_success([
+        'html' => $html,
+        'has_more' => $paged < $query->max_num_pages,
+        'next_page' => $paged + 1,
+        'max_pages' => $query->max_num_pages,
+    ]);
 }

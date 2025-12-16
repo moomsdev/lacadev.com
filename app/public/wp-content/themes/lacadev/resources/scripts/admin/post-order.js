@@ -8,6 +8,12 @@
 
 class PostOrderDragDrop {
   constructor() {
+    // Check if lacaPostOrder is defined (only defined when post type is enabled)
+    if (typeof lacaPostOrder === 'undefined') {
+      console.log('PostOrder: Not enabled for this post type');
+      return;
+    }
+
     this.table = document.querySelector('.wp-list-table tbody');
     this.isTermPage = document.body.classList.contains('edit-tags-php');
 

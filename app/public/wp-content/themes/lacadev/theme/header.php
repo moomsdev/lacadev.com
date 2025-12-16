@@ -117,10 +117,11 @@ if (!defined('ABSPATH')) {
                             <!-- search -->
                             <div class="header__bottom-search">
                                 <div class="header__bottom-search-inner">
-                                    <form class="search-box" role="search" aria-label="<?php esc_attr_e('Tìm kiếm', 'laca'); ?>">
+                                    <form class="search-box" method="get" role="search" aria-label="<?php esc_attr_e('Tìm kiếm', 'laca'); ?>" action="<?php echo esc_url(home_url('/')) ?>">
                                         <label for="search-input" class="screen-reader-text"><?php esc_html_e('Từ khóa tìm kiếm', 'laca'); ?></label>
                                         <input type="text" 
                                                id="search-input"
+                                               name="s"
                                                placeholder="<?php echo esc_attr__('Tìm kiếm ...', 'laca'); ?>" 
                                                aria-label="<?php esc_attr_e('Nhập từ khóa tìm kiếm', 'laca'); ?>"/>
                                         <button type="reset" aria-label="<?php esc_attr_e('Xóa tìm kiếm', 'laca'); ?>"></button>

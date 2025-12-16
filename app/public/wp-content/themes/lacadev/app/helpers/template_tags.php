@@ -208,6 +208,48 @@ function thePagination($query = null) {
 }
 
 /**
+ * Pagination for specific post type (used in search results)
+ *
+ * @param mixed|\WP_Query $query
+ * @param string $post_type Post type slug (e.g., 'post', 'page', 'service')
+ */
+function thePostTypePagination($query, $post_type) {
+    if (empty($query) || $query->max_num_pages <= 1) {
+        return;
+    }
+
+    $paged_var = 'paged_' . $post_type;
+    $paged = max(1, get_query_var($paged_var, 1));
+    
+    // Get current URL without pagination params
+    $base_url = remove_query_arg([$paged_var, 'paged']);
+    
+    $pages = paginate_links([
+        'base'      => add_query_arg($paged_var, '%#%', $base_url),
+        'format'    => '',
+        'current'   => $paged,
+        'total'     => $query->max_num_pages,
+        'mid_size'  => 2,
+        'type'      => 'array',
+        'prev_next' => true,
+        'prev_text' => '&laquo;',
+        'next_text' => '&raquo;',
+    ]);
+
+    if (is_array($pages)) {
+        $pagination = '<nav class="pagination-container" aria-label="' . esc_attr($post_type) . ' navigation"><ul class="pagination-list">';
+
+        foreach ($pages as $page) {
+            $pagination .= '<li class="pagination-item">' . $page . '</li>';
+        }
+
+        $pagination .= '</ul></nav>';
+
+        echo $pagination;
+    }
+}
+
+/**
  * Tạo breadcrumb
  */
 function theBreadcrumb() {

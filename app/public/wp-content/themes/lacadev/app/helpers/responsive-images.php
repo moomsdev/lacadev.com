@@ -11,16 +11,48 @@
 // =============================================================================
 
 /**
+ * Get fallback image HTML
+ * 
+ * @param string $size Image size name
+ * @param array $attr Additional attributes
+ * @return string HTML img tag
+ */
+function getFallbackResponsiveImage($size = 'mobile', $attr = []) {
+
+    $img_url = get_template_directory_uri() . '/../resources/images/default-img.webp';
+    $class = isset($attr['class']) ? $attr['class'] : '';
+    $alt = isset($attr['alt']) ? $attr['alt'] : 'Default Image';
+
+    // Map size to probable dimensions (optional, for layout stability)
+    $style = '';
+    // We can add logic here if needed, but for now allow CSS to handle it
+    
+    // Construct attributes string
+    $attr_str = '';
+    foreach ($attr as $name => $value) {
+        if ($name === 'class' || $name === 'alt') continue;
+        $attr_str .= ' ' . esc_attr($name) . '="' . esc_attr($value) . '"';
+    }
+
+    return sprintf(
+        '<img src="%s" alt="%s" class="attachment-%s size-%s %s"%s loading="lazy">',
+        esc_url($img_url),
+        esc_attr($alt),
+        esc_attr($size),
+        esc_attr($size),
+        esc_attr($class),
+        $attr_str
+    );
+}
+
+/**
  * Echo responsive post thumbnail
  * 
  * @param string $size Image size name (mobile, tablet, full)
  * @param array $attr Additional attributes
  */
 function theResponsivePostThumbnail($size = 'mobile', $attr = []) {
-    $image_id = get_post_thumbnail_id();
-    if ($image_id) {
-        echo wp_get_attachment_image($image_id, $size, false, $attr);
-    }
+    echo getResponsivePostThumbnail(null, $size, $attr);
 }
 
 /**
@@ -36,12 +68,13 @@ function getResponsivePostThumbnail($post_id = null, $size = 'mobile', $attr = [
     $image_id = get_post_thumbnail_id($post_id);
     
     if (!$image_id) {
-        // Return default image if set
+        // Return default image if set in Theme Options
         $default_id = getOption('default_image');
         if ($default_id) {
             return wp_get_attachment_image($default_id, $size, false, $attr);
         }
-        return '';
+        // Fallback to static default image
+        return getFallbackResponsiveImage($size, $attr);
     }
     
     return wp_get_attachment_image($image_id, $size, false, $attr);
@@ -55,10 +88,7 @@ function getResponsivePostThumbnail($post_id = null, $size = 'mobile', $attr = [
  * @param array $attr Additional attributes
  */
 function theResponsivePostMeta($meta_key, $size = 'mobile', $attr = []) {
-    $image_id = carbon_get_post_meta(get_the_ID(), $meta_key);
-    if ($image_id) {
-        echo wp_get_attachment_image($image_id, $size, false, $attr);
-    }
+    echo getResponsivePostMeta($meta_key, null, $size, $attr);
 }
 
 /**
@@ -75,7 +105,8 @@ function getResponsivePostMeta($meta_key, $post_id = null, $size = 'mobile', $at
     $image_id = carbon_get_post_meta($post_id, $meta_key);
     
     if (!$image_id) {
-        return '';
+        // Fallback to static default image
+        return getFallbackResponsiveImage($size, $attr);
     }
     
     return wp_get_attachment_image($image_id, $size, false, $attr);
@@ -89,10 +120,7 @@ function getResponsivePostMeta($meta_key, $post_id = null, $size = 'mobile', $at
  * @param array $attr Additional attributes
  */
 function theResponsiveOption($option_key, $size = 'mobile', $attr = []) {
-    $image_id = carbon_get_theme_option($option_key);
-    if ($image_id) {
-        echo wp_get_attachment_image($image_id, $size, false, $attr);
-    }
+    echo getResponsiveOption($option_key, $size, $attr);
 }
 
 /**
@@ -107,7 +135,8 @@ function getResponsiveOption($option_key, $size = 'mobile', $attr = []) {
     $image_id = carbon_get_theme_option($option_key);
     
     if (!$image_id) {
-        return '';
+        // Fallback to static default image
+        return getFallbackResponsiveImage($size, $attr);
     }
     
     return wp_get_attachment_image($image_id, $size, false, $attr);
@@ -121,9 +150,7 @@ function getResponsiveOption($option_key, $size = 'mobile', $attr = []) {
  * @param array $attr Additional attributes
  */
 function theResponsiveImage($attachment_id, $size = 'mobile', $attr = []) {
-    if ($attachment_id) {
-        echo wp_get_attachment_image($attachment_id, $size, false, $attr);
-    }
+    echo getResponsiveImage($attachment_id, $size, $attr);
 }
 
 /**
@@ -136,7 +163,8 @@ function theResponsiveImage($attachment_id, $size = 'mobile', $attr = []) {
  */
 function getResponsiveImage($attachment_id, $size = 'mobile', $attr = []) {
     if (!$attachment_id) {
-        return '';
+        // Fallback to static default image
+        return getFallbackResponsiveImage($size, $attr);
     }
     
     return wp_get_attachment_image($attachment_id, $size, false, $attr);

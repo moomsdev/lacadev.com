@@ -31,6 +31,7 @@ class PostOrder {
         
         // Frontend filters
         add_action('pre_get_posts', [$this, 'modifyQuery']);
+        add_filter('posts_orderby', [$this, 'modifyOrderBy'], 10, 2);
         add_filter('get_terms_orderby', [$this, 'modifyTermsOrderBy'], 10, 3);
     }
     
@@ -114,29 +115,37 @@ class PostOrder {
         $enabled_terms = $this->getEnabledTerms();
         
         if (empty($enabled_objects) && empty($enabled_terms)) {
+            error_log("PostOrder shouldLoadSortable: No enabled objects/terms");
             return false;
         }
         
         // Don't load if custom orderby is set
         if (isset($_GET['orderby'])) {
+            error_log("PostOrder shouldLoadSortable: Custom orderby set, not loading");
             return false;
         }
         
         // Check if we're on a post list page
         if (isset($_GET['post_type']) && in_array($_GET['post_type'], $enabled_objects)) {
+            error_log("PostOrder shouldLoadSortable: Loading for post_type=" . $_GET['post_type']);
             return true;
         }
         
         // Check if we're on default post list
         if (!isset($_GET['post_type']) && strstr($_SERVER['REQUEST_URI'], 'wp-admin/edit.php')) {
-            return in_array('post', $enabled_objects);
+            $should_load = in_array('post', $enabled_objects);
+            error_log("PostOrder shouldLoadSortable: Default post list, should_load=" . ($should_load ? 'yes' : 'no'));
+            return $should_load;
         }
         
         // Check if we're on a taxonomy page
         if (isset($_GET['taxonomy']) && in_array($_GET['taxonomy'], $enabled_terms)) {
+            error_log("PostOrder shouldLoadSortable: Loading for taxonomy=" . $_GET['taxonomy']);
             return true;
         }
         
+        $current_post_type = isset($_GET['post_type']) ? $_GET['post_type'] : 'not_set';
+        error_log("PostOrder shouldLoadSortable: Not loading, post_type={$current_post_type}, enabled=" . json_encode($enabled_objects));
         return false;
     }
     
@@ -218,40 +227,82 @@ class PostOrder {
             return;
         }
         
+        $should_apply = false;
+        
+        // Debug
+        $post_type = isset($wp_query->query['post_type']) ? $wp_query->query['post_type'] : 'not_set';
+        $is_admin = is_admin() && !wp_doing_ajax();
+        error_log("PostOrder modifyQuery: post_type={$post_type}, is_admin={$is_admin}, enabled=" . json_encode($enabled_objects));
+        
         // Admin
         if (is_admin() && !wp_doing_ajax()) {
             if (isset($wp_query->query['post_type']) && !isset($_GET['orderby'])) {
                 if (in_array($wp_query->query['post_type'], $enabled_objects)) {
-                    if (!$wp_query->get('orderby')) {
-                        $wp_query->set('orderby', 'menu_order');
-                    }
-                    if (!$wp_query->get('order')) {
-                        $wp_query->set('order', 'ASC');
-                    }
+                    $should_apply = true;
+                    error_log("PostOrder: ADMIN - Should apply for {$wp_query->query['post_type']}");
                 }
             }
         }
         // Frontend
         else {
-            $active = false;
-            
             if (isset($wp_query->query['post_type'])) {
                 if (in_array($wp_query->query['post_type'], $enabled_objects)) {
-                    $active = true;
+                    $should_apply = true;
+                    error_log("PostOrder: FRONTEND - Should apply for {$wp_query->query['post_type']}");
                 }
             } elseif (in_array('post', $enabled_objects)) {
-                $active = true;
-            }
-            
-            if ($active) {
-                if (!$wp_query->get('orderby')) {
-                    $wp_query->set('orderby', 'menu_order');
-                }
-                if (!$wp_query->get('order')) {
-                    $wp_query->set('order', 'ASC');
-                }
+                $should_apply = true;
+                error_log("PostOrder: FRONTEND - Should apply for default post");
             }
         }
+        
+        if ($should_apply) {
+            $current_orderby = $wp_query->get('orderby');
+            // Only override if orderby is not already set, or if it's the default menu_order
+            if (!$current_orderby || $current_orderby === 'menu_order' || $current_orderby === 'menu_order title' || (is_array($current_orderby) && isset($current_orderby['menu_order']))) {
+                // Mark this query for custom ordering
+                $wp_query->set('_lacadev_custom_order', true);
+                error_log("PostOrder: Marked query for custom order");
+            } else {
+                error_log("PostOrder: NOT marking - custom orderby already set: " . (is_array($current_orderby) ? json_encode($current_orderby) : $current_orderby));
+            }
+        } else {
+            // Not enabled - check if we need to override default WordPress ordering
+            $current_orderby = $wp_query->get('orderby');
+            $post_type = isset($wp_query->query['post_type']) ? $wp_query->query['post_type'] : '';
+            
+            // WordPress defaults pages to 'menu_order title', override to date DESC
+            if ($post_type === 'page' && $current_orderby === 'menu_order title') {
+                $wp_query->set('orderby', 'date');
+                $wp_query->set('order', 'DESC');
+                error_log("PostOrder: Overriding page default to date DESC");
+            } else {
+                error_log("PostOrder: NOT marking - should_apply=false, post_type={$post_type}");
+            }
+        }
+    }
+    
+    /**
+     * Modify the ORDER BY SQL clause
+     */
+    public function modifyOrderBy($orderby, $wp_query) {
+        global $wpdb;
+        
+        // Only apply to queries we marked
+        if (!$wp_query->get('_lacadev_custom_order')) {
+            return $orderby;
+        }
+        
+        // Debug logging
+        $post_type = isset($wp_query->query['post_type']) ? $wp_query->query['post_type'] : 'default';
+        error_log("PostOrder: Modifying ORDER BY for post_type: " . $post_type);
+        error_log("PostOrder: Original orderby: " . $orderby);
+        
+        // Order by menu_order ASC, then by post_date DESC
+        $new_orderby = "{$wpdb->posts}.menu_order ASC, {$wpdb->posts}.post_date DESC";
+        error_log("PostOrder: New orderby: " . $new_orderby);
+        
+        return $new_orderby;
     }
     
     /**

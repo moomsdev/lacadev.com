@@ -431,3 +431,78 @@ add_post_type_support('page', 'excerpt');
 
 // Disable Gutenberg for all post types
 // add_filter('use_block_editor_for_post', '__return_false');
+
+//Duplicate post
+/*
+ * Thêm link 'Duplicate & Publish' vào danh sách bài viết
+ */
+function dev_duplicate_post_as_publish( $actions, $post ) {
+    if ( current_user_can( 'edit_posts' ) ) {
+        $actions['duplicate_publish'] = '<a href="' . wp_nonce_url( 'admin.php?action=dev_duplicate_post_as_publish&post=' . $post->ID, basename( __FILE__ ), 'duplicate_nonce' ) . '" title="Duplicate & Publish this item" rel="permalink">Duplicate & Publish</a>';
+    }
+    return $actions;
+}
+add_filter( 'post_row_actions', 'dev_duplicate_post_as_publish', 10, 2 );
+add_filter( 'page_row_actions', 'dev_duplicate_post_as_publish', 10, 2 );
+
+/*
+ * Xử lý logic nhân bản và public ngay lập tức
+ */
+function dev_save_duplicate_post_as_publish() {
+    if ( ! ( isset( $_GET['post'] ) || isset( $_POST['post'] ) || ( isset($_REQUEST['action']) && 'dev_duplicate_post_as_publish' == $_REQUEST['action'] ) ) ) {
+        wp_die( 'No post to duplicate has been supplied!' );
+    }
+
+    if ( ! isset( $_GET['duplicate_nonce'] ) || ! wp_verify_nonce( $_GET['duplicate_nonce'], basename( __FILE__ ) ) ) {
+        return;
+    }
+
+    $post_id = (isset($_GET['post']) ? absint( $_GET['post'] ) : absint( $_POST['post'] ) );
+    $post = get_post( $post_id );
+
+    $current_user = wp_get_current_user();
+    $new_post_author = $current_user->ID;
+
+    if ( isset( $post ) && $post != null ) {
+        $args = array(
+            'comment_status' => $post->comment_status,
+            'ping_status'    => $post->ping_status,
+            'post_author'    => $new_post_author,
+            'post_content'   => $post->post_content,
+            'post_excerpt'   => $post->post_excerpt,
+            'post_name'      => $post->post_name . '-copy', // Slug mới
+            'post_parent'    => $post->post_parent,
+            'post_password'  => $post->post_password,
+            'post_status'    => 'publish', // QUAN TRỌNG: Set thẳng là publish
+            'post_title'     => $post->post_title . ' (Copy)',
+            'post_type'      => $post->post_type,
+            'to_ping'        => $post->to_ping,
+            'menu_order'     => $post->menu_order
+        );
+
+        $new_post_id = wp_insert_post( $args );
+
+        // Copy danh mục và thẻ (taxonomies)
+        $taxonomies = get_object_taxonomies( $post->post_type );
+        foreach ( $taxonomies as $taxonomy ) {
+            $post_terms = wp_get_object_terms( $post_id, $taxonomy, array( 'fields' => 'slugs' ) );
+            wp_set_object_terms( $new_post_id, $post_terms, $taxonomy, false );
+        }
+
+        // Copy Post Meta (nếu cần)
+        $post_meta_infos = get_post_meta( $post_id );
+        if ( count( $post_meta_infos ) != 0 ) {
+            foreach ( $post_meta_infos as $meta_key => $meta_value ) {
+                $meta_value = $meta_value[0];
+                add_post_meta( $new_post_id, $meta_key, $meta_value );
+            }
+        }
+
+        // Redirect về trang admin
+        wp_redirect( admin_url( 'edit.php?post_type=' . $post->post_type ) );
+        exit;
+    } else {
+        wp_die( 'Post creation failed, could not find original post: ' . $post_id );
+    }
+}
+add_action( 'admin_action_dev_duplicate_post_as_publish', 'dev_save_duplicate_post_as_publish' );
