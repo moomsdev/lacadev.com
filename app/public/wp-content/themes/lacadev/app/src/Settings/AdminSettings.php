@@ -111,17 +111,29 @@ class AdminSettings
 	{
 		add_action('wp_dashboard_setup', static function () {
 			wp_add_dashboard_widget('custom_help_widget', 'Giới thiệu', static function () { ?>
-				<div style="position: relative;">
-					<div style="text-align:center">
-						<a target="_blank" href="<?php echo AUTHOR['website'] ?>" title="<?php echo AUTHOR['name'] ?>">
-							<img style="width:100%" src="<?php echo get_site_url() . '/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png' ?>" alt="<?php echo AUTHOR['name'] ?>" title="<?php echo AUTHOR['name'] ?>">
-						</a>
-					</div>
-					<h2 style="text-align:center;"><?php echo AUTHOR['name'] ?></h2>
-					<div style="margin-top:2rem; display: flex; column-gap: 15px; justify-content: space-between;">
-						<p><a style="font: normal normal 500 12px Montserrat; color: black; text-decoration: none;" href="tel:<?php echo str_replace(['.', ',', ' '], '', AUTHOR['phone_number']); ?>"><?php echo AUTHOR['phone_number'] ?></a></p>
-						<p><a style="font: normal normal 500 12px Montserrat; color: black; text-decoration: none;" href="mailto:<?php echo AUTHOR['email'] ?>"><?php echo AUTHOR['email'] ?></a></p>
-						<p><a style="font: normal normal 500 12px Montserrat; color: black; text-decoration: none;" href="<?php echo AUTHOR['website'] ?>" target="_blank"><?php echo AUTHOR['website'] ?></a></p>
+				<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
+					<a target="_blank" href="<?php echo AUTHOR['website'] ?>" title="<?php echo AUTHOR['name'] ?>" style="opacity: 0.9; transition: opacity 0.2s;">
+						<img style="max-width: 160px; height: auto; display: block;" src="<?php echo get_site_url() . '/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png' ?>" alt="<?php echo AUTHOR['name'] ?>">
+					</a>
+					<div style="margin-top: 20px; text-align: center;">
+						
+						<p style="margin: 0 0 15px; font-size: 16px; font-style: italic; color: #b5b5b5; font-family: 'Quicksand', sans-serif; font-weight: 500;">
+							"Coding amidst the journeys"
+						</p>
+
+						<div style="display: flex; gap: 12px; justify-content: center; align-items: center; font-size: 14px; color: #848383; font-family: 'Quicksand', sans-serif; font-weight: 600;">
+							<a style="color: inherit; text-decoration: none;" href="tel:<?php echo str_replace(['.', ',', ' '], '', AUTHOR['phone_number']); ?>" target="_blank">
+								<?php echo AUTHOR['phone_number'] ?>
+							</a>
+							<span style="color: #dcdcde;">|</span>
+							<a style="color: inherit; text-decoration: none;" href="mailto:<?php echo AUTHOR['email'] ?>" target="_blank">
+								<?php echo AUTHOR['email'] ?>
+							</a>
+							<span style="color: #dcdcde;">|</span>
+							<a style="color: inherit; text-decoration: none;" href="<?php echo AUTHOR['website'] ?>" target="_blank">
+								Ghé thăm tôi
+							</a>
+						</div>
 					</div>
 				</div>
 <?php });

@@ -17,7 +17,7 @@ define('SUPER_USER', ['lacadev']);
 define('AUTHOR', [
     'name' => 'La Cà Dev',
     'email' => 'mooms.dev@gmail.com',
-    'phone_number' => '0989 64 67 66',
+    'phone_number' => '0989.64.67.66',
     'website' => 'https://lacadev.com/',
     'date_started' => get_option('_theme_info_date_started'),
     'date_published' => get_option('_theme_info_date_publish'),
@@ -40,7 +40,6 @@ define('APP_VENDOR_DIR_NAME', 'vendor');
 // Theme Component Names
 define('APP_THEME_USER_NAME', 'users');
 define('APP_THEME_ECOMMERCE_NAME', 'users');
-define('APP_THEME_POST_TYPE_NAME', 'post-types');
 define('APP_THEME_TAXONOMY_NAME', 'taxonomies');
 define('APP_THEME_WIDGET_NAME', 'widgets');
 define('APP_THEME_BLOCK_NAME', 'blocks');
@@ -94,7 +93,6 @@ require_once APP_APP_DIR . 'hooks.php';
 // =============================================================================
 // THEME SETUP
 // =============================================================================
-
 add_action('after_setup_theme', function () {
     // Load textdomain
     load_theme_textdomain('laca', APP_DIR . 'languages');
@@ -133,7 +131,6 @@ add_action('after_setup_theme', function () {
 // =============================================================================
 // AUTOLOAD COMPONENTS
 // =============================================================================
-
 $folders = [
     APP_APP_SETUP_ECOMMERCE_DIR,
     APP_APP_SETUP_TAXONOMY_DIR,
@@ -157,7 +154,6 @@ foreach ($folders as $folder) {
  */
 function custom_ajax_search_script()
 {
-    // Script is bundled in theme.js, just localize the data
     wp_localize_script('theme-js-bundle', 'themeSearch', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('theme_search_nonce'),
