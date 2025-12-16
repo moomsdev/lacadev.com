@@ -21,7 +21,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const searchQuery = button.dataset.search;
 		const currentPage = parseInt( button.dataset.page, 10 );
 
-		// Disable button and show loading state
 		button.disabled = true;
 		const originalText = button.textContent;
 		button.textContent = 'Đang tải...';
@@ -43,60 +42,58 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			const data = await response.json();
 
 			if ( data.success ) {
-				// Find the results container for this post type
 				const section = button.closest( '.search-section' );
 				const resultsContainer = section.querySelector( '.list-post' );
 
-				// Append new posts
 				if ( resultsContainer ) {
-					// Create a temporary container to parse the HTML
 					const tempDiv = document.createElement( 'div' );
 					tempDiv.innerHTML = data.data.html;
 
-					// Count actual number of items being added
-					// Using .loop-service which is the actual class in loop-post.php
-					const newItemsCount = tempDiv.querySelectorAll( '.loop-service' ).length;
+					const newItemsCount =
+						tempDiv.querySelectorAll( '.loop-service' ).length;
 
-					// Append the new content
 					resultsContainer.insertAdjacentHTML(
 						'beforeend',
 						data.data.html
 					);
 
-					// Update count display
-					const countSpan = section.querySelector( '.search-section__count' );
+					const countSpan = section.querySelector(
+						'.search-section__count'
+					);
 					if ( countSpan ) {
-						const currentDisplayed = parseInt( countSpan.dataset.displayed, 10 );
-						const totalCount = parseInt( countSpan.dataset.total, 10 );
-						const newDisplayed = Math.min( currentDisplayed + newItemsCount, totalCount );
+						const currentDisplayed = parseInt(
+							countSpan.dataset.displayed,
+							10
+						);
+						const totalCount = parseInt(
+							countSpan.dataset.total,
+							10
+						);
+						const newDisplayed = Math.min(
+							currentDisplayed + newItemsCount,
+							totalCount
+						);
 
 						countSpan.dataset.displayed = newDisplayed;
 
-						// Update the text - simplified to just show numbers
-						const countText = `(hiển thị ${newDisplayed}/${totalCount})`;
+						const countText = `(hiển thị ${ newDisplayed }/${ totalCount })`;
 						countSpan.textContent = countText;
 					}
 				}
 
-				// Update button page number
 				button.dataset.page = data.data.next_page;
 
-				// Hide button if no more posts
 				if ( ! data.data.has_more ) {
 					button.style.display = 'none';
 				}
 
-				// Re-enable button
 				button.disabled = false;
 				button.textContent = originalText;
 				button.classList.remove( 'loading' );
 			} else {
-				// Error or no more posts
 				button.style.display = 'none';
 			}
 		} catch ( error ) {
-			console.error( 'Load more error:', error );
-			// Re-enable button on error
 			button.disabled = false;
 			button.textContent = originalText;
 			button.classList.remove( 'loading' );
