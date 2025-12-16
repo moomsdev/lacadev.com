@@ -2,84 +2,241 @@
 
 Theme WordPress hiệu suất cao, "Zero jQuery", tối ưu hóa cho tốc độ và trải nghiệm người dùng.
 
-## 🌟 Điểm Nổi Bật
+## Tổng Quan Dự Án
 
-- **🚀 Siêu Tốc Độ:** Frontend Vanilla JS, Webpack bundling, tách code thông minh.
-- **⚡ Critical CSS:** Tự động inline CSS quan trọng, FCP cực nhanh.
-- **🛡️ Bảo Mật:** Nonce verification toàn diện.
-- **📊 Web Vitals:** Giám sát hiệu suất realtime (LCP, CLS, FID).
+La Cà Dev là một WordPress theme hiệu năng cao được xây dựng với kiến trúc hiện đại:
+- **Zero jQuery** - Sử dụng Vanilla JavaScript để tối ưu hiệu năng
+- **WPEmerge Framework** - Routing và controllers theo phong cách MVC cho WordPress
+- **Modern Build System** - Webpack 5 với code splitting, Critical CSS và tối ưu hóa
+- **PSR-4 Autoloading** - Cấu trúc namespace PHP chuẩn
+- **Tập trung vào bảo mật** - Xác thực nonce toàn diện, security headers và sanitization input
 
-## 🚀 Quick Start
+## Các Lệnh Development
 
-**Yêu cầu:** Node.js v20+, Yarn, PHP 7.4+, Composer.
-
+### Lệnh Cơ Bản
 ```bash
-# 1. Setup
+# Cài đặt ban đầu
 composer install && yarn install
 
-# 2. Development (Watch + Hot Reload tại localhost:3000)
+# Chế độ development (watch + hot reload tại localhost:3000)
 yarn dev
 
-# 3. Production Build (Minify + Optimize)
+# Build production (minify + optimize)
 yarn build
+
+# Tạo Critical CSS (sau khi sửa đổi Header/Hero sections)
+yarn critical
+
+# Build theme assets only (để debug)
+yarn build:theme
 ```
 
-## � Commands
+### Lệnh Linting
+```bash
+# Kiểm tra tất cả code
+yarn lint
 
-| Command | Chức năng | Khi nào chạy? |
-|---------|-----------|---------------|
-| `yarn dev` | Chạy dev server | Khi đang code |
-| `yarn build` | Build production | Trước khi deploy |
-| `yarn critical` | Tạo Critical CSS | Khi sửa Header/Home |
-| `yarn build:theme` | Chỉ build theme | Debug theme assets |
+# Kiểm tra từng phần cụ thể
+yarn lint:styles     # Chỉ CSS/SCSS
+yarn lint:scripts    # Chỉ JavaScript
 
-## 📂 Cấu Trúc Dự Án
+# Tự động sửa lỗi linting
+yarn lint-fix
+yarn lint-fix:styles
+yarn lint-fix:scripts
+```
 
-- **`app/`** (PHP Logic): Nơi chứa logic, post types, helpers.
-- **`resources/`** (Source Code): **Sửa giao diện ở đây** (SCSS, JS, Images).
-- **`dist/`** (Compiled): File đã build (Minified). **Không sửa ở đây**.
-- **`theme/`** (Wrapper): File cấu trúc WordPress (`functions.php`, `header.php`...).
+### Build Targets
+- `yarn dev:theme` - Theme assets với webpack ở chế độ watch
+- `yarn dev:blocks` - Gutenberg blocks với @wordpress/scripts
+- `yarn build:blocks` - Build production cho Gutenberg blocks
 
-## � Workflow Lưu Ý
+## Kiến Trúc
 
-### 1. Critical CSS (`yarn critical`)
-Tự động quét trang chủ và tạo CSS inline cho phần hiển thị đầu tiên (Header, Hero).
-- Giúp web hiển thị nội dung **ngay lập tức**.
-- **Lưu ý:** Cần chạy lại lệnh này nếu bạn sửa layout Header hoặc Hero section.
+### Cấu Trúc Thư Mục
+```
+lacadev/
+├── app/                     # PHP Business Logic (PSR-4: App\)
+│   ├── src/                 # Core application classes
+│   │   ├── Abstracts/       # Base classes (AbstractPostType, AbstractTaxonomy)
+│   │   ├── Controllers/     # Web, Admin, Ajax controllers
+│   │   ├── PostTypes/       # Định nghĩa custom post type
+│   │   ├── Routing/         # Route service providers
+│   │   ├── Settings/        # Admin settings, tools (Optimize, Security)
+│   │   └── View/            # View service provider
+│   ├── routes/              # Định nghĩa routes
+│   │   ├── web.php          # Frontend routes
+│   │   ├── admin.php        # Admin panel routes
+│   │   └── ajax.php         # AJAX endpoints
+│   ├── helpers/             # Utility functions
+│   ├── config.php           # WPEmerge configuration
+│   └── hooks.php            # WordPress hooks registration
+│
+├── resources/               # Source Code (SỬA Ở ĐÂY)
+│   ├── scripts/             # JavaScript modules
+│   │   ├── theme/           # Frontend JS → dist/theme.js
+│   │   ├── admin/           # Admin panel JS → dist/admin.js
+│   │   ├── editor/          # Gutenberg editor → dist/editor.js
+│   │   └── login/           # Login page → dist/login.js
+│   ├── styles/              # SCSS source files
+│   │   ├── theme/           # Frontend styles
+│   │   ├── admin/           # Admin panel styles
+│   │   ├── editor/          # Block editor styles
+│   │   └── shared/          # Shared utilities/variables
+│   └── build/               # Webpack configuration
+│
+├── dist/                    # Compiled Assets (KHÔNG SỬA)
+│   ├── theme.js             # Main theme bundle (~12KB)
+│   ├── vendors.js           # Third-party libraries (~685KB)
+│   ├── admin.js             # Admin bundle
+│   └── styles/              # Compiled CSS
+│
+├── theme/                   # WordPress Theme Wrapper
+│   ├── setup/               # Modular setup files
+│   │   ├── assets.php       # Asset enqueuing
+│   │   ├── performance.php  # Performance optimizations
+│   │   ├── security.php     # Security headers & hardening
+│   │   ├── seo.php          # SEO meta tags, Schema.org
+│   │   └── gutenberg-blocks.php
+│   ├── template-parts/      # Reusable template components
+│   ├── functions.php        # Theme bootstrap
+│   └── *.php                # WordPress template files
+│
+└── block-gutenberg/         # React-based Gutenberg blocks
+```
 
-### 2. Assets Loading
-- **Frontend:** `theme.js` load defer (footer).
-- **Admin:** `vendors.js` load **blocking** (head) để đảm bảo thư viện (như SweetAlert2) sẵn sàng cho `admin.js`.
+### WPEmerge Routing
+Theme này sử dụng WPEmerge framework cho routing theo phong cách MVC:
 
-### 3. Minification
-- `yarn build` sẽ tự động xóa `console.log` và nén code tối đa.
-- Nếu code Admin lỗi, kiểm tra xem tên biến có bị đổi (mangle) sai không trong `webpack.production.js`.
+- **Routes** được định nghĩa trong `app/routes/` (web.php, admin.php, ajax.php)
+- **Controllers** trong `app/src/Controllers/` xử lý business logic
+- **Views** được phục vụ từ thư mục `theme/` (WordPress templates chuẩn)
+- **Middleware** được cấu hình trong `app/config.php`
 
-### 4. Kiểm tra lỗi
+Ví dụ cấu trúc route (hiện tại sử dụng `Route::all()` cho WordPress template hierarchy chuẩn):
+```php
+// app/routes/web.php
+Route::all(); // Chuyển tất cả requests qua WPEmerge
+```
 
-#### 1. Để kiểm tra lỗi (Check):
-Mở terminal tại thư mục theme và chạy các lệnh sau:
+### Webpack Entry Points
+Bốn bundles riêng biệt được tạo ra:
+1. **theme.js** - Frontend functionality (deferred, loads ở footer)
+2. **admin.js** - Admin panel features
+3. **editor.js** - Block editor enhancements
+4. **login.js** - Login page customizations
 
--   **Kiểm tra tất cả:**
-    `yarn lint`
+Mỗi bundle tự động include SCSS tương ứng từ `resources/styles/`.
 
--   **Chỉ kiểm tra CSS/SCSS (Giao diện):**
-    `yarn lint:styles`
-    
--   **Chỉ kiểm tra JS/React:**
-    `yarn lint:scripts`
+### Chiến Lược Load Assets
+- **Frontend**: `theme.js` load deferred (footer) để tối ưu hiệu năng
+- **Admin**: `vendors.js` load blocking (head) để đảm bảo các thư viện như SweetAlert2 sẵn sàng trước `admin.js`
+- **Critical CSS**: Tự động inline trong header để có First Contentful Paint nhanh
 
-#### 2. Để TỰ ĐỘNG SỬA lỗi (Auto Fix):
-Các công cụ này còn có khả năng tự sửa các lỗi cơ bản (như thụt đầu dòng sai, thiếu dấu chấm phẩy...):
+## Quy Trình Development Chính
 
--   **Sửa tất cả:**
-    `yarn lint-fix`
-    
--   **Chỉ sửa lỗi CSS/SCSS:**
-    `yarn lint-fix:styles`
-    
--   **Chỉ sửa lỗi JS:**
-    `yarn lint-fix:scripts`
+### Khi Sửa Đổi Frontend UI
+1. Sửa source files trong `resources/scripts/theme/` hoặc `resources/styles/theme/`
+2. Chạy `yarn dev` để live reloading
+3. Thay đổi tự động compile vào `dist/`
+4. Nếu sửa đổi Header/Hero sections, chạy `yarn critical` để tạo lại Critical CSS
+
+### Khi Thêm Custom Post Types
+1. Tạo class mới trong `app/src/PostTypes/` extend `AbstractPostType`
+2. Đăng ký trong `theme/functions.php`:
+   ```php
+   new \App\PostTypes\YourPostType();
+   ```
+
+### Khi Thêm Routes
+1. Thêm route trong file phù hợp (`app/routes/web.php`, `admin.php`, `ajax.php`)
+2. Tạo controller trong `app/src/Controllers/`
+3. Theo docs WPEmerge routing: https://docs.wpemerge.com/#/framework/routing/methods
+
+### Trước Khi Deploy Production
+1. Chạy `yarn build` - Xóa console.log, minify code
+2. Test admin panel hoạt động (kiểm tra biến bị mangled)
+3. Xác minh Critical CSS đã cập nhật
+4. Chạy linting: `yarn lint`
+5. **KHÔNG commit** trừ khi được yêu cầu rõ ràng - để user review trước
+
+## Chuẩn Code
+
+### PHP
+- Tuân theo WordPress Coding Standards
+- Sử dụng PSR-4 autoloading (namespace `App\`)
+- Tabs cho indentation (chuẩn WordPress)
+- Luôn kiểm tra `ABSPATH` trong mọi file:
+  ```php
+  if (!defined('ABSPATH')) {
+      exit;
+  }
+  ```
+- Sử dụng nonce verification cho tất cả AJAX/form submissions
+- Sanitize input, escape output
+
+### JavaScript/CSS
+- 2 spaces indentation (không dùng tabs)
+- Tuân theo rules của `@wordpress/eslint-plugin`
+- Không dùng jQuery - sử dụng Vanilla JS
+- Console statements bị xóa trong production builds
+- Globals được định nghĩa trong `.eslintrc.js`:
+  - WordPress: `themeSearch`, `lacaPostOrder`, `lacaDashboard`, `ajaxurl_params`
+  - Libraries: `Swal` (SweetAlert2), `ScrollTrigger`, `SplitText` (GSAP)
+
+## Cân Nhắc Về Bảo Mật
+
+Theme này có các biện pháp bảo mật toàn diện:
+
+- **HTTP Security Headers**: X-Frame-Options, X-Content-Type-Options, CSP, Referrer-Policy
+- **WordPress Hardening**: XML-RPC disabled, file editing disabled, version numbers hidden
+- **Login Protection**: Rate limiting (5 lần thử trong 15 phút)
+- **AJAX Protection**: Nonce verification trên tất cả AJAX endpoints
+- **Input Sanitization**: Tất cả user input được sanitized với `sanitize_text_field()` hoặc tương tự
+
+Khi thêm AJAX endpoints mới:
+1. Luôn verify nonce: `check_ajax_referer('your_nonce_name')`
+2. Kiểm tra user capabilities: `current_user_can('required_capability')`
+3. Sanitize input: `sanitize_text_field($_POST['field'])`
+4. Escape output: `esc_html()`, `esc_attr()`, `esc_url()`
+
+## Ghi Chú Về Hiệu Năng
+
+- **Critical CSS** inline trong header để FCP nhanh
+- **Code splitting**: Vendors bundle tách riêng khỏi theme code
+- **Image optimization**: Tự động qua webpack (JPEG 85%, PNG compressed)
+- **Lazy loading**: Images lazy-loaded với `lazysizes.min.js`
+- **Service Worker**: Có sẵn trong `resources/scripts/sw.js` cho advanced caching
+- **Web Vitals Monitoring**: Theo dõi hiệu năng real-time (LCP, CLS, FID)
+
+## Xử Lý Sự Cố
+
+### Lỗi Admin JavaScript Sau Build
+Nếu admin features bị lỗi sau `yarn build`, kiểm tra webpack mangling settings trong `resources/build/webpack.production.js`. Reserved globals bao gồm: `Swal`, `LacaDashboard`, `lacaDashboard`, `ajaxurl_params`, `adminI18n`.
+
+### CSS Không Áp Dụng
+1. Kiểm tra `yarn build` hoàn thành thành công
+2. Xác minh `dist/styles/` chứa compiled CSS
+3. Xóa browser cache và WordPress object cache
+4. Kiểm tra console có lỗi 404 không
+
+### BrowserSync Không Hoạt Động
+Proxy URL mặc định là `localhost:3000`. Cập nhật `resources/build/browsersync.js` nếu WordPress local của bạn chạy trên URL khác.
+
+## Yêu Cầu
+
+- **Node.js**: v20+
+- **Yarn**: Latest
+- **PHP**: 7.4+
+- **Composer**: Latest
+- **WordPress**: Tương thích với phiên bản mới nhất
+
+## Tài Nguyên Bổ Sung
+
+- Theme documentation: README.md
+- Phân tích chi tiết: THEME-ANALYSIS-REPORT.md
+- Lộ trình cải thiện: TODO-IMPROVEMENTS.md
+- HTML best practices: HTML-BEST-PRACTICES.md
 ---
 *Author: La Cà Dev - Code giữa những chuyến đi*
 Email: mooms.dev@gmail.com
