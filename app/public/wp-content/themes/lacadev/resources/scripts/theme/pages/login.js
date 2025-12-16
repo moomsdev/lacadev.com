@@ -1,12 +1,12 @@
-let loginFunction = {
-    init: function (formElement) {
+const loginFunction = {
+  init(formElement) {
 
-    }
-}
+  },
+};
 
-document.addEventListener("DOMContentLoaded", function () {
-    let loginForm = document.getElementById('login_form');
-    if (loginForm) {
-        loginFunction.init(loginForm);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('login_form');
+  if (loginForm) {
+    loginFunction.init(loginForm);
+  }
 });

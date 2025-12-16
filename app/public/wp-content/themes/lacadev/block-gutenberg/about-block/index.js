@@ -7,6 +7,6 @@ import Save from './save';
 // No need to import block-specific SCSS files
 
 registerBlockType(metadata.name, {
-	edit: Edit,
-	save: Save,
+  edit: Edit,
+  save: Save,
 });

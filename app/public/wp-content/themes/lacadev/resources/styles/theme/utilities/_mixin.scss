@@ -3,13 +3,13 @@
 /// Block Element
 @mixin element($element) {
   &__#{$element} {
-      @content;
+    @content;
   }
 }
 /// Block Modifier
 @mixin modifier($modifier) {
   &--#{$modifier} {
-      @content;
+    @content;
   }
 }
 

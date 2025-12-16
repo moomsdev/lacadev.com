@@ -1,25 +1,25 @@
 // eslint-disable-next-line no-unused-vars
-import "@styles/login";
+import '@styles/login';
 
-document.addEventListener("DOMContentLoaded", function () {
-  const loginHeaderLink = document.querySelector("#login h1 a");
+document.addEventListener('DOMContentLoaded', () => {
+  const loginHeaderLink = document.querySelector('#login h1 a');
   if (loginHeaderLink) {
-    loginHeaderLink.setAttribute("href", "https://lacadev.com/");
-    loginHeaderLink.setAttribute("target", "_blank");
+    loginHeaderLink.setAttribute('href', 'https://lacadev.com/');
+    loginHeaderLink.setAttribute('target', '_blank');
   }
 
   document.getElementById('user_login').setAttribute('placeholder', 'Username or Email Address');
   document.getElementById('user_pass').setAttribute('placeholder', 'Password');
 
   // create div class welcome
-  var welcomeDiv = document.createElement('div');
+  const welcomeDiv = document.createElement('div');
   welcomeDiv.className = 'welcome';
   welcomeDiv.textContent = 'Welcome to our website';
 
   // insert after logo
-  var loginForm = document.getElementById('login');
-  var logo = document.querySelector('#login h1');
+  const loginForm = document.getElementById('login');
+  const logo = document.querySelector('#login h1');
   if (logo) {
-      logo.insertAdjacentElement('afterend', welcomeDiv);
+    logo.insertAdjacentElement('afterend', welcomeDiv);
   }
 });

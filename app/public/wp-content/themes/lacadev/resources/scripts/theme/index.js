@@ -1,44 +1,44 @@
-import "@images/favicon.ico";
-import "@styles/theme";
-import "airbnb-browser-shims";
-import "./pages/*.js";
-import "./ajax-search.js";
-import gsap from "gsap";
+import '@images/favicon.ico';
+import '@styles/theme';
+import 'airbnb-browser-shims';
+import './pages/*.js';
+import './ajax-search.js';
+import gsap from 'gsap';
 import Swup from 'swup';
-import Swiper from "swiper";
+import Swiper from 'swiper';
 
-document.addEventListener("DOMContentLoaded", function () {
-    const swup = new Swup();
+document.addEventListener('DOMContentLoaded', () => {
+  const swup = new Swup();
+  initializePageFeatures();
+
+  swup.hooks.on('content:replace', () => {
     initializePageFeatures();
-
-    swup.hooks.on('content:replace', () => {
-      initializePageFeatures();
-    });
+  });
 });
 
 function initializePageFeatures() {
-    initHoverService();
-    setupGsap404();
-    initToggleDarkMode();
+  initHoverService();
+  setupGsap404();
+  initToggleDarkMode();
 }
 
 /**
  * Khởi tạo hoạt ảnh GSAP và AOS
  */
 function initAnimations() {
-    // GSAP
-    gsap.registerPlugin(ScrollTrigger);
-    gsap.from(".block-title-scroll", {
-        x: "50%",
-        duration: 2,
-        opacity: .3,
-        scrollTrigger: {
-        trigger: ".block-title-scroll",
-        start: "top 80%",
-        end: "bottom 20%",
-        scrub: true,
-        },
-    });
+  // GSAP
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.from('.block-title-scroll', {
+    x: '50%',
+    duration: 2,
+    opacity: 0.3,
+    scrollTrigger: {
+      trigger: '.block-title-scroll',
+      start: 'top 80%',
+      end: 'bottom 20%',
+      scrub: true,
+    },
+  });
 
 //   // AOS
 //   AOS.init({
@@ -47,53 +47,53 @@ function initAnimations() {
 }
 
 function initHoverService() {
-    
+
 }
 
 function initToggleDarkMode() {
-  const toggleInput = document.querySelector(".darkmode-icon input");
+  const toggleInput = document.querySelector('.darkmode-icon input');
   const rootElement = document.documentElement;
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   // Set initial theme based on system preference or saved preference
-  const savedTheme = localStorage.getItem("theme");
-  const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
-  rootElement.setAttribute("data-theme", initialTheme);
+  const savedTheme = localStorage.getItem('theme');
+  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+  rootElement.setAttribute('data-theme', initialTheme);
   if (toggleInput) {
-    toggleInput.checked = initialTheme === "dark";
+    toggleInput.checked = initialTheme === 'dark';
   }
 
   // Handle theme toggle
   if (toggleInput) {
     // Set initial ARIA state
     toggleInput.setAttribute('aria-checked', initialTheme === 'dark');
-    
-    toggleInput.addEventListener("change", (event) => {
+
+    toggleInput.addEventListener('change', (event) => {
       const isDark = event.target.checked;
-      const newTheme = isDark ? "dark" : "light";
-      
+      const newTheme = isDark ? 'dark' : 'light';
+
       // Update ARIA state
       toggleInput.setAttribute('aria-checked', isDark);
 
       if (document.startViewTransition) {
         document.startViewTransition(() => {
-          rootElement.setAttribute("data-theme", newTheme);
-          localStorage.setItem("theme", newTheme);
+          rootElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
         });
       } else {
-        rootElement.setAttribute("data-theme", newTheme);
-        localStorage.setItem("theme", newTheme);
+        rootElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
       }
     });
   }
 
   // Listen for system theme changes
   window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", (e) => {
-      if (!localStorage.getItem("theme")) {
-        const newTheme = e.matches ? "dark" : "light";
-        rootElement.setAttribute("data-theme", newTheme);
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        rootElement.setAttribute('data-theme', newTheme);
         if (toggleInput) {
           toggleInput.checked = e.matches;
         }
@@ -102,28 +102,28 @@ function initToggleDarkMode() {
 }
 
 function initMenu() {
-  var $menuBtn = document.getElementById("btn-hamburger");
-  const navMenu = document.querySelector("nav.nav-menu");
+  const $menuBtn = document.getElementById('btn-hamburger');
+  const navMenu = document.querySelector('nav.nav-menu');
 
   if ($menuBtn) {
-      $menuBtn.onclick = function (e) {
-        const isExpanded = navMenu.classList.contains("actived");
-        
-        // Update ARIA states
-        $menuBtn.setAttribute('aria-expanded', !isExpanded);
-        $menuBtn.setAttribute('aria-label', isExpanded ? 'Mở menu' : 'Đóng menu');
-        
-        navMenu.classList.toggle("actived");
-        document.body.classList.toggle("overflow-hidden");
+    $menuBtn.onclick = function (e) {
+      const isExpanded = navMenu.classList.contains('actived');
 
-        animatedMenu(this);
-        e.preventDefault();
-      };
+      // Update ARIA states
+      $menuBtn.setAttribute('aria-expanded', !isExpanded);
+      $menuBtn.setAttribute('aria-label', isExpanded ? 'Mở menu' : 'Đóng menu');
+
+      navMenu.classList.toggle('actived');
+      document.body.classList.toggle('overflow-hidden');
+
+      animatedMenu(this);
+      e.preventDefault();
+    };
   }
 }
 
 function animatedMenu(x) {
-  x.classList.toggle("animeOpenClose");
+  x.classList.toggle('animeOpenClose');
 }
 
 function initMmenu() {
@@ -136,10 +136,10 @@ function initMmenu() {
 
 function initSwiperSlider() {
   setTimeout(() => {
-    new Swiper(".sliders", {
+    new Swiper('.sliders', {
       spaceBetween: 30,
       centeredSlides: true,
-      effect: "fade",
+      effect: 'fade',
       speed: 1500,
       autoplay: {
         delay: 5000,
@@ -180,84 +180,84 @@ function initIsotop() {
  */
 function setupHideHeaderOnScroll() {
   let lastScrollTop = 0;
-  let header = document.getElementById("header");
+  const header = document.getElementById('header');
   let scrollTimeout;
 
-  window.addEventListener("scroll", function () {
+  window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
 
-    let currentScrollTop =
+    const currentScrollTop =
       window.pageYOffset || document.documentElement.scrollTop;
 
     if (currentScrollTop > lastScrollTop) {
-      header.classList.add("hidden");
+      header.classList.add('hidden');
     } else {
-      header.classList.add("hidden");
+      header.classList.add('hidden');
     }
 
     lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
 
     scrollTimeout = setTimeout(() => {
-      header.classList.remove("hidden");
+      header.classList.remove('hidden');
     }, 500);
   });
 }
 
 function setupGsap404() {
-  gsap.set("svg", { visibility: "visible" });
+  gsap.set('svg', { visibility: 'visible' });
 
-  gsap.to("#spaceman", {
+  gsap.to('#spaceman', {
     y: 5,
     rotation: 2,
     yoyo: true,
     repeat: -1,
-    ease: "sine.inOut",
+    ease: 'sine.inOut',
     duration: 1,
   });
 
-  gsap.to("#starsBig line", {
-    rotation: "random(-30,30)",
-    transformOrigin: "50% 50%",
+  gsap.to('#starsBig line', {
+    rotation: 'random(-30,30)',
+    transformOrigin: '50% 50%',
     yoyo: true,
     repeat: -1,
-    ease: "sine.inOut",
-    });
+    ease: 'sine.inOut',
+  });
 
   gsap.fromTo(
-    "#starsSmall g",
+    '#starsSmall g',
     { scale: 0 },
     {
       scale: 1,
-      transformOrigin: "50% 50%",
+      transformOrigin: '50% 50%',
       yoyo: true,
       repeat: -1,
       stagger: 0.1,
-    }
+    },
   );
 
-  gsap.to("#circlesSmall circle", {
+  gsap.to('#circlesSmall circle', {
     y: -4,
     yoyo: true,
     duration: 1,
-    ease: "sine.inOut",
+    ease: 'sine.inOut',
     repeat: -1,
   });
 
-  gsap.to("#circlesBig circle", {
+  gsap.to('#circlesBig circle', {
     y: -2,
     yoyo: true,
     duration: 1,
-    ease: "sine.inOut",
+    ease: 'sine.inOut',
     repeat: -1,
   });
 
-  gsap.set("#glassShine", { x: -68 });
-  gsap.to("#glassShine", {
+  gsap.set('#glassShine', { x: -68 });
+  gsap.to('#glassShine', {
     x: 80,
     duration: 2,
     rotation: -30,
-    ease: "expo.inOut",
-    transformOrigin: "50% 50%",
+    ease: 'expo.inOut',
+    transformOrigin: '50% 50%',
     repeat: -1,
     repeatDelay: 8,
     delay: 2,
@@ -265,26 +265,26 @@ function setupGsap404() {
 }
 
 function animateText(selector) {
-  var hasAnim = document.querySelectorAll(".slogan p");
-  hasAnim.forEach(function (element) {
-    var splitType = "lines, chars";
-    var splitto = new SplitText(element, {
+  const hasAnim = document.querySelectorAll('.slogan p');
+  hasAnim.forEach((element) => {
+    const splitType = 'lines, chars';
+    const splitto = new SplitText(element, {
       type: splitType,
-      linesClass: "anim_line",
-      charsClass: "anim_char",
-      wordsClass: "anim_word",
+      linesClass: 'anim_line',
+      charsClass: 'anim_char',
+      wordsClass: 'anim_word',
     });
-    var chars = element.querySelectorAll(".anim_char");
+    const chars = element.querySelectorAll('.anim_char');
     gsap.fromTo(
       chars,
-      { y: "100%", autoAlpha: 0 },
+      { y: '100%', autoAlpha: 0 },
       {
-        y: "0%",
+        y: '0%',
         autoAlpha: 1,
         duration: 0.8,
         stagger: 0.01,
-        ease: "power2.out",
-      }
+        ease: 'power2.out',
+      },
     );
   });
 }
