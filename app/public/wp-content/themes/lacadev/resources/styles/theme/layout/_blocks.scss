@@ -1,5 +1,5 @@
-@use "../utilities/variables.scss" as *;
-@use "../utilities/mixin.scss" as *;
+@use "../abstracts/variables.scss" as *;
+@use "../abstracts/mixin.scss" as *;
 
 // Mixin containing all block styles
 // This allows reuse in both theme and editor contexts
@@ -54,7 +54,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: $backgroundDark;
+        background-color: $primaryColor;
       }
     }
 
