@@ -1,7 +1,5 @@
 # Build files
 /dist/
-/resources/styles/theme/_sprite.scss
-
 
 # Development files
 /config.json

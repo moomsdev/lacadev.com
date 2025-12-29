@@ -298,8 +298,6 @@ class AdminSettings
 		});
 	}
 
-	// Removed: addCustomResources() - jQuery Repeater was never used
-
 	public function disableChangeAdminEmailRequireConfirm()
 	{
 		remove_action('add_option_new_admin_email', 'update_option_new_admin_email');
@@ -375,7 +373,12 @@ class AdminSettings
 			}
 
 			global $submenu;
-			unset($submenu['themes.php'][5], $submenu['themes.php'][6], $submenu['themes.php'][11]);
+			unset($submenu['themes.php'][5], $submenu['themes.php'][6]);
+
+			if (get_option('_hide_theme_editor') === 'yes') {
+				unset($submenu['themes.php'][11]);
+				remove_submenu_page('themes.php', 'theme-editor.php');
+			}
 		}, 999);
 
 		$errorMessage = $this->errorMessage;
@@ -386,15 +389,20 @@ class AdminSettings
 				'plugin-editor',
 				'themes',
 				'theme-install',
-				'theme-editor',
+				'theme-install',
+				'customize',
 				'customize',
 				'tools',
 				'import',
 				'export',
 				'tools_page_action-scheduler',
 				'tools_page_export_personal_data',
+				'tools_page_export_personal_data',
 				'tools_page_remove_personal_data',
 			];
+			if (get_option('_hide_theme_editor') === 'yes') {
+				$deniePage[] = 'theme-editor';
+			}
 			$current_screen = get_current_screen();
 
 			if ($current_screen !== null && in_array($current_screen->id, $deniePage, true)) {
@@ -494,6 +502,13 @@ class AdminSettings
 						->set_width(70)
 						->set_html( '<i class="fa-regular fa-lightbulb-on"></i> Khi bật chế độ bảo trì, tất cả người dùng sẽ không thể truy cập vào trang web của bạn. Bạn có thể tạm thời đóng băng trang web để tránh việc người dùng truy cập vào trang web của bạn.' ),
 					
+					// hide theme editor
+					Field::make('checkbox', 'hide_theme_editor', __('Tắt chức năng chỉnh sửa code', 'laca'))
+					->set_width(30),
+					Field::make( 'html', 'hide_theme_editor_desc' )
+						->set_width(70)
+						->set_html( '<i class="fa-regular fa-lightbulb-on"></i> Khi bật chế độ này, bạn sẽ không thể chỉnh sửa code trong trang admin.' ),
+
 					Field::make('checkbox', 'disable_admin_confirm_email', __('Tắt chức năng xác thực email khi thay đổi email admin', 'laca'))
 						->set_width(30),
 					Field::make( 'html', 'disable_admin_confirm_email_desc' )
@@ -517,6 +532,7 @@ class AdminSettings
 					Field::make( 'html', 'hide_comment_menu_default_desc' )
 						->set_width(70)
 						->set_html( '<i class="fa-regular fa-lightbulb-on"></i> Khi bật chế độ này, bạn sẽ không thể xem menu bình luận trong trang admin.' ),
+						
 				])
 				->add_tab(__('SMTP', 'laca'), [
 					Field::make('checkbox', 'use_smtp', __('Sử dụng SMTP để gửi mail', 'laca')),
@@ -589,8 +605,6 @@ class AdminSettings
 					
 				// The function of lazy loading images
 				Field::make( 'separator', 'title_lazy_loading_images', __( 'The function of lazy loading images' ) ),
-				Field::make('checkbox', 'enable_lazy_loading_images', __('Enable image lazy loading', 'laca'))
-					->set_width(30),
 				Field::make( 'html', 'lazy_loading_images_desc' )
 					->set_width(70)
 					->set_html( '<i class="fa-regular fa-lightbulb-on"></i> Nếu bạn muốn lazy load hình ảnh mỗi khi trang tải, hãy bật tính năng này. Chức năng này giúp trang web của bạn tải nhanh hơn' ),

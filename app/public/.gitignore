@@ -10,8 +10,6 @@
 /wp-content/backup-db/
 /wp-content/debug.log
 /wp-content/index.php
-/wp-content/themes/generatepress/
-/wp-content/themes/mooms_dev_v1/
 
 .htaccess
 index.php
