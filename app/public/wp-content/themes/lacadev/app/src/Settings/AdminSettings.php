@@ -30,6 +30,7 @@ class AdminSettings
 			$this->removeUnnecessaryMenus();
 		}
 
+		$this->applyAdminColorVariables();
 		$this->addDashboardContactWidget();
 		$this->removeDefaultWidgets();
 		$this->removeDashboardWidgets();
@@ -48,8 +49,6 @@ class AdminSettings
 		if (get_option('_disable_use_weak_password') === 'yes') {
 			$this->disableCheckboxUseWeakPassword();
 		}
-
-
 
 		if (get_option('_hide_post_menu_default') === 'yes') {
 			$this->hidePostMenuDefault();
@@ -79,6 +78,26 @@ class AdminSettings
 			}
 			die($url);
 		});
+	}
+
+	public function applyAdminColorVariables(): void
+	{
+		$printColors = static function () {
+			$primary   = carbon_get_theme_option('primary_color_ad') ?: '#566a7f';
+			$secondary = carbon_get_theme_option('secondary_color_ad') ?: '#566a7f';
+			$bg        = carbon_get_theme_option('bg_color_ad') ?: '#E6E4FC';
+			$text      = carbon_get_theme_option('text_color_ad') ?: '#000';
+
+			echo '<style>:root{'
+				. '--primary-color-ad:' . esc_attr($primary) . ';'
+				. '--secondary-color-ad:' . esc_attr($secondary) . ';'
+				. '--bg-color-ad:' . esc_attr($bg) . ';'
+				. '--text-color-ad:' . esc_attr($text) . ';'
+				. '}</style>';
+		};
+
+		add_action('admin_head', $printColors);
+		add_action('login_head', $printColors);
 	}
 
 	public function disableCheckboxUseWeakPassword()
@@ -189,7 +208,7 @@ class AdminSettings
 	public function changeFooterCopyright()
 	{
 		add_filter('admin_footer_text', static function () {
-			echo '<a href="' . AUTHOR['website'] . '" target="_blank">' . AUTHOR['name'] . '</a> © ' . date('Y') . ' - All rights reserved';
+			echo '<a href="' . AUTHOR['website'] . '" target="_blank">' . AUTHOR['name'] . '</a> © ' . date('Y') . ' - Coding amidst the journeys';
 		});
 	}
 
@@ -216,7 +235,7 @@ class AdminSettings
 		add_action('admin_bar_menu', static function ($wp_admin_bar) use ($author) {
 			$args = [
 				'id'    => 'logo_author',
-				'title' => '<img src="' . get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-white.png" . '" style="height: 1rem; padding-top:.3rem;" alt="' . AUTHOR['name'] . '">',
+				'title' => '<img src="' . get_site_url() . "/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png" . '" class="logo-admin-bar" alt="' . AUTHOR['name'] . '">',
 				'href'  => $author['website'],
 				'meta'  => [
 					'target' => '_blank',
@@ -495,6 +514,16 @@ class AdminSettings
 			$options = Container::make('theme_options', __('Laca Admin', 'laca'))
 				->set_page_file(__('laca-admin', 'laca'))
 				->set_page_menu_position(3)
+				->add_tab(__('ADMIN COLOR', 'laca'), [
+					Field::make('color', 'primary_color_ad', __('Primary color', 'laca'))
+						->set_width(25),
+					Field::make('color', 'secondary_color_ad', __('Secondary color', 'laca'))
+						->set_width(25),
+					Field::make('color', 'bg_color_ad', __('Background color', 'laca'))
+						->set_width(25),
+					Field::make('color', 'text_color_ad', __('Text color', 'laca'))
+						->set_width(25),
+				])
 				->add_tab(__('ADMIN', 'laca'), [
 					Field::make('checkbox', 'is_maintenance', __('Bật chế độ bảo trì', 'laca')) 
 						->set_width(30),

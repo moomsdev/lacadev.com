@@ -364,12 +364,12 @@ class PostOrder
                 $wpdb->prepare(
                     "UPDATE {$wpdb->posts} AS pt
                     JOIN (
-                        SELECT ID, (@row_number:=@row_number + 1) AS rank
+                        SELECT ID, (@row_number:=@row_number + 1) AS row_num
                         FROM {$wpdb->posts}
                         WHERE post_type = %s AND post_status IN ('publish', 'pending', 'draft', 'private', 'future')
                         ORDER BY menu_order ASC
                     ) AS pt2 ON pt.ID = pt2.ID
-                    SET pt.menu_order = pt2.rank;",
+                    SET pt.menu_order = pt2.row_num;",
                     $object
                 )
             );

@@ -45,6 +45,28 @@ if (!defined('ABSPATH')) {
         echo '<style id="critical-css">' . file_get_contents($critical_css_path) . '</style>';
     }
     ?>
+    <style>
+        :root {
+            /* Theme colors */
+            --primary-color: <?php echo getOption('primary_color'); ?>;
+            --secondary-color: <?php echo getOption('secondary_color'); ?>;
+            --bg-color: <?php echo getOption('bg_color'); ?>;
+
+            --primary-color-dark: <?php echo getOption('primary_color_dark'); ?>;
+            --secondary-color-dark: <?php echo getOption('secondary_color_dark'); ?>;
+            --bg-color-dark: <?php echo getOption('bg_color_dark'); ?>;
+        }
+
+        html[data-theme="dark"] {
+            --primary-color: <?php echo getOption('primary_color_dark'); ?>;
+            --secondary-color: <?php echo getOption('secondary_color_dark'); ?>;
+            --bg-color: <?php echo getOption('bg_color_dark'); ?>;
+
+            --primary-color-dark: <?php echo getOption('primary_color'); ?>;
+            --secondary-color-dark: <?php echo getOption('secondary_color'); ?>;
+            --bg-color-dark: <?php echo getOption('bg_color'); ?>;
+        }
+    </style>
 </head>
 
 <body <?php body_class(); ?>>

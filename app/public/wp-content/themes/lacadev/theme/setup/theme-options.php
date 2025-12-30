@@ -16,6 +16,26 @@ $optionsPage = Container::make('theme_options', __('Laca Theme', 'laca'))
 	->set_page_file('app-theme-options.php')
 	->set_page_menu_position(3)
 	->add_tab(__('Branding | Thương hiệu', 'laca'), [
+		Field::make('color', 'primary_color', __('Primary color', 'laca'))
+			->set_attribute('data-default-color', '#333')
+			->set_width(33.33),
+		Field::make('color', 'secondary_color', __('Secondary color', 'laca'))
+			->set_attribute('data-default-color', '#626262')
+			->set_width(33.33),
+		Field::make('color', 'bg_color', __('Background color', 'laca'))
+			->set_attribute('data-default-color', '#f6f7fe')
+			->set_width(33.33),
+
+		Field::make('color', 'primary_color_dark', __('Primary color dark', 'laca'))
+			->set_attribute('data-default-color', '#fff')
+			->set_width(33.33),
+		Field::make('color', 'secondary_color_dark', __('Secondary color dark', 'laca'))
+			->set_attribute('data-default-color', '#fff')
+			->set_width(33.33),
+		Field::make('color', 'bg_color_dark', __('Background color dark', 'laca'))
+			->set_attribute('data-default-color', '#050610')
+			->set_width(33.33),
+
 		Field::make('image', 'logo' . currentLanguage(), __('Logo', 'laca'))
 			->set_width(33.33),
 		Field::make('image', 'logo_dark' . currentLanguage(), __('Logo Dark', 'laca'))
