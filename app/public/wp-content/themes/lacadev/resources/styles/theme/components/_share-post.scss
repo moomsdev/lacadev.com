@@ -1,3 +1,6 @@
+@use "../abstracts/variables.scss" as *;
+@use "../abstracts/mixin.scss" as *;
+
 .share-post {
   .inner {
     margin-top: 0 !important;
