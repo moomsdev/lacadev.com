@@ -101,6 +101,7 @@ add_action('after_setup_theme', function () {
 
     // Load security & SEO (Phase 1 improvements)
     require_once APP_APP_SETUP_DIR . 'security.php';
+    require_once APP_APP_SETUP_DIR . 'recaptcha.php';
     // require_once APP_APP_SETUP_DIR . 'seo.php';
 
     // Load image optimization (Phase 2 improvements)

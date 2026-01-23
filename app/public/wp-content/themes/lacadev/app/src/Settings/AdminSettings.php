@@ -745,7 +745,48 @@ class AdminSettings
 					->set_width(70)
 					->set_html('<i class="fa-regular fa-lightbulb-on"></i> Giám sát hiệu suất, phát hiện bất thường.'),
 			]);
-			
+
+			// Google reCAPTCHA
+			Container::make('theme_options', __('Google reCAPTCHA', 'laca'))
+				->set_page_parent($options)
+				->set_page_file(__('laca-recaptcha', 'laca'))
+				->add_fields([
+					Field::make('html', 'recaptcha_info', '')
+						->set_html('<div class="carbon-field-description">Bảo vệ website khỏi spam/bot bằng Google reCAPTCHA v3. <a href="https://www.google.com/recaptcha/admin/create" target="_blank">Đăng ký Key tại đây</a>.</div>'),
+					
+					Field::make('text', 'recaptcha_site_key', __('Site Key', 'laca'))
+						->set_width(50)
+						->set_attribute('placeholder', '6Le...'),
+						
+					Field::make('text', 'recaptcha_secret_key', __('Secret Key', 'laca'))
+						->set_width(50)
+						->set_attribute('type', 'password')
+						->set_attribute('placeholder', '6Le...'),
+						
+					Field::make('separator', 'recaptcha_separator', __('Cấu hình hiển thị', 'laca')),
+					
+					Field::make('checkbox', 'enable_recaptcha_login', __('Kích hoạt cho Đăng nhập', 'laca'))
+						->set_width(25)
+						->set_default_value(true),
+						
+					Field::make('checkbox', 'enable_recaptcha_register', __('Kích hoạt cho Đăng ký', 'laca'))
+						->set_width(25)
+						->set_default_value(true),
+						
+					Field::make('checkbox', 'enable_recaptcha_comment', __('Kích hoạt cho Bình luận', 'laca'))
+						->set_width(25)
+						->set_default_value(true),
+						
+					Field::make('text', 'recaptcha_score', __('Điểm tối thiểu (0.0 - 1.0)', 'laca'))
+						->set_width(25)
+						->set_default_value('0.5')
+						->set_attribute('type', 'number')
+						->set_attribute('step', '0.1')
+						->set_attribute('min', '0.0')
+						->set_attribute('max', '1.0')
+						->set_help_text('Bot thường < 0.5. Người dùng thật thường > 0.5.'),
+				]);
+
 			Container::make('theme_options', __('Login Socials', 'laca'))
 			->set_page_parent($options)
 			->set_page_file(__('laca-login-socials', 'laca'))
