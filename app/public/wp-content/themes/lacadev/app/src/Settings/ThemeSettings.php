@@ -80,8 +80,8 @@ class ThemeSettings {
             }
 
             echo '<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-                    <meta name="author" content="' . AUTHOR['name'] . '" />
-                    <meta name="copyright" content="' . AUTHOR['name'] . ' [' . AUTHOR['email'] . '] [' . AUTHOR['website'] . ']" />
+                    <meta name="author" content="' . esc_attr(AUTHOR['name']) . '" />
+                    <meta name="copyright" content="' . esc_attr(AUTHOR['name']) . ' [' . esc_attr(AUTHOR['email']) . '] [' . esc_attr(AUTHOR['website']) . ']" />
                     <meta http-equiv="Content-Language" content="' . get_bloginfo('language') . '"/>
                     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
                     <!--[if lt IE 9]>

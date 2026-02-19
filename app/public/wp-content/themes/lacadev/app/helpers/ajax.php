@@ -502,9 +502,32 @@ add_action('wp_ajax_nopriv_get_page', 'ajaxGetPage');
 add_action('wp_ajax_get_page', 'ajaxGetPage');
 
 function ajaxGetPage() {
+    // Security check
+    check_ajax_referer('theme_nonce', 'nonce');
+
+    $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+    
+    if (!$post_id) {
+        wp_send_json_error(['message' => 'Missing Post ID']);
+    }
+
+    // Setup global post data
+    global $post;
+    $post = get_post($post_id);
+    
+    if (!$post) {
+        wp_send_json_error(['message' => 'Post not found']);
+    }
+    
+    setup_postdata($post);
+
     ob_start();
-    get_template_part('page');
+    // Load the page template. Note: This will load 'page.php' from the theme root.
+    // If you need a specific part, use get_template_part('template-parts/content', 'page');
+    get_template_part('page'); 
     $content = ob_get_clean();
+    
+    wp_reset_postdata();
     wp_send_json_success($content);
 }
 

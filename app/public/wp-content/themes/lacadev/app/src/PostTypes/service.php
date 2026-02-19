@@ -5,7 +5,7 @@ namespace App\PostTypes;
 use Carbon_Fields\Container\Container;
 use Carbon_Fields\Field;
 
-class service extends \App\Abstracts\AbstractPostType
+class Service extends \App\Abstracts\AbstractPostType
 {
 
     public function __construct()

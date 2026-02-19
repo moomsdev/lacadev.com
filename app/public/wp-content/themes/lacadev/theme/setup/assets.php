@@ -272,11 +272,6 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
         'hotjar'
     ];
 
-    // Scripts to preload (critical)
-    $preload_scripts = [
-        'theme-critical-js'
-    ];
-
     if (in_array($handle, $defer_scripts)) {
         return str_replace('<script ', '<script defer ', $tag);
     }
@@ -285,16 +280,11 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
         return str_replace('<script ', '<script async ', $tag);
     }
 
-    if (in_array($handle, $preload_scripts)) {
-        // Add preload hint for critical scripts
-        echo '<link rel="preload" href="' . $src . '" as="script">';
-    }
-
     return $tag;
 }, 10, 3);
 
 /**
- * Advanced style optimization with preload
+ * Advanced style optimization
  */
 add_filter('style_loader_tag', function ($tag, $handle, $href) {
     // Non-critical styles to load asynchronously
@@ -304,15 +294,9 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
         'google-fonts'
     ];
 
-    // Critical styles to preload
-    $critical_styles = [
-        'theme-css-bundle'
-    ];
-
     // If critical CSS file exists (inlined in header), load main bundle asynchronously
     if (file_exists(get_template_directory() . '/dist/styles/critical.css')) {
         $non_critical_styles[] = 'theme-css-bundle';
-        $critical_styles = array_diff($critical_styles, ['theme-css-bundle']);
     }
 
     if (in_array($handle, $non_critical_styles)) {
@@ -321,13 +305,30 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
             '<noscript><link rel="stylesheet" href="' . $href . '"></noscript>';
     }
 
-    if (in_array($handle, $critical_styles)) {
-        // Add preload for critical CSS
-        echo '<link rel="preload" href="' . $href . '" as="style">';
-    }
-
     return $tag;
 }, 10, 3);
+
+/**
+ * FIXED: Preload critical assets in wp_head (Agent Skills: Performance)
+ */
+add_action('wp_head', function() {
+    $template_dir = get_template_directory_uri();
+    
+    // 1. Preload Critical JS
+    if (file_exists(get_template_directory() . '/dist/critical.js')) {
+        echo '<link rel="preload" href="' . $template_dir . '/dist/critical.js" as="script">' . "\n";
+    }
+
+    // 2. Preload Main CSS Bundle (if not using Critical CSS inline)
+    // If critical.css exists, we async load the main bundle (handled in style_loader_tag above)
+    // If NOT, we should preload it here to prioritize it
+    if (!file_exists(get_template_directory() . '/dist/styles/critical.css')) {
+         echo '<link rel="preload" href="' . $template_dir . '/dist/styles/theme.css" as="style">' . "\n";
+    }
+
+    // 3. Preload important fonts (Example)
+    // echo '<link rel="preload" href="' . $template_dir . '/resources/fonts/primary-font.woff2" as="font" type="font/woff2" crossorigin>' . "\n";
+}, 1);
 
 /**
  * Enhanced resource hints for performance
