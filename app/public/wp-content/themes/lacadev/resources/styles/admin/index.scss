@@ -2,8 +2,8 @@
 @use "post-order";
 @use "admin-custom";
 
-html:where(.wp-block) {
-  max-width: 120rem;
+html :where(.wp-block) {
+  max-width: 144rem !important;
   position: relative;
   overflow: hidden;
 }
