@@ -237,6 +237,27 @@ function app_action_editor_enqueue_assets()
         'theme-editor-css-bundle',
         $template_dir . '/dist/styles/editor.css'
     );
+
+    // Inject theme colors as CSS variables for the editor
+    $primary_color = getOption('primary_color');
+    $secondary_color = getOption('secondary_color');
+    $bg_color = getOption('bg_color');
+    
+    $primary_color_dark = getOption('primary_color_dark');
+    $secondary_color_dark = getOption('secondary_color_dark');
+    $bg_color_dark = getOption('bg_color_dark');
+
+    $custom_css = "
+        :root, .editor-styles-wrapper {
+            --primary-color: {$primary_color};
+            --secondary-color: {$secondary_color};
+            --bg-color: {$bg_color};
+            --primary-color-dark: {$primary_color_dark};
+            --secondary-color-dark: {$secondary_color_dark};
+            --bg-color-dark: {$bg_color_dark};
+        }
+    ";
+    wp_add_inline_style('theme-editor-css-bundle', $custom_css);
 }
 
 /**

@@ -184,6 +184,31 @@
       }
     }
   }
+
+  // Block Slogan
+  .block-slogan {
+    padding: 10rem 0;
+    text-align: center;
+    font-family: $primaryFont;
+    font-weight: $extraBold;
+    line-height: 1.2;
+
+    @include resFont(5, 11);
+
+    span {
+      text-transform: uppercase;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 2px $primaryColor;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
+    &.editor-view {
+        padding: 4rem 0;
+    }
+  }
 }
 
 // Apply block styles at root level for theme
