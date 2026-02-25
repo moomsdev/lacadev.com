@@ -7,6 +7,6 @@ if (!empty($attributes['className'])) {
 ?>
 <section class="<?php echo esc_attr($class_name); ?>">
     <div class="container">
-        <?php echo $slogan; ?>
+        <?php echo wp_kses_post($slogan); ?>
     </div>
 </section>

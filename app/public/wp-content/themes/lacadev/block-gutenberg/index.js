@@ -6,3 +6,8 @@
 import './slogan-block';
 import './about-laca-block';
 import './service-block';
+import './blog-block';
+import './staggered-blog-block';
+import './statement-block';
+import './process-block';
+import './marquee-block';

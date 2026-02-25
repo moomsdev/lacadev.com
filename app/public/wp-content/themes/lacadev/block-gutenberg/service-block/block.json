@@ -20,6 +20,14 @@
     "serviceIds": {
       "type": "array",
       "default": []
+    },
+    "buttonText": {
+      "type": "string",
+      "default": "Cùng tôi tạo nên thương hiệu của bạn"
+    },
+    "buttonUrl": {
+      "type": "string",
+      "default": "/lien-he/"
     }
   },
   "supports": {

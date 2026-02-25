@@ -2,7 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { 
 	useBlockProps, 
 	RichText, 
-	InspectorControls 
+	InspectorControls,
+	URLInput
 } from '@wordpress/block-editor';
 import { 
 	PanelBody, 
@@ -15,7 +16,7 @@ import {
 import { useSelect } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { title, description, serviceIds } = attributes;
+	const { title, description, serviceIds, buttonText, buttonUrl } = attributes;
 
 	const blockProps = useBlockProps( {
 		className: 'block-service editor-view',
@@ -50,11 +51,25 @@ export default function Edit( { attributes, setAttributes } ) {
 						onChange={ ( value ) => setAttributes( { title: value } ) }
 					/>
 					<TextareaControl
-						label={ __( 'Mô tả ngắn', 'laca' ) }
+						label={ __( 'Mô tả block', 'laca' ) }
 						value={ description }
 						onChange={ ( value ) => setAttributes( { description: value } ) }
-						rows={ 4 }
+						rows={ 3 }
 					/>
+					<hr style={{ margin: '20px 0' }} />
+					<p><strong>{ __( 'Cấu hình Button:', 'laca' ) }</strong></p>
+					<TextControl
+						label={ __( 'Nội dung button', 'laca' ) }
+						value={ buttonText }
+						onChange={ ( value ) => setAttributes( { buttonText: value } ) }
+					/>
+					<div style={{ marginBottom: '15px' }}>
+						<label style={{ display: 'block', marginBottom: '5px' }}>{ __( 'Nhập URL (chọn page hoặc nhập thủ công):', 'laca' ) }</label>
+						<URLInput
+							value={ buttonUrl }
+							onChange={ ( value ) => setAttributes( { buttonUrl: value } ) }
+						/>
+					</div>
 					<hr style={{ margin: '20px 0' }} />
 					<p><strong>{ __( 'Chọn dịch vụ hiển thị:', 'laca' ) }</strong></p>
 					{ ! services ? (
@@ -87,9 +102,8 @@ export default function Edit( { attributes, setAttributes } ) {
 						tagName="div"
 						className="block-desc"
 						value={ description }
-						multiline="p"
 						onChange={ ( value ) => setAttributes( { description: value } ) }
-						placeholder={ __( 'Nhập mô tả dịch vụ...', 'laca' ) }
+						placeholder={ __( 'Nhập mô tả...', 'laca' ) }
 					/>
 					
 					{ serviceIds.length === 0 ? (
@@ -118,6 +132,15 @@ export default function Edit( { attributes, setAttributes } ) {
 										</div>
 									) )
 							) }
+						</div>
+					) }
+
+					{ buttonText && (
+						<div className="block-footer" style={{ marginTop: '5rem', textAlign: 'center' }}>
+							<div className="btn btn-minimal" style={{ display: 'inline-flex' }}>
+								<span className="btn-icon"></span>
+								<span className="btn-text">{ buttonText }</span>
+							</div>
 						</div>
 					) }
 				</div>

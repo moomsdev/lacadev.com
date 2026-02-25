@@ -25,13 +25,16 @@ if (!empty($service_ids)) {
 
 <section class="<?php echo esc_attr($class_name); ?>">
     <div class="container">
-        <?php if ($title) : ?>
-            <h2 class="block-title block-title-scroll"><?php echo esc_html($title); ?></h2>
-        <?php endif; ?>
-        
-        <?php if ($description) : ?>
-            <div class="block-desc">
-                <?php echo wp_kses_post($description); ?>
+        <?php if ($title || $description) : ?>
+            <div class="block-header">
+                <?php if ($title) : ?>
+                    <h2 class="block-title block-title-scroll"><?php echo esc_html($title); ?></h2>
+                <?php endif; ?>
+                <?php if ($description) : ?>
+                    <div class="block-desc">
+                        <?php echo wp_kses_post($description); ?>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
@@ -54,6 +57,21 @@ if (!empty($service_ids)) {
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php 
+            $button_text = !empty($attributes['buttonText']) ? $attributes['buttonText'] : ''; 
+            $button_url = !empty($attributes['buttonUrl']) ? $attributes['buttonUrl'] : '';
+            ?>
+            <?php if ($button_text && $button_url) : ?>
+                <div class="block-footer">
+                    <a href="<?php echo esc_url($button_url); ?>" class="btn btn-minimal">
+                        <span class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"></line><polyline points="10 4 20 4 20 14"></polyline></svg>
+                        </span>
+                        <span class="btn-text"><?php echo esc_html($button_text); ?></span>
+                    </a>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
-    </div>
+    </div>`
 </section>
