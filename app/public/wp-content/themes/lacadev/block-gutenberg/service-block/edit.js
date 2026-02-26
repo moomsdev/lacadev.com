@@ -1,22 +1,23 @@
 import { __ } from '@wordpress/i18n';
-import { 
-	useBlockProps, 
-	RichText, 
+import {
+	useBlockProps,
+	RichText,
 	InspectorControls,
-	URLInput
+	URLInput,
 } from '@wordpress/block-editor';
-import { 
-	PanelBody, 
-	TextControl, 
+import {
+	PanelBody,
+	TextControl,
 	TextareaControl,
 	CheckboxControl,
 	Placeholder,
-	Spinner
+	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { title, description, serviceIds, buttonText, buttonUrl } = attributes;
+	const { title, description, serviceIds, buttonText, buttonUrl } =
+		attributes;
 
 	const blockProps = useBlockProps( {
 		className: 'block-service editor-view',
@@ -48,40 +49,67 @@ export default function Edit( { attributes, setAttributes } ) {
 					<TextControl
 						label={ __( 'Tiêu đề', 'laca' ) }
 						value={ title }
-						onChange={ ( value ) => setAttributes( { title: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { title: value } )
+						}
 					/>
 					<TextareaControl
 						label={ __( 'Mô tả block', 'laca' ) }
 						value={ description }
-						onChange={ ( value ) => setAttributes( { description: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { description: value } )
+						}
 						rows={ 3 }
 					/>
-					<hr style={{ margin: '20px 0' }} />
-					<p><strong>{ __( 'Cấu hình Button:', 'laca' ) }</strong></p>
+					<hr style={ { margin: '20px 0' } } />
+					<p>
+						<strong>{ __( 'Cấu hình Button:', 'laca' ) }</strong>
+					</p>
 					<TextControl
 						label={ __( 'Nội dung button', 'laca' ) }
 						value={ buttonText }
-						onChange={ ( value ) => setAttributes( { buttonText: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { buttonText: value } )
+						}
 					/>
-					<div style={{ marginBottom: '15px' }}>
-						<label style={{ display: 'block', marginBottom: '5px' }}>{ __( 'Nhập URL (chọn page hoặc nhập thủ công):', 'laca' ) }</label>
+					<div style={ { marginBottom: '15px' } }>
+						<div
+							style={ { display: 'block', marginBottom: '5px' } }
+						>
+							{ __(
+								'Nhập URL (chọn page hoặc nhập thủ công):',
+								'laca'
+							) }
+						</div>
 						<URLInput
 							value={ buttonUrl }
-							onChange={ ( value ) => setAttributes( { buttonUrl: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { buttonUrl: value } )
+							}
 						/>
 					</div>
-					<hr style={{ margin: '20px 0' }} />
-					<p><strong>{ __( 'Chọn dịch vụ hiển thị:', 'laca' ) }</strong></p>
+					<hr style={ { margin: '20px 0' } } />
+					<p>
+						<strong>
+							{ __( 'Chọn dịch vụ hiển thị:', 'laca' ) }
+						</strong>
+					</p>
 					{ ! services ? (
 						<Spinner />
 					) : (
-						<div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+						<div
+							style={ { maxHeight: '300px', overflowY: 'auto' } }
+						>
 							{ services.map( ( service ) => (
 								<CheckboxControl
 									key={ service.id }
 									label={ service.title.rendered }
-									checked={ serviceIds.includes( service.id ) }
-									onChange={ () => toggleService( service.id ) }
+									checked={ serviceIds.includes(
+										service.id
+									) }
+									onChange={ () =>
+										toggleService( service.id )
+									}
 								/>
 							) ) }
 						</div>
@@ -95,23 +123,30 @@ export default function Edit( { attributes, setAttributes } ) {
 						tagName="h2"
 						className="block-title block-title-scroll"
 						value={ title }
-						onChange={ ( value ) => setAttributes( { title: value } ) }
-						placeholder={ __( 'Nhập tiêu đề...', 'laca' ) }
+						onChange={ ( value ) =>
+							setAttributes( { title: value } )
+						}
+						placeholder={ __( 'Nhập tiêu đề…', 'laca' ) }
 					/>
 					<RichText
 						tagName="div"
 						className="block-desc"
 						value={ description }
-						onChange={ ( value ) => setAttributes( { description: value } ) }
-						placeholder={ __( 'Nhập mô tả...', 'laca' ) }
+						onChange={ ( value ) =>
+							setAttributes( { description: value } )
+						}
+						placeholder={ __( 'Nhập mô tả…', 'laca' ) }
 					/>
-					
+
 					{ serviceIds.length === 0 ? (
-						<Placeholder 
-							icon="megaphone" 
+						<Placeholder
+							icon="megaphone"
 							label={ __( 'Laca Service', 'laca' ) }
 						>
-							{ __( 'Vui lòng chọn các dịch vụ trong thanh cấu hình bên phải.', 'laca' ) }
+							{ __(
+								'Vui lòng chọn các dịch vụ trong thanh cấu hình bên phải.',
+								'laca'
+							) }
 						</Placeholder>
 					) : (
 						<div className="block-service__list">
@@ -119,14 +154,32 @@ export default function Edit( { attributes, setAttributes } ) {
 								<Spinner />
 							) : (
 								services
-									.filter( s => serviceIds.includes( s.id ) )
+									.filter( ( s ) =>
+										serviceIds.includes( s.id )
+									)
 									.map( ( service ) => (
-										<div key={ service.id } className="block-service__item">
+										<div
+											key={ service.id }
+											className="block-service__item"
+										>
 											<div className="item__link">
-												<span className="item__icon">{ service.title.rendered.charAt(0) }</span>
-												<h3 className="item__title">{ service.title.rendered }</h3>
+												<span className="item__icon">
+													{ service.title.rendered.charAt(
+														0
+													) }
+												</span>
+												<h3 className="item__title">
+													{ service.title.rendered }
+												</h3>
 												<div className="item__desc">
-													{ service.excerpt.rendered.replace(/<[^>]*>?/gm, '') || __( 'Chưa có mô tả...', 'laca' ) }
+													{ service.excerpt.rendered.replace(
+														/<[^>]*>?/gm,
+														''
+													) ||
+														__(
+															'Chưa có mô tả…',
+															'laca'
+														) }
 												</div>
 											</div>
 										</div>
@@ -136,8 +189,14 @@ export default function Edit( { attributes, setAttributes } ) {
 					) }
 
 					{ buttonText && (
-						<div className="block-footer" style={{ marginTop: '5rem', textAlign: 'center' }}>
-							<div className="btn btn-minimal" style={{ display: 'inline-flex' }}>
+						<div
+							className="block-footer"
+							style={ { marginTop: '5rem', textAlign: 'center' } }
+						>
+							<div
+								className="btn btn-minimal"
+								style={ { display: 'inline-flex' } }
+							>
 								<span className="btn-icon"></span>
 								<span className="btn-text">{ buttonText }</span>
 							</div>

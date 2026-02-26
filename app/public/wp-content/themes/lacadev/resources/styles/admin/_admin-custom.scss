@@ -510,14 +510,6 @@ body.wp-admin {
   width: auto;
   z-index: 9998;
 
-  @include maxWidth($lg) {
-    height: 36px;
-  }
-
-  @include maxWidth($sm) {
-    padding: 0;
-  }
-
   ul#wp-admin-bar-root-default>li {
     margin-right: 30px;
   }
@@ -551,5 +543,13 @@ body.wp-admin {
       border-radius: 50%;
       background: #fff !important;
     }
+  }
+
+  @include maxWidth($lg) {
+    height: 36px;
+  }
+
+  @include maxWidth($sm) {
+    padding: 0;
   }
 }

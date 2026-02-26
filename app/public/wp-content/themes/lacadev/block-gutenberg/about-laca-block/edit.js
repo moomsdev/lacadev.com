@@ -1,9 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { 
-	useBlockProps, 
-	RichText, 
+import {
+	useBlockProps,
+	RichText,
 	MediaUpload,
-	InspectorControls 
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { PanelBody, Button } from '@wordpress/components';
 
@@ -49,17 +49,21 @@ const CampingScene = ( { onOpenMedia } ) => (
 		<style>{ SCENE_CSS }</style>
 
 		{ Array.from( { length: 100 }, ( _, i ) => {
-			const size = ( ( i % 4 ) * 0.5 + 1.2 );
+			const size = ( i % 4 ) * 0.5 + 1.2;
 			return (
-				<div key={ i } className="alp-star" style={ {
-					left: `${ ( i * 37 + 13 ) % 100 }%`,
-					top: `${ ( i * 53 + 7 ) % 85 }%`,
-					width: `${ size }px`,
-					height: `${ size }px`,
-					animationDelay: `${ ( i * 0.4 ) % 5 }s`,
-					animationDuration: `${ 2 + ( i % 3 ) }s`,
-					boxShadow: `0 0 ${ size }px #fff`,
-				} } />
+				<div
+					key={ i }
+					className="alp-star"
+					style={ {
+						left: `${ ( i * 37 + 13 ) % 100 }%`,
+						top: `${ ( i * 53 + 7 ) % 85 }%`,
+						width: `${ size }px`,
+						height: `${ size }px`,
+						animationDelay: `${ ( i * 0.4 ) % 5 }s`,
+						animationDuration: `${ 2 + ( i % 3 ) }s`,
+						boxShadow: `0 0 ${ size }px #fff`,
+					} }
+				/>
 			);
 		} ) }
 
@@ -71,18 +75,22 @@ const CampingScene = ( { onOpenMedia } ) => (
 		</div>
 
 		<div className="alp-tent" />
-		
+
 		<div className="alp-fire-wrap">
 			<div className="alp-f-glow" />
-			
+
 			{ Array.from( { length: 8 }, ( _, i ) => (
-				<div key={ i } className="alp-ember" style={ {
-					'--x': `${ ( ( i * 17 ) % 30 - 15 ) }px`,
-					'--tx': `${ ( ( i * 23 ) % 60 - 30 ) }px`,
-					'--e-dur': `${ 1.5 + ( ( i * 0.3 ) % 2 ) }s`,
-					animationDelay: `${ i * 0.4 }s`,
-					left: `${ 40 + ( ( i * 7 ) % 20 ) }%`,
-				} } />
+				<div
+					key={ i }
+					className="alp-ember"
+					style={ {
+						'--x': `${ ( ( i * 17 ) % 30 ) - 15 }px`,
+						'--tx': `${ ( ( i * 23 ) % 60 ) - 30 }px`,
+						'--e-dur': `${ 1.5 + ( ( i * 0.3 ) % 2 ) }s`,
+						animationDelay: `${ i * 0.4 }s`,
+						left: `${ 40 + ( ( i * 7 ) % 20 ) }%`,
+					} }
+				/>
 			) ) }
 
 			<div className="alp-flames">
@@ -94,17 +102,24 @@ const CampingScene = ( { onOpenMedia } ) => (
 			<div className="alp-f-pit">
 				<div className="alp-logs">
 					<div className="alp-log" style={ { '--r': '25deg' } } />
-					<div className="alp-log" style={ { '--r': '-25deg', marginLeft: '-15px' } } />
+					<div
+						className="alp-log"
+						style={ { '--r': '-25deg', marginLeft: '-15px' } }
+					/>
 				</div>
 				<div className="alp-rocks">
-					<div className="alp-rock" /><div className="alp-rock" style={ { marginTop: '2px' } } />
-					<div className="alp-rock" /><div className="alp-rock" style={ { marginTop: '2px' } } />
+					<div className="alp-rock" />
+					<div className="alp-rock" style={ { marginTop: '2px' } } />
+					<div className="alp-rock" />
+					<div className="alp-rock" style={ { marginTop: '2px' } } />
 				</div>
 			</div>
 		</div>
 
 		<div className="alp-ground" />
-		<div className="alp-hint">{ __( '// nhấn để chọn ảnh nền', 'laca' ) }</div>
+		<div className="alp-hint">
+			{ __( '// nhấn để chọn ảnh nền', 'laca' ) }
+		</div>
 		<div className="alp-click-ring" />
 	</div>
 );
@@ -135,8 +150,15 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Cấu hình Ảnh nền', 'laca' ) }>
 					{ bgImageUrl && (
-						<div className="image-preview" style={ { marginBottom: '10px' } }>
-							<img src={ bgImageUrl } alt="" style={ { maxWidth: '100%', height: 'auto' } } />
+						<div
+							className="image-preview"
+							style={ { marginBottom: '10px' } }
+						>
+							<img
+								src={ bgImageUrl }
+								alt=""
+								style={ { maxWidth: '100%', height: 'auto' } }
+							/>
 							<Button isDestructive onClick={ removeImage }>
 								{ __( 'Xóa ảnh', 'laca' ) }
 							</Button>
@@ -148,7 +170,9 @@ export default function Edit( { attributes, setAttributes } ) {
 						value={ bgImageId }
 						render={ ( { open } ) => (
 							<Button isPrimary onClick={ open }>
-								{ ! bgImageId ? __( 'Chọn ảnh nền', 'laca' ) : __( 'Thay đổi ảnh', 'laca' ) }
+								{ ! bgImageId
+									? __( 'Chọn ảnh nền', 'laca' )
+									: __( 'Thay đổi ảnh', 'laca' ) }
 							</Button>
 						) }
 					/>
@@ -159,8 +183,13 @@ export default function Edit( { attributes, setAttributes } ) {
 						tagName="div"
 						className="about-content"
 						value={ content }
-						onChange={ ( value ) => setAttributes( { content: value } ) }
-						placeholder={ __( 'Nhập nội dung giới thiệu...', 'laca' ) }
+						onChange={ ( value ) =>
+							setAttributes( { content: value } )
+						}
+						placeholder={ __(
+							'Nhập nội dung giới thiệu…',
+							'laca'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -179,7 +208,9 @@ export default function Edit( { attributes, setAttributes } ) {
 					) : (
 						<div
 							className="bg-image-preview"
-							style={ { backgroundImage: `url(${ bgImageUrl })` } }
+							style={ {
+								backgroundImage: `url(${ bgImageUrl })`,
+							} }
 						/>
 					) }
 
@@ -188,8 +219,13 @@ export default function Edit( { attributes, setAttributes } ) {
 							tagName="div"
 							className="about-content"
 							value={ content }
-							onChange={ ( value ) => setAttributes( { content: value } ) }
-							placeholder={ __( 'Nhập nội dung giới thiệu...', 'laca' ) }
+							onChange={ ( value ) =>
+								setAttributes( { content: value } )
+							}
+							placeholder={ __(
+								'Nhập nội dung giới thiệu…',
+								'laca'
+							) }
 						/>
 					</div>
 				</div>

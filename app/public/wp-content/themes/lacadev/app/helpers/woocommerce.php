@@ -9,15 +9,17 @@ add_action('wp_ajax_nopriv_gm_add_to_cart', 'ajaxAddToCart');
 add_action('wp_ajax_gm_add_to_cart', 'ajaxAddToCart');
 function ajaxAddToCart()
 {
-	$product_id = apply_filters('woocommerce_add_to_cart_product_id', absint($_POST['product_id']));
-	$product = wc_get_product($product_id);
-	$quantity = empty($_POST['quantity']) ? 1 : apply_filters('woocommerce_stock_amount', $_POST['quantity']);
-	$variation_id = $_POST['variation_id'] ?? 0;
-	$variation = $_POST['variation'] ?? [];
+	if (empty($_POST['product_id'])) {
+		wp_send_json_error(__('ID sản phẩm không hợp lệ', 'laca'));
+	}
+
+	$product_id = apply_filters('woocommerce_add_to_cart_product_id', absint(wp_unslash($_POST['product_id'])));
+	$quantity = empty($_POST['quantity']) ? 1 : apply_filters('woocommerce_stock_amount', absint(wp_unslash($_POST['quantity'])));
+	$variation_id = isset($_POST['variation_id']) ? absint(wp_unslash($_POST['variation_id'])) : 0;
+	$variation = isset($_POST['variation']) ? (array) $_POST['variation'] : [];
 
 	if (wc()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation)) {
-		WC_AJAX::get_refreshed_fragments();
-		wp_send_json_success();
+		WC_AJAX::get_refreshed_fragments(); // this calls wp_die() internally
 	} else {
 		wp_send_json_error(__('Thêm vào giỏ thất bại', 'laca'));
 	}
@@ -75,22 +77,17 @@ function getFeaturedProducts($productCount = null)
 function getIsOnSaleProducts($productCount = null)
 {
 	$productCount = $productCount ?: get_option('posts_per_page');
+	$product_ids_on_sale = wc_get_product_ids_on_sale();
+	
+	if (empty($product_ids_on_sale)) {
+		return new WP_Query(['post_type' => 'product', 'post__in' => [0]]);
+	}
+
 	return new WP_Query([
 		'post_type'      => 'product',
 		'posts_per_page' => $productCount,
-		'meta_query'     => [
-			'relation' => 'OR',
-			[
-				'key'     => '_sale_price',
-				'value'   => 0,
-				'compare' => '>',
-			],
-			[
-				'key'     => '_min_variation_sale_price',
-				'value'   => 0,
-				'compare' => '>',
-			],
-		],
+		'post__in'       => $product_ids_on_sale,
+		'post_status'    => 'publish',
 	]);
 }
 
@@ -125,26 +122,30 @@ function getTopRatingProducts($productCount = null)
 /**
  * Lấy phần trăm giảm giá của sản phẩm
  */
-function getProductPercentageSaleOff(WC_Product $product)
+function getProductPercentageSaleOff($product)
 {
-	if (!$product->is_on_sale()) return 0;
+	if (!$product || !$product->is_on_sale()) return 0;
 
-	$regular_price = $product->get_regular_price();
-	$sale_price = $product->get_sale_price();
-	$percentage = 0;
-
-	if ($regular_price && $sale_price) {
-		$percentage = ($regular_price - $sale_price) / $regular_price * 100;
-	} elseif ($product->is_type('variable')) {
-		foreach ($product->get_children() as $child_id) {
-			$variation = wc_get_product($child_id);
-			if ($variation) {
-				$percentage = max($percentage, ($variation->get_regular_price() - $variation->get_sale_price()) / $variation->get_regular_price() * 100);
+	if ($product->is_type('variable')) {
+		$percentages = [];
+		$prices = $product->get_variation_prices();
+		foreach ($prices['regular_price'] as $vid => $regular_price) {
+			$sale_price = $prices['sale_price'][$vid];
+			if ($regular_price > 0 && $sale_price < $regular_price) {
+				$percentages[] = ($regular_price - $sale_price) / $regular_price * 100;
 			}
+		}
+		return count($percentages) ? round(max($percentages)) : 0;
+	} else {
+		$regular_price = (float) $product->get_regular_price();
+		$sale_price = (float) $product->get_sale_price();
+
+		if ($regular_price > 0 && $sale_price > 0 && $regular_price > $sale_price) {
+			return round(($regular_price - $sale_price) / $regular_price * 100);
 		}
 	}
 
-	return round($percentage);
+	return 0;
 }
 
 function theProductPercentageSaleOff()

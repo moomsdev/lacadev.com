@@ -5,23 +5,38 @@ import './custom_thumbnail_support.js';
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
-// ===== Login Success Alert =====
+// ===== Premium Welcome Notification =====
 document.addEventListener( 'DOMContentLoaded', function () {
 	const showAlert = localStorage.getItem( 'show_alert' );
 	if ( showAlert ) {
 		try {
-			const alert = JSON.parse( showAlert );
+			const alertData = JSON.parse( showAlert );
 			Swal.fire( {
-				title: alert.title,
-				text: alert.message,
-				icon: 'success',
-				confirmButtonText: 'OK',
-				timer: 5000,
+				html: `
+					<div class="alp-swal-content">
+						<div class="alp-swal-icon">${ alertData.icon }</div>
+						<h2 class="alp-swal-title">${ alertData.title }</h2>
+						<p class="alp-swal-msg">${ alertData.message }</p>
+					</div>
+				`,
+				position: 'center',
+				showConfirmButton: false,
+				timer: 4000,
 				timerProgressBar: true,
+				background: 'transparent',
+				customClass: {
+					popup: 'alp-welcome-swal',
+				},
+				showClass: {
+					popup: 'alp-zoom-in',
+				},
+				hideClass: {
+					popup: 'alp-zoom-out',
+				},
 			} );
 			localStorage.removeItem( 'show_alert' );
 		} catch ( e ) {
-			console.error( 'Error parsing show_alert:', e );
+			console.error( 'Error rendering welcome notification:', e );
 			localStorage.removeItem( 'show_alert' );
 		}
 	}
@@ -88,8 +103,11 @@ document.addEventListener( 'click', function ( e ) {
 		scripts.disableTheGrid();
 
 		// Get nonce from data attribute (preferred) or fallback to global
-		const nonce = trigger.dataset.nonce ||
-			( typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '' );
+		const nonce =
+			trigger.dataset.nonce ||
+			( typeof ajaxurl_params !== 'undefined'
+				? ajaxurl_params.nonce
+				: '' );
 
 		fetch( '/wp-admin/admin-ajax.php', {
 			method: 'POST',
@@ -110,7 +128,11 @@ document.addEventListener( 'click', function ( e ) {
 					if ( tdCell ) {
 						// Replace entire cell content with thumbnail + remove button (same as PHP output)
 						// Preserve nonce for security
-						const preservedNonce = nonce || ( typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '' );
+						const preservedNonce =
+							nonce ||
+							( typeof ajaxurl_params !== 'undefined'
+								? ajaxurl_params.nonce
+								: '' );
 						tdCell.innerHTML = `
               <div style='position:relative;display:inline-block;'>
                 <a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${ postId }' data-nonce='${ preservedNonce }'>
@@ -146,42 +168,49 @@ document.addEventListener( 'click', function ( e ) {
 		return;
 	}
 
-		const postId = removeBtn.dataset.postId;
+	const postId = removeBtn.dataset.postId;
 
-		// Use SweetAlert2 for confirmation
-		Swal.fire( {
-			title: adminI18n.removeThumbnailTitle,
-			text: adminI18n.removeThumbnailText,
-			icon: 'warning',
-			showCancelButton: true,
-			confirmButtonColor: '#F15D4F',
-			cancelButtonColor: '#6c757d',
-			confirmButtonText: adminI18n.removeThumbnailConfirm,
-			cancelButtonText: adminI18n.removeThumbnailCancel,
-		} ).then( ( result ) => {
-			if ( ! result.isConfirmed ) {
-				return;
-			}
+	// Use SweetAlert2 for confirmation
+	Swal.fire( {
+		title: adminI18n.removeThumbnailTitle,
+		text: adminI18n.removeThumbnailText,
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#F15D4F',
+		cancelButtonColor: '#6c757d',
+		confirmButtonText: adminI18n.removeThumbnailConfirm,
+		cancelButtonText: adminI18n.removeThumbnailCancel,
+	} ).then( ( result ) => {
+		if ( ! result.isConfirmed ) {
+			return;
+		}
 
-			// Get nonce from data attribute (preferred) or fallback to global
-			const nonce = removeBtn.dataset.nonce ||
-				( typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '' );
+		// Get nonce from data attribute (preferred) or fallback to global
+		const nonce =
+			removeBtn.dataset.nonce ||
+			( typeof ajaxurl_params !== 'undefined'
+				? ajaxurl_params.nonce
+				: '' );
 
-			fetch( '/wp-admin/admin-ajax.php', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams( {
-					action: 'remove_post_thumbnail',
-					post_id: postId,
-					nonce, // WordPress nonce for CSRF protection
-				} ),
-			} )
+		fetch( '/wp-admin/admin-ajax.php', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams( {
+				action: 'remove_post_thumbnail',
+				post_id: postId,
+				nonce, // WordPress nonce for CSRF protection
+			} ),
+		} )
 			.then( ( response ) => response.json() )
 			.then( ( data ) => {
 				if ( data.success === true ) {
 					// Replace thumbnail with "Choose image" button
 					// Preserve nonce for security
-					const preservedNonce = nonce || ( typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '' );
+					const preservedNonce =
+						nonce ||
+						( typeof ajaxurl_params !== 'undefined'
+							? ajaxurl_params.nonce
+							: '' );
 					const container = removeBtn.closest( 'td' );
 					if ( container ) {
 						container.innerHTML = `<a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='${ postId }' data-nonce='${ preservedNonce }'><div class='no-image-text'>${ adminI18n.chooseImage }</div></a>`;

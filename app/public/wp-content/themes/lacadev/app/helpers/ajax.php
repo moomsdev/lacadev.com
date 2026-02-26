@@ -101,18 +101,6 @@ function mms_ajax_search() {
     
     // Search Products (WooCommerce)
     if (!empty($organized_types['product']) && class_exists('WooCommerce')) {
-        // First, get total count
-        $products_count_query = new WP_Query([
-            'post_type' => 'product',
-            'posts_per_page' => -1,
-            's' => $search_query,
-            'post_status' => 'publish',
-            'fields' => 'ids', // Only get IDs for counting
-        ]);
-        $total_products = $products_count_query->found_posts;
-        wp_reset_postdata();
-        
-        // Then get limited results
         $products = new WP_Query([
             'post_type' => 'product',
             'posts_per_page' => 2, // Only show 2 items
@@ -126,6 +114,7 @@ function mms_ajax_search() {
         if ($products->have_posts()) {
             $has_results = true;
             $displayed_count = $products->post_count;
+            $total_products = $products->found_posts;
             
             $html .= '<div class="search-results__section">';
             $html .= '<h3 class="search-results__title"><strong>Sản phẩm liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_products . ' sản phẩm)</span>:</h3>';
@@ -151,23 +140,12 @@ function mms_ajax_search() {
     
     // Search Posts
     if (!empty($organized_types['post'])) {
-        // First, get total count
-        $posts_count_query = new WP_Query([
-            'post_type' => 'post',
-            'posts_per_page' => -1,
-            's' => $search_query,
-            'post_status' => 'publish',
-            'fields' => 'ids',
-        ]);
-        $total_posts = $posts_count_query->found_posts;
-        wp_reset_postdata();
-        
-        // Then get limited results
         $posts = new WP_Query([
             'post_type' => 'post',
             'posts_per_page' => 2, // Only show 2 items
             's' => $search_query,
             'post_status' => 'publish',
+            'no_found_rows' => false,
             'orderby' => 'date',
             'order' => 'DESC',
         ]);
@@ -175,6 +153,7 @@ function mms_ajax_search() {
         if ($posts->have_posts()) {
             $has_results = true;
             $displayed_count = $posts->post_count;
+            $total_posts = $posts->found_posts;
             
             $html .= '<div class="search-results__section">';
             $html .= '<h3 class="search-results__title"><strong>Bài viết liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_posts . ' bài viết)</span>:</h3>';
@@ -200,23 +179,12 @@ function mms_ajax_search() {
     
     // Search Pages
     if (!empty($organized_types['page'])) {
-        // First, get total count
-        $pages_count_query = new WP_Query([
-            'post_type' => 'page',
-            'posts_per_page' => -1,
-            's' => $search_query,
-            'post_status' => 'publish',
-            'fields' => 'ids',
-        ]);
-        $total_pages = $pages_count_query->found_posts;
-        wp_reset_postdata();
-        
-        // Then get limited results
         $pages = new WP_Query([
             'post_type' => 'page',
             'posts_per_page' => 2, // Only show 2 items
             's' => $search_query,
             'post_status' => 'publish',
+            'no_found_rows' => false,
             'orderby' => 'date',
             'order' => 'DESC',
         ]);
@@ -224,6 +192,7 @@ function mms_ajax_search() {
         if ($pages->have_posts()) {
             $has_results = true;
             $displayed_count = $pages->post_count;
+            $total_pages = $pages->found_posts;
             
             $html .= '<div class="search-results__section">';
             $html .= '<h3 class="search-results__title"><strong>Trang liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_pages . ' trang)</span>:</h3>';
@@ -250,23 +219,12 @@ function mms_ajax_search() {
     // Search Other Custom Post Types
     if (!empty($organized_types['other'])) {
         foreach ($organized_types['other'] as $custom_type) {
-            // First, get total count
-            $custom_count_query = new WP_Query([
-                'post_type' => $custom_type,
-                'posts_per_page' => -1,
-                's' => $search_query,
-                'post_status' => 'publish',
-                'fields' => 'ids',
-            ]);
-            $total_custom = $custom_count_query->found_posts;
-            wp_reset_postdata();
-            
-            // Then get limited results
             $custom_posts = new WP_Query([
                 'post_type' => $custom_type,
                 'posts_per_page' => 2, // Only show 2 items
                 's' => $search_query,
                 'post_status' => 'publish',
+                'no_found_rows' => false,
                 'orderby' => 'date',
                 'order' => 'DESC',
             ]);
@@ -274,8 +232,9 @@ function mms_ajax_search() {
             if ($custom_posts->have_posts()) {
                 $has_results = true;
                 $post_type_obj = get_post_type_object($custom_type);
-                $type_label = $post_type_obj->labels->name;
+                $type_label = $post_type_obj->labels->name ?? $custom_type;
                 $displayed_count = $custom_posts->post_count;
+                $total_custom = $custom_posts->found_posts;
                 
                 $html .= '<div class="search-results__section">';
                 $html .= '<h3 class="search-results__title"><strong>' . esc_html($type_label) . ' liên quan</strong> <span class="search-results__count">(hiển thị ' . $displayed_count . '/' . $total_custom . ')</span>:</h3>';
@@ -333,6 +292,11 @@ if (!defined('ABSPATH')) {
  */
 add_action('wp_ajax_update_custom_sort_order', 'updateCustomSortOrder');
 function updateCustomSortOrder() {
+    // Basic permissions check
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error(['message' => 'Unauthorized access.']);
+    }
+
     // Kiểm tra nonce để bảo vệ CSRF
     check_ajax_referer('update_custom_sort_order', 'nonce');
     
@@ -341,8 +305,8 @@ function updateCustomSortOrder() {
         wp_send_json_error(['message' => 'Missing parameters.']);
     }
 
-    $postIds = array_map('absint', $_POST['post_ids']);
-    $currentPage = absint($_POST['current_page']);
+    $postIds = array_map('absint', wp_unslash($_POST['post_ids']));
+    $currentPage = absint(wp_unslash($_POST['current_page']));
     $order = (($currentPage - 1) * count($postIds)) + 1;
 
     // Cập nhật menu_order cho từng post
@@ -363,13 +327,15 @@ function updateCustomSortOrder() {
 /**
  * Cập nhật thumbnail (ảnh đại diện) cho post qua Ajax.
  *
- * @action wp_ajax_nopriv_update_post_thumbnail_id
  * @action wp_ajax_update_post_thumbnail_id
  */
-add_action('wp_ajax_nopriv_update_post_thumbnail_id', 'updatePostThumbnailId');
 add_action('wp_ajax_update_post_thumbnail_id', 'updatePostThumbnailId');
 
 function updatePostThumbnailId() {
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error(['message' => 'Unauthorized access.']);
+    }
+
     // Kiểm tra nonce để bảo vệ CSRF
     check_ajax_referer('update_post_thumbnail', 'nonce');
     
@@ -378,8 +344,8 @@ function updatePostThumbnailId() {
         wp_send_json_error(['message' => 'Missing parameters.']);
     }
 
-    $postId = absint($_POST['post_id']);
-    $attachmentId = absint($_POST['attachment_id']);
+    $postId = absint(wp_unslash($_POST['post_id']));
+    $attachmentId = absint(wp_unslash($_POST['attachment_id']));
 
     // Cập nhật _thumbnail_id bằng hàm update_post_meta
     if (update_post_meta($postId, '_thumbnail_id', $attachmentId)) {
@@ -395,13 +361,15 @@ function updatePostThumbnailId() {
 /**
  * Xóa thumbnail (ảnh đại diện) cho post qua Ajax.
  *
- * @action wp_ajax_nopriv_remove_post_thumbnail
  * @action wp_ajax_remove_post_thumbnail
  */
-add_action('wp_ajax_nopriv_remove_post_thumbnail', 'removePostThumbnail');
 add_action('wp_ajax_remove_post_thumbnail', 'removePostThumbnail');
 
 function removePostThumbnail() {
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error(['message' => 'Unauthorized access.']);
+    }
+
     // Kiểm tra nonce để bảo vệ CSRF
     check_ajax_referer('update_post_thumbnail', 'nonce');
     
@@ -410,7 +378,7 @@ function removePostThumbnail() {
         wp_send_json_error(['message' => 'Missing post ID.']);
     }
 
-    $postId = absint($_POST['post_id']);
+    $postId = absint(wp_unslash($_POST['post_id']));
 
     // Xóa thumbnail bằng hàm delete_post_thumbnail
     if (delete_post_thumbnail($postId)) {
@@ -515,8 +483,8 @@ function ajaxGetPage() {
     global $post;
     $post = get_post($post_id);
     
-    if (!$post) {
-        wp_send_json_error(['message' => 'Post not found']);
+    if (!$post || ($post->post_status !== 'publish' && !current_user_can('read_post', $post_id))) {
+        wp_send_json_error(['message' => 'Post not found or unauthorized']);
     }
     
     setup_postdata($post);

@@ -16,22 +16,26 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			userPlaceholder: 'Điền tên hoặc email vào đây nhé',
 			passLabel: 'Chìa khóa',
 			passPlaceholder: 'Nhập chìa khóa mở cửa',
-			welcomeText: 'Chào mừng về Trạm Laca!<br/>Cắm sạc, pha trà và bắt đầu nào!',
+			welcomeText:
+				'Chào mừng về Trạm Laca!<br/>Cắm sạc, pha trà và bắt đầu nào!',
 			forgetPwd: 'Rớt chìa khoá?',
-			backToBlog: '← Rời khỏi Trạm'
+			backToBlog: '← Rời khỏi Trạm',
 		},
 		en: {
 			userLabel: "Who's visiting the station?",
 			userPlaceholder: 'Enter name or email here',
 			passLabel: 'The Key',
 			passPlaceholder: 'Enter your key to open',
-			welcomeText: "Welcome to Laca Station!<br/>Charge up, brew some tea and let's go!",
+			welcomeText:
+				"Welcome to Laca Station!<br/>Charge up, brew some tea and let's go!",
 			forgetPwd: 'Lost your key?',
-			backToBlog: '← Leave the Station'
-		}
+			backToBlog: '← Leave the Station',
+		},
 	};
 
-	const currentLang = document.documentElement.lang.includes( 'en' ) ? 'en' : 'vi';
+	const currentLang = document.documentElement.lang.includes( 'en' )
+		? 'en'
+		: 'vi';
 	const i18n = locales[ currentLang ];
 
 	const userLabel = document.querySelector( 'label[for="user_login"]' );
@@ -79,24 +83,30 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	// 2. CUSTOM LANGUAGE TOGGLE
 	const switcher = document.querySelector( '.language-switcher' );
 	const switcherForm = document.querySelector( '.language-switcher form' );
-	const switcherSelect = document.querySelector( '.language-switcher select' );
-	
+	const switcherSelect = document.querySelector(
+		'.language-switcher select'
+	);
+
 	if ( switcher && loginDiv ) {
 		// Place toggle ABOVE the form/logo
 		loginDiv.prepend( switcher );
-		
+
 		if ( switcherForm && switcherSelect ) {
 			const langWrapper = document.createElement( 'div' );
 			langWrapper.className = 'alp-lang-toggle';
-			
+
 			langWrapper.innerHTML = `
-				<button type="button" data-lang="vi" class="${ currentLang === 'vi' ? 'active' : '' }">Vie</button>
-				<button type="button" data-lang="en_US" class="${ currentLang === 'en' ? 'active' : '' }">Eng</button>
+				<button type="button" data-lang="vi" class="${
+					currentLang === 'vi' ? 'active' : ''
+				}">Vie</button>
+				<button type="button" data-lang="en_US" class="${
+					currentLang === 'en' ? 'active' : ''
+				}">Eng</button>
 			`;
-			
+
 			switcherForm.appendChild( langWrapper );
-			
-			langWrapper.querySelectorAll( 'button' ).forEach( btn => {
+
+			langWrapper.querySelectorAll( 'button' ).forEach( ( btn ) => {
 				btn.addEventListener( 'click', ( e ) => {
 					const targetLang = e.target.getAttribute( 'data-lang' );
 					if ( switcherSelect.value !== targetLang ) {
@@ -111,7 +121,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	// 3. TYPEWRITER EFFECT
 	const welcomeDiv = document.createElement( 'div' );
 	welcomeDiv.className = 'welcome';
-	
+
 	const logo = document.querySelector( '#login h1' );
 	if ( logo ) {
 		logo.insertAdjacentElement( 'afterend', welcomeDiv );
@@ -125,7 +135,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			if ( welcomeText.charAt( charIndex ) === '<' ) {
 				const tagEnd = welcomeText.indexOf( '>', charIndex );
 				if ( tagEnd !== -1 ) {
-					welcomeDiv.innerHTML += welcomeText.substring( charIndex, tagEnd + 1 );
+					welcomeDiv.innerHTML += welcomeText.substring(
+						charIndex,
+						tagEnd + 1
+					);
 					charIndex = tagEnd + 1;
 				} else {
 					welcomeDiv.innerHTML += welcomeText.charAt( charIndex );
@@ -135,7 +148,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				welcomeDiv.innerHTML += welcomeText.charAt( charIndex );
 				charIndex++;
 			}
-			
+
 			const speed = Math.random() * ( 150 - 50 ) + 50;
 			setTimeout( typeWriter, speed );
 		} else {

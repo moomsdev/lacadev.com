@@ -211,12 +211,6 @@
     font-weight: $extraBold;
     line-height: 1.4;
 
-    @include maxWidth($md) {
-        padding: 6rem 0;
-      }
-
-    @include resFont(3.2, 11);
-
     span {
       text-transform: uppercase;
       -webkit-text-fill-color: transparent;
@@ -232,8 +226,14 @@
     }
 
     &.editor-view {
-        padding: 4rem 0;
+      padding: 4rem 0;
     }
+
+    @include maxWidth($md) {
+      padding: 6rem 0;
+    }
+
+    @include resFont(3.2, 11);
   }
 
   // Block About La Ca Dev
@@ -285,14 +285,14 @@
     }
 
     .content-wrapper {
-        position: relative;
-        z-index: 2;
-        color: #fff;
-        text-align: center;
-        max-width: 100rem;
-        margin: 0 auto;
-        opacity: 0; 
-        transform: translateY(30px);
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      text-align: center;
+      max-width: 100rem;
+      margin: 0 auto;
+      opacity: 0; 
+      transform: translateY(30px);
     }
 
     .about-content {
@@ -301,44 +301,44 @@
     }
 
     &.editor-view {
-        height: auto;
-        min-height: 400px;
-        padding: 4rem 0 !important;
-        font-family: $secondaryFont;
+      height: auto;
+      min-height: 400px;
+      padding: 4rem 0 !important;
+      font-family: $secondaryFont;
 
-        .parallax-bg {
-            height: 100%;
-        }
+      .parallax-bg {
+        height: 100%;
+      }
 
-        .bg-image-preview {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: 1;
+      .bg-image-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: 1;
             
-            &::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.3);
-            }
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.3);
         }
+      }
 
-        .img-container {
-          max-width: 100%;
-        }
+      .img-container {
+        max-width: 100%;
+      }
 
-        .content-wrapper {
-            opacity: 1;
-            transform: none;
-        }
+      .content-wrapper {
+        opacity: 1;
+        transform: none;
+      }
     }
   }
 
@@ -499,12 +499,6 @@
       display: flex;
       align-items: center;
 
-      @include maxWidth($md) {
-        flex-direction: column-reverse;
-        gap: 3rem;
-        text-align: center;
-      }
-
       &--even {
         flex-direction: row-reverse;
 
@@ -541,15 +535,15 @@
         width: 100%;
 
         a {
-            display: block;
-            border-radius: 4rem;
-            overflow: hidden;
-            background: #f9f9f9;
-            aspect-ratio: 4/3;
+          display: block;
+          border-radius: 4rem;
+          overflow: hidden;
+          background: #f9f9f9;
+          aspect-ratio: 4/3;
 
-            @include maxWidth($md) {
-                border-radius: 2rem;
-            }
+          @include maxWidth($md) {
+            border-radius: 2rem;
+          }
         }
 
         img {
@@ -564,11 +558,17 @@
           transform: scale(1.05);
         }
       }
+
+      @include maxWidth($md) {
+        flex-direction: column-reverse;
+        gap: 3rem;
+        text-align: center;
+      }
     }
 
     &.editor-view {
       .staggered-item {
-          margin-bottom: 4rem;
+        margin-bottom: 4rem;
       }
     }
   }
@@ -713,12 +713,12 @@
       align-items: center;
       transition: opacity 0.3s ease;
 
-      @include resFont(2, 2.6);
-
       .marquee-sep {
         margin: 0 4rem;
         opacity: 0.3;
       }
+
+      @include resFont(2, 2.6);
     }
 
     &:hover .marquee-inner {

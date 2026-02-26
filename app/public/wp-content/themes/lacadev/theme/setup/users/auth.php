@@ -15,20 +15,20 @@ define('SOCIAL_DRIVER', [
 function mm_user_login()
 {
     if (empty($_POST)) {
-        return '';
+        wp_send_json_error(__('Empty request.', 'laca'));
     }
 
-    if (!wp_verify_nonce($_POST['_token'], 'user_dang_nhap')) {
-        return __('Token mismatch!', 'laca');
+    if (!isset($_POST['_token']) || !wp_verify_nonce(wp_unslash($_POST['_token']), 'user_dang_nhap')) {
+        wp_send_json_error(__('Token mismatch!', 'laca'));
     }
 
     if (empty($_POST['user_login']) || empty($_POST['password'])) {
-        return __('Tài khoản hoặc mật khẩu không đúng, vui lòng kiểm tra lại', 'laca');
+        wp_send_json_error(__('Tài khoản hoặc mật khẩu không đúng, vui lòng kiểm tra lại', 'laca'));
     }
 
     $user = wp_signon([
-        'user_login'    => $_POST['user_login'],
-        'user_password' => $_POST['password'],
+        'user_login'    => wp_unslash($_POST['user_login']),
+        'user_password' => wp_unslash($_POST['password']),
         'remember'      => true,
     ], false);
 
@@ -36,9 +36,11 @@ function mm_user_login()
         wp_send_json_error($user->get_error_message());
     }
 
+    $redirect_url = !empty($_POST['redirect_to']) ? wp_validate_redirect(wp_unslash($_POST['redirect_to']), home_url()) : home_url();
+
     // Return success with alert data for AJAX handler
     wp_send_json_success([
-        'redirect' => $_POST['redirect_to'],
+        'redirect' => $redirect_url,
         'alert' => [
             'title' => __('Xin chào, ', 'laca') . $user->user_email,
             'message' => __('Chúc mừng bạn đã đăng nhập thành công', 'laca')
@@ -51,65 +53,63 @@ add_action('wp_ajax_user_register', 'mm_user_register');
 function mm_user_register()
 {
     if (empty($_POST)) {
-        return '';
+        wp_send_json_error(__('Empty request.', 'laca'));
     }
 
-    /* Kiem tra captcha */
-    //    $captcha = $_POST['g-recaptcha-response'];
-    //    if (empty($captcha)) return [
-    //      'status'   => false,
-    //      'loi_nhan' => __("Bạn chưa nhập mã xác nhận (chọn vào I'm not robot)", 'mtdev'),
-    //    ];
-    //    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6LfIuzYUAAAAADoy5KWNcnYkDumOexP1apz9Vv3v&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']);
-    //    $response = json_decode($response, true);
-    //    if (!$response['success']) return [
-    //      'status'   => 'alert-success',
-    //      'title'    => 'Cảnh báo',
-    //      'loi_nhan' => __("Mã xác nhận chưa chính xác", 'mtdev'),
-    //    ];
-
-    /* Kiem tra token truoc khi xu ly */
-    if (!wp_verify_nonce($_REQUEST['_token'], 'user_dang_ky_thanh_vien')) {
-        return __('Token mismatch!', 'laca');
+    if (!isset($_REQUEST['_token']) || !wp_verify_nonce(wp_unslash($_REQUEST['_token']), 'user_dang_ky_thanh_vien')) {
+        wp_send_json_error(__('Token mismatch!', 'laca'));
     }
 
     if (empty($_POST['first_name'])) {
-        return __('Vui lòng nhập họ', 'laca');
+        wp_send_json_error(__('Vui lòng nhập họ', 'laca'));
     }
 
     if (empty($_POST['last_name'])) {
-        return __('Vui lòng nhập tên', 'laca');
+        wp_send_json_error(__('Vui lòng nhập tên', 'laca'));
     }
 
-    if (empty($_POST['email'])) {
-        return __('Vui lòng nhập email', 'laca');
+    if (empty($_POST['email']) || !is_email(wp_unslash($_POST['email']))) {
+        wp_send_json_error(__('Vui lòng nhập email hợp lệ', 'laca'));
     }
 
     if (empty($_POST['password'])) {
-        return __('Vui lòng nhập mật khẩu', 'laca');
+        wp_send_json_error(__('Vui lòng nhập mật khẩu', 'laca'));
     }
 
     if ($_POST['password'] !== $_POST['password_confirmation']) {
-        return __('Vui lòng kiểm tra lại mật khẩu', 'laca');
+        wp_send_json_error(__('Vui lòng kiểm tra lại mật khẩu', 'laca'));
     }
 
     $userParams = [
-        'user_login'   => $_POST['user_login'],
-        'user_email'   => $_POST['email'],
-        'user_pass'    => $_POST['password_confirmation'],  // When creating an user, `user_pass` is expected.
-        'display_name' => $_POST['last_name'],
+        'user_login'   => sanitize_user(wp_unslash($_POST['user_login'])),
+        'user_email'   => sanitize_email(wp_unslash($_POST['email'])),
+        'user_pass'    => wp_unslash($_POST['password_confirmation']),
+        'display_name' => sanitize_text_field(wp_unslash($_POST['last_name'])),
+        'first_name'   => sanitize_text_field(wp_unslash($_POST['first_name'])),
+        'last_name'    => sanitize_text_field(wp_unslash($_POST['last_name'])),
     ];
 
     $idUser = wp_insert_user($userParams);
 
-    update_user_meta($idUser, '_user_birthday', sanitize_text_field($_POST['birthday']));
-    update_user_meta($idUser, '_user_gender', sanitize_text_field($_POST['sex']));
-
     if (is_wp_error($idUser)) {
-        return $idUser->get_error_message();
+        wp_send_json_error($idUser->get_error_message());
     }
 
-    return true;
+    if (!empty($_POST['birthday'])) {
+        update_user_meta($idUser, '_user_birthday', sanitize_text_field(wp_unslash($_POST['birthday'])));
+    }
+    if (!empty($_POST['sex'])) {
+        update_user_meta($idUser, '_user_gender', sanitize_text_field(wp_unslash($_POST['sex'])));
+    }
+
+    // Attempt auto-login after register
+    wp_set_current_user($idUser);
+    wp_set_auth_cookie($idUser);
+
+    wp_send_json_success([
+        'message' => __('Đăng ký thành công!', 'laca'),
+        'redirect' => home_url()
+    ]);
 }
 
 add_action('wp_ajax_nopriv_user_reset_password', 'mm_user_reset_password');
@@ -130,13 +130,14 @@ function googleLogin() {
     $redirect = !empty($_GET['redirect_to']) ? $_GET['redirect_to'] : null;
     $socialite = new SocialiteManager(SOCIAL_DRIVER);
 
+    $driver = $socialite->driver('google');
+
     // Nếu có redirect_to thì override redirect URI
     if ($redirect) {
-        /** @noinspection PhpUndefinedMethodInspection */
-        $socialite->driver('google')->redirectUrl($redirect);
+        $driver->withRedirectUrl($redirect);
     }
 
-    $response  = $socialite->driver('google')->redirect();
+    $response  = $driver->redirect();
     echo $response;
 }
 
@@ -237,32 +238,43 @@ function mm_inject_login_alert_script() {
         
         $title = '';
         $message = '';
+        $icon = '☕'; // Default
         
         // Check for weekend first
         if ($current_day === 'saturday' || $current_day === 'sunday') {
             $title = __('Cuối tuần vui vẻ, ', 'laca') . $user->display_name;
-            $message = sprintf(__('Hãy làm việc nhẹ nhàng và thư giãn nhé.', 'laca'), $user->display_name);
+            $message = __('Hãy gác lại công việc, dành thời gian nghỉ ngơi và sạc đầy năng lượng nhé! ✨', 'laca');
+            $icon = '🌈';
         } else {
             // Weekday logic
-            if ($current_hour >= 5 && $current_hour < 12) {
-                // Morning (5:00 - 11:59)
+            if ($current_hour >= 5 && $current_hour < 11) {
+                // Morning (5:00 - 10:59)
                 $title = sprintf(__('Chào buổi sáng %s', 'laca'), $user->display_name);
-                $message = __('Nhớ uống một tách cà phê trước khi bắt đầu nhé! ☕', 'laca');
-            } elseif ($current_hour >= 12 && $current_hour < 18) {
-                // Afternoon (12:00 - 17:59)
+                $message = __('Một tách cà phê thơm và bắt đầu ngày mới thật hứng khởi nào! ☕', 'laca');
+                $icon = '☀️';
+            } elseif ($current_hour >= 11 && $current_hour < 14) {
+                // Lunch (11:00 - 13:59)
+                $title = sprintf(__('Nghỉ trưa thôi %s', 'laca'), $user->display_name);
+                $message = __('Đừng quên ăn trưa và chợp mắt một lát để nạp lại pin nhé! 🍱', 'laca');
+                $icon = '🔋';
+            } elseif ($current_hour >= 14 && $current_hour < 18) {
+                // Afternoon (14:00 - 17:59)
                 $title = sprintf(__('Chào buổi chiều %s', 'laca'), $user->display_name);
-                $message = __('Giữ vững năng lượng để hoàn thành nốt công việc nào! ☀️', 'laca');
+                $message = __('Giữ vững sự tập trung, sắp hoàn thành mục tiêu ngày rồi! 💪', 'laca');
+                $icon = '🌇';
             } else {
                 // Evening/Night (18:00 - 4:59)
                 $title = sprintf(__('Chào buổi tối %s', 'laca'), $user->display_name);
-                $message = __('Đừng làm việc quá khuya nhé! 🌙', 'laca');
+                $message = __('Đã muộn rồi, làm việc vừa sức và sớm đi ngủ nhé! 🌕', 'laca');
+                $icon = '🌙';
             }
         }
         
         $script = "
             localStorage.setItem('show_alert', JSON.stringify({
                 title: '" . esc_js($title) . "',
-                message: '" . esc_js($message) . "'
+                message: '" . esc_js($message) . "',
+                icon: '" . esc_js($icon) . "'
             }));
         ";
         wp_add_inline_script('theme-admin-js-bundle', $script, 'before');

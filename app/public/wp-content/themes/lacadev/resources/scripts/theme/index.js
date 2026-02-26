@@ -39,11 +39,11 @@ function initializePageFeatures() {
 	initHeaderScroll();
 	initMobileMenu();
 	animateText();
-	
+
 	// Refresh ScrollTrigger after items are initialized
-	setTimeout(() => {
+	setTimeout( () => {
 		ScrollTrigger.refresh();
-	}, 500);
+	}, 500 );
 }
 
 /**
@@ -52,7 +52,9 @@ function initializePageFeatures() {
 function showPageLoader() {
 	const loader = document.querySelector( '.page-loader' );
 	const textLoader = document.querySelector( '.text-loader' );
-	if ( ! loader || ! textLoader ) return;
+	if ( ! loader || ! textLoader ) {
+		return;
+	}
 
 	gsap.set( [ loader, textLoader ], { display: 'block', opacity: 1 } );
 	document.body.classList.add( 'overflow-hidden' );
@@ -65,7 +67,9 @@ function showPageLoader() {
 function hidePageLoader() {
 	const loader = document.querySelector( '.page-loader' );
 	const textLoader = document.querySelector( '.text-loader' );
-	if ( ! loader || ! textLoader ) return;
+	if ( ! loader || ! textLoader ) {
+		return;
+	}
 
 	const randoms = document.querySelectorAll( '.randoms' );
 	randoms.forEach( ( el ) => ( el.style.opacity = '1' ) );
@@ -108,7 +112,8 @@ function startFlicker() {
 
 	flickerInterval = setInterval( () => {
 		randoms.forEach( ( el ) => {
-			const randomWord = words[ Math.floor( Math.random() * words.length ) ];
+			const randomWord =
+				words[ Math.floor( Math.random() * words.length ) ];
 			el.textContent = randomWord;
 			el.style.opacity = Math.random() > 0.5 ? '1' : '0.1';
 		} );
@@ -126,7 +131,9 @@ function stopFlicker() {
  */
 function initPageLoader() {
 	const loader = document.querySelector( '.page-loader' );
-	if ( ! loader ) return;
+	if ( ! loader ) {
+		return;
+	}
 
 	document.body.classList.add( 'overflow-hidden' );
 	startFlicker();
@@ -239,36 +246,43 @@ function initToggleDarkMode() {
  */
 function initHeaderScroll() {
 	const header = document.getElementById( 'header' );
-	if ( ! header ) return;
+	if ( ! header ) {
+		return;
+	}
 
 	let lastScrollTop = 0;
 	const threshold = 100;
 
-	window.addEventListener( 'scroll', () => {
-		const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	window.addEventListener(
+		'scroll',
+		() => {
+			const scrollTop =
+				window.pageYOffset || document.documentElement.scrollTop;
 
-		// Background / Scrolled state
-		if ( scrollTop > 50 ) {
-			header.classList.add( 'header--scrolled' );
-		} else {
-			header.classList.remove( 'header--scrolled' );
-		}
-
-		// Hide / Show logic
-		if ( scrollTop > threshold ) {
-			if ( scrollTop > lastScrollTop ) {
-				// Scroll Down
-				header.classList.add( 'header--hidden' );
+			// Background / Scrolled state
+			if ( scrollTop > 50 ) {
+				header.classList.add( 'header--scrolled' );
 			} else {
-				// Scroll Up
+				header.classList.remove( 'header--scrolled' );
+			}
+
+			// Hide / Show logic
+			if ( scrollTop > threshold ) {
+				if ( scrollTop > lastScrollTop ) {
+					// Scroll Down
+					header.classList.add( 'header--hidden' );
+				} else {
+					// Scroll Up
+					header.classList.remove( 'header--hidden' );
+				}
+			} else {
 				header.classList.remove( 'header--hidden' );
 			}
-		} else {
-			header.classList.remove( 'header--hidden' );
-		}
 
-		lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-	}, { passive: true } );
+			lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+		},
+		{ passive: true }
+	);
 }
 
 /**
@@ -277,13 +291,15 @@ function initHeaderScroll() {
 function initMobileMenu() {
 	const burgerBtn = document.getElementById( 'btn-hamburger' );
 	const overlay = document.querySelector( '.mobile-overlay' );
-	
-	if ( ! burgerBtn || ! overlay ) return;
+
+	if ( ! burgerBtn || ! overlay ) {
+		return;
+	}
 
 	// Toggle mobile overlay
 	burgerBtn.addEventListener( 'click', () => {
 		const isActive = burgerBtn.classList.contains( 'active' );
-		
+
 		if ( isActive ) {
 			burgerBtn.classList.remove( 'active' );
 			overlay.classList.remove( 'active' );
@@ -297,23 +313,26 @@ function initMobileMenu() {
 
 	// Combined logic for mobile submenus and navigation
 	const menuLinks = overlay.querySelectorAll( 'a' );
-	menuLinks.forEach( link => {
+	menuLinks.forEach( ( link ) => {
 		link.addEventListener( 'click', ( e ) => {
 			const parentLi = link.parentElement;
 			const isParent = parentLi.classList.contains( 'has-children' );
 
 			if ( window.innerWidth < 992 && isParent ) {
 				const isOpen = parentLi.classList.contains( 'open' );
-				
+
 				if ( ! isOpen ) {
 					// First click on parent: prevent navigation & open submenu
 					e.preventDefault();
 					e.stopPropagation();
 
 					// Close other open submenus (Accordion style)
-					const allParents = overlay.querySelectorAll( '.has-children' );
-					allParents.forEach( p => {
-						if ( p !== parentLi ) p.classList.remove( 'open' );
+					const allParents =
+						overlay.querySelectorAll( '.has-children' );
+					allParents.forEach( ( p ) => {
+						if ( p !== parentLi ) {
+							p.classList.remove( 'open' );
+						}
 					} );
 
 					parentLi.classList.add( 'open' );
@@ -423,7 +442,9 @@ function initCustomCursor() {
 	const cursorOuter = document.querySelector( '.cursor-outer' );
 	const cursorInner = document.querySelector( '.cursor-inner' );
 
-	if ( ! cursorOuter || ! cursorInner ) return;
+	if ( ! cursorOuter || ! cursorInner ) {
+		return;
+	}
 
 	let mouseX = 0;
 	let mouseY = 0;
