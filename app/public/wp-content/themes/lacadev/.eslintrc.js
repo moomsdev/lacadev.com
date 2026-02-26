@@ -12,7 +12,6 @@ module.exports = {
 	globals: {
 		// WordPress globals
 		themeSearch: 'readonly',
-		lacaPostOrder: 'readonly',
 		lacaDashboard: 'readonly',
 		ajaxurl_params: 'readonly',
 		adminI18n: 'readonly',

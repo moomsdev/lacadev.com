@@ -181,7 +181,7 @@ Mỗi bundle tự động include SCSS tương ứng từ `resources/styles/`.
 - Không dùng jQuery - sử dụng Vanilla JS
 - Console statements bị xóa trong production builds
 - Globals được định nghĩa trong `.eslintrc.js`:
-  - WordPress: `themeSearch`, `lacaPostOrder`, `lacaDashboard`, `ajaxurl_params`
+  - WordPress: `themeSearch`, `lacaDashboard`, `ajaxurl_params`
   - Libraries: `Swal` (SweetAlert2), `ScrollTrigger`, `SplitText` (GSAP)
 
 ## Cân Nhắc Về Bảo Mật

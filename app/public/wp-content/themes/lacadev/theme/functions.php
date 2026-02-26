@@ -111,10 +111,6 @@ add_action('after_setup_theme', function () {
     require_once APP_APP_SETUP_DIR . 'assets.php';
     require_once APP_APP_SETUP_DIR . 'performance.php';
 
-    // Load Custom Post Order
-    require_once APP_APP_DIR . 'src/Settings/PostOrder.php';
-    new \App\Settings\PostOrder();
-
     // Load Gutenberg blocks (Carbon Fields)
     // $blocks_dir = APP_APP_SETUP_DIR . '/blocks';
     // $block_files = glob($blocks_dir . '/*.php');

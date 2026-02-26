@@ -2,9 +2,6 @@
 import '@styles/admin';
 import './custom_thumbnail_support.js';
 
-// Custom Post Order - Drag & Drop
-import './post-order.js';
-
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
