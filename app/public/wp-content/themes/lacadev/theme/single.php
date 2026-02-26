@@ -13,6 +13,7 @@
 <div class="single-content">
 	<div class="container">
 		<div class="wrapper-content">
+			<h1 class="single-title screen-reader-text"><?php the_title(); ?></h1>
 			<?php theContent(); ?>
 		</div>
 	</div>

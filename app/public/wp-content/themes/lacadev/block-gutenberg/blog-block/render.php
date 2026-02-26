@@ -46,6 +46,14 @@ if ($mode === 'manual' && !empty($post_ids)) {
 
 $query = new WP_Query($args);
 
+// START: N+1 Prevention
+if ($query->have_posts()) {
+    update_post_caches($query->posts, 'post', true, true);
+    // Pre-cache terms for specific taxonomy if needed
+    update_object_term_cache(wp_list_pluck($query->posts, 'ID'), 'post');
+}
+// END: N+1 Prevention
+
 $class_name = 'block-blog';
 if (!empty($attributes['className'])) {
     $class_name .= ' ' . $attributes['className'];

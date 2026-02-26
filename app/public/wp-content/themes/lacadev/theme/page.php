@@ -16,5 +16,14 @@ endif;
 
 if (is_front_page()):
     the_content();
+else:
+    ?>
+		<div class="wrapper-content">
+			<h1 class="single-title screen-reader-text"><?php the_title(); ?></h1>
+			<?php
+			the_content();
+			?>
+		</div>
+    <?php
 endif;
 ?>

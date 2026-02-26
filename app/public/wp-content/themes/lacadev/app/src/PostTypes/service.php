@@ -30,13 +30,6 @@ class Service extends \App\Abstracts\AbstractPostType
 
     public function metaFields()
     {
-        // Container::make('post_meta', __('Information | Thông tin', 'laca'))
-        //     ->set_context('carbon_fields_after_title')
-        //     ->set_priority('high')
-        //     ->where('post_type', 'IN', [$this->post_type])
-        //     ->add_fields([
-        //         Field::make('text', 'price', __('Price | Giá', 'laca'))->set_width(30),
-        //         Field::make('textarea', 'food_desc', __('Description | Mô tả', 'laca'))->set_width(70),
-        //     ]);
+        // Add meta fields for services here
     }
 }

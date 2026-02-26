@@ -67,6 +67,10 @@ $search_query = get_search_query();
             
             if ($products->have_posts()) {
                 $has_results = true;
+
+                // Pre-cache results for N+1 prevention
+                update_post_caches($products->posts, 'product', true, true);
+                
                 $total_products = $products->found_posts;
                 $displayed_products = ($paged_product - 1) * 8 + $products->post_count;
                 ?>
@@ -115,6 +119,11 @@ $search_query = get_search_query();
             
             if ($posts->have_posts()) {
                 $has_results = true;
+
+                // Pre-cache results for N+1 prevention
+                update_post_caches($posts->posts, 'post', true, true);
+                update_object_term_cache(wp_list_pluck($posts->posts, 'ID'), 'post');
+
                 $total_posts = $posts->found_posts;
                 $displayed_posts = ($paged_post - 1) * 8 + $posts->post_count;
                 ?>
@@ -163,6 +172,10 @@ $search_query = get_search_query();
             
             if ($pages->have_posts()) {
                 $has_results = true;
+
+                // Pre-cache results for N+1 prevention
+                update_post_caches($pages->posts, 'page', true, true);
+
                 $total_pages = $pages->found_posts;
                 $displayed_pages = ($paged_page - 1) * 8 + $pages->post_count;
                 ?>

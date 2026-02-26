@@ -6,8 +6,6 @@ class Optimize
 {
     protected $currentUser;
 
-	protected $superUsers = SUPER_USER;
-
 	protected $errorMessage = '';
 
 	public function __construct()

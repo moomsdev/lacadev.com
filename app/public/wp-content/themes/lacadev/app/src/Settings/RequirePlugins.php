@@ -48,7 +48,7 @@ class RequirePlugins
                 'updating' => __('Updating plugins: %s', 'laca'),
                 'oops' => __('An error occurred while communicating with the plugins API.', 'laca'),
                 'notice_can_install_required' => _n_noop('This theme set requires the following plugins to be installed: %1$s.', 'This theme set requires the following plugins to be installed: %1$s.', 'laca'),
-                'notice_can_install_recommended' => _n_noop('Bộ giao diện này đề xuất cài đặt và sử dụng các gói mở rộng sau: %1$s.', 'This set of themes recommends installing and using the following plugins: %1$s.', 'laca'),
+                'notice_can_install_recommended' => _n_noop('This set of themes recommends installing and using the following plugins: %1$s.', 'This set of themes recommends installing and using the following plugins: %1$s.', 'laca'),
                 'notice_ask_to_update' => _n_noop(
                     'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.',
                     'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.',

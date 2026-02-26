@@ -163,7 +163,32 @@ add_action('wp_head', function() {
         
         echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
     }
-    
+
+    // Service schema
+    if (is_singular('service')) {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'name' => get_the_title(),
+            'description' => has_excerpt() ? get_the_excerpt() : wp_trim_words(strip_shortcodes($post->post_content), 30),
+            'provider' => [
+                '@type' => 'LocalBusiness',
+                'name' => get_bloginfo('name'),
+                'url' => home_url('/')
+            ],
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => get_permalink()
+            ]
+        ];
+
+        if (has_post_thumbnail()) {
+            $schema['image'] = get_the_post_thumbnail_url($post->ID, 'large');
+        }
+
+        echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+    }
+
     // Organization schema for homepage
     if (is_front_page()) {
         $schema = [

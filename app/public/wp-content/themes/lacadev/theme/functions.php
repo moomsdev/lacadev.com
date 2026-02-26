@@ -9,7 +9,24 @@ if (!defined('ABSPATH')) {
 // =============================================================================
 // SECURITY & PERMISSIONS
 // =============================================================================
-define('SUPER_USER', ['lacadev']);
+/**
+ * Define super users (Developers) who can see system menus and hidden users.
+ */
+add_filter('lacadev_super_user_logins', function($logins) {
+    return ['lacadev']; // Add your developer username here
+});
+
+/**
+ * Custom check for super user status
+ */
+add_filter('lacadev_is_super_user', function($is_super, $current_user) {
+    // Developers are always super users regardless of role
+    $super_logins = apply_filters('lacadev_super_user_logins', ['lacadev']);
+    if (in_array($current_user->user_login, $super_logins, true)) {
+        return true;
+    }
+    return $is_super;
+}, 10, 2);
 
 // =============================================================================
 // THEME INFORMATION
@@ -83,6 +100,7 @@ require_once APP_APP_DIR . 'helpers.php';
 require_once APP_APP_DIR . 'helpers/responsive-images.php';
 
 // Bootstrap Theme
+// phpcs:ignore
 Theme::bootstrap(require APP_APP_DIR . 'config.php');
 
 // Register hooks

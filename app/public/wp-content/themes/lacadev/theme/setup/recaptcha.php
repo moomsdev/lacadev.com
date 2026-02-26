@@ -56,23 +56,10 @@ class Laca_Recaptcha {
     public function enqueue_scripts() {
         wp_enqueue_script('google-recaptcha', 'https://www.google.com/recaptcha/api.js?render=' . $this->site_key, [], null, false);
         
-        $nonce_attr = '';
-        if (defined('LACA_CSP_NONCE')) {
-            $nonce_attr = 'nonce="' . LACA_CSP_NONCE . '"';
-        }
-
         $script = "
             document.addEventListener('DOMContentLoaded', function() {
                 var forms = document.querySelectorAll('#loginform, #registerform, #commentform');
-                forms.forEach(function(form) {
-                    form.addEventListener('submit', function(e) {
-                         // reCAPTCHA v3 is async, but WP forms submit synchronously.
-                         // For simplicity in v3, we generate token immediately on load or focus,
-                         // but standard practice is 'grecaptcha.ready' then 'execute'.
-                         // To avoid breaking default WP submit flow, we append token via JS on load.
-                    });
-                });
-
+                
                 grecaptcha.ready(function() {
                     grecaptcha.execute('" . $this->site_key . "', {action: 'submit'}).then(function(token) {
                         var inputs = document.querySelectorAll('.laca-recaptcha-response');
@@ -97,6 +84,15 @@ class Laca_Recaptcha {
         ";
 
         wp_add_inline_script('google-recaptcha', $script);
+        
+        // Ensure standard WP handles the nonce for this script via a filter if needed, 
+        // but since we are in a custom theme setup, we can also manually add it to the tag.
+        add_filter('script_loader_tag', function($tag, $handle) {
+            if ($handle === 'google-recaptcha' && defined('LACA_CSP_NONCE')) {
+                return str_replace('<script ', '<script nonce="' . LACA_CSP_NONCE . '" ', $tag);
+            }
+            return $tag;
+        }, 10, 2);
     }
 
     /**

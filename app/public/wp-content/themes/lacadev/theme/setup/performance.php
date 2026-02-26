@@ -59,7 +59,7 @@ class ThemePerformance
         remove_action('wp_head', 'wp_shortlink_wp_head', 10);
         remove_action('wp_head', 'start_post_rel_link');
         remove_action('wp_head', 'index_rel_link');
-        remove_action('wp_head', 'parent_post_rel_link', 10, 0);
+        remove_action('wp_head', 'parent_post_rel_link');
 
         // Optimize heartbeat
         add_filter('heartbeat_settings', function ($settings) {
@@ -120,18 +120,8 @@ class ThemePerformance
     public static function optimize_sql_queries($query)
     {
         // Add query optimization if needed
-        if (strpos($query, 'SELECT') === 0) {
-            // Log slow queries in development
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                $start_time = microtime(true);
-                register_shutdown_function(function () use ($start_time, $query) {
-                    $execution_time = microtime(true) - $start_time;
-                    if ($execution_time > 0.5) { // Log queries taking more than 500ms
-                        error_log("Slow query detected: {$execution_time}s - {$query}");
-                    }
-                });
-            }
-        }
+        // For production, we don't want to log slow queries per request here 
+        // as it adds overhead. Use Query Monitor or server logs instead.
         return $query;
     }
 

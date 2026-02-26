@@ -1,4 +1,5 @@
 
+
 			<?php
 				/**
 				 * App Layout: layouts/app.php
@@ -17,6 +18,9 @@
 					<div class="wrapper-content">
 						<?php
 						if (have_posts()) :
+							// START: N+1 Prevention
+							update_post_caches($GLOBALS['wp_query']->posts, 'service', true, true);
+							// END: N+1 Prevention
 							while (have_posts()) : the_post();
 								get_template_part("template-parts/loop","post");
 							endwhile;

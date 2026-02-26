@@ -17,14 +17,14 @@ abstract class AbstractPostType
 	 *
 	 * @var string
 	 */
-	public $singularName = 'Bài viết';
+	public $singularName = 'Post';
 
 	/**
 	 * Name for one object of this post type in plural
 	 *
 	 * @var string
 	 */
-	public $pluralName = 'Bài viết';
+	public $pluralName = 'Posts';
 
 	public $slug = 'post';
 
@@ -33,9 +33,9 @@ abstract class AbstractPostType
 	 *
 	 * @var string
 	 */
-	public $titlePlaceHolder = 'Tên bài viết';
+	public $titlePlaceHolder = 'Enter title here';
 
-	public $excerptLabel = 'Chú thích';
+	public $excerptLabel = 'Excerpt';
 
 	/**
 	 * A short descriptive summary of what the post type is.
@@ -202,21 +202,6 @@ abstract class AbstractPostType
 					'menu_position'       => 25,
 					'has_archive' => true,
 					"rewrite" => ["with_front" => true],
-					'hierarchical'        => true,
-					//                    'map_meta_cap'        => true,
-					//                    'capabilities'        => [
-					//                        'create_posts'           => 'create_' . $this->post_type,
-					//                        'delete_others_posts'    => 'delete_others_' . $this->post_type,
-					//                        'delete_posts'           => 'delete_' . $this->post_type,
-					//                        'delete_private_posts'   => 'delete_private_' . $this->post_type,
-					//                        'delete_published_posts' => 'delete_published_' . $this->post_type,
-					//                        'edit_others_posts'      => 'edit_others_' . $this->post_type,
-					//                        'edit_posts'             => 'edit_' . $this->post_type,
-					//                        'edit_private_posts'     => 'edit_private_' . $this->post_type,
-					//                        'edit_published_posts'   => 'edit_published_' . $this->post_type,
-					//                        'publish_posts'          => 'publish_' . $this->post_type,
-					//                        'read_private_posts'     => 'read_private_' . $this->post_type,
-					//                    ],
 				],
 				[
 					'singular' => $this->singularName,
@@ -266,8 +251,6 @@ abstract class AbstractPostType
 		//             Field::make('checkbox', 'is_feature', __('Nổi bật', 'laca'))->set_default_value(false),
 		//         ]);
 		// });
-
-		$this->createRequiredPages();
 	}
 
 	/**
@@ -306,72 +289,6 @@ abstract class AbstractPostType
 		];
 	}
 
-	public function createRequiredPages()
-	{
-		$postType = $this->post_type === 'post' ? '' : '-' . $this->post_type;
-
-		$filename = __DIR__ . '/../../../theme/archive' . $postType . '.php';
-		if (!file_exists($filename)) {
-			file_put_contents($filename, '
-			<?php
-				/**
-				 * App Layout: layouts/app.php
-				 *
-				 * This is the template that is used for displaying all posts by default.
-				 *
-				 * @link    https://codex.wordpress.org/Template_Hierarchy
-				 *
-				 * @package WPEmergeTheme
-				 */
-
-				theBreadcrumb();
-			?>
-			<div class="archive-content">
-				<div class="container">
-					<div class="wrapper-content">
-						<?php
-						if (have_posts()) :
-							while (have_posts()) : the_post();
-								get_template_part("template-parts/loop","post");
-							endwhile;
-							wp_reset_postdata();
-						endif;
-						thePagination();
-						?>
-					</div>
-				</div>
-			</div>
-			');
-		}
-
-		$filename = __DIR__ . '/../../../theme/single' . $postType . '.php';
-		if (!file_exists($filename)) {
-			file_put_contents($filename, '
-			<?php
-				/**
-				 * App Layout: layouts/app.php
-				 *
-				 * This is the template that is used for displaying all posts by default.
-				 *
-				 * @link    https://codex.wordpress.org/Template_Hierarchy
-				 *
-				 * @package WPEmergeTheme
-				 */
-
-				theBreadcrumb();
-			?>
-			<main class="single-content">
-				<div class="container">
-					<div class="wrapper-content">
-						<?php
-						theContent();
-						?>
-					</div>
-				</div>
-			</main>
-			');
-		}
-	}
 
 	/**
 	 * Custom style
@@ -475,12 +392,6 @@ abstract class AbstractPostType
 	 */
 	public function metaFields()
 	{
-		//        Container::make('post_meta', __('Advanced', 'laca'))
-		//                 ->set_context('carbon_fields_after_title')// normal, advanced, side or carbon_fields_after_title
-		//                 ->set_priority('high')// high, core, default or low
-		//                 ->where('post_type', 'IN', [$this->post_type])
-		//                 ->add_fields([
-		//                                  Field::make('checkbox', 'abcd', __('Tin nóng', 'laca')),
-		//                              ]);
+		// To be implemented by child classes
 	}
 }

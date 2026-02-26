@@ -157,8 +157,8 @@ function resizeImageFly($url, $width = null, $height = null, $crop = true, $reti
     $height = $height ?: get_option('thumbnail_size_h');
     $retina = $retina ? ($retina === true ? 2 : $retina) : 1;
 
-    $file_path = parse_url($url);
-    $file_path = $_SERVER['DOCUMENT_ROOT'] . $file_path['path'];
+    $file_info = parse_url($url);
+    $file_path = ABSPATH . ltrim($file_info['path'], '/');
 
     if (is_multisite()) {
         global $blog_id;
@@ -278,7 +278,7 @@ function getRelatePosts($postId = null, $postCount = null)
     $arrTaxQuery = ['relation' => 'OR'];
     foreach ($taxonomies as $taxonomy) {
         $terms = get_the_terms($thisPost->ID, $taxonomy);
-        if ($terms) {
+        if ($terms && !is_wp_error($terms)) {
             $arrTaxQuery[] = [
                 'taxonomy' => $taxonomy,
                 'field' => 'term_id',
@@ -293,15 +293,21 @@ function getRelatePosts($postId = null, $postCount = null)
         'posts_per_page' => $postCount,
         'post__not_in' => [$thisPost->ID],
         'tax_query' => $arrTaxQuery,
+        'fields' => 'ids', // Optimization: fetch only IDs for the transient
     ]);
 
     // Cache post IDs for 1 hour
-    if ($query->have_posts()) {
-        $post_ids = wp_list_pluck($query->posts, 'ID');
-        set_transient($cache_key, $post_ids, HOUR_IN_SECONDS);
-    }
+    $post_ids = $query->posts;
+    set_transient($cache_key, $post_ids, HOUR_IN_SECONDS);
 
-    return $query;
+    // Now return a full query object for the frontend
+    return new WP_Query([
+        'post__in' => $post_ids,
+        'post_type' => $thisPost->post_type,
+        'post_status' => 'publish',
+        'posts_per_page' => $postCount,
+        'orderby' => 'post__in',
+    ]);
 }
 
 function getLatestPosts($postType = 'post', $postCount = null)
@@ -330,15 +336,19 @@ function getLatestPosts($postType = 'post', $postCount = null)
         'posts_per_page' => $postCount,
         'orderby' => 'date',
         'order' => 'DESC',
+        'fields' => 'ids', // Optimization
     ]);
 
-    // Cache post IDs for 15 minutes (latest posts change frequently)
-    if ($query->have_posts()) {
-        $post_ids = wp_list_pluck($query->posts, 'ID');
-        set_transient($cache_key, $post_ids, 15 * MINUTE_IN_SECONDS);
-    }
+    $post_ids = $query->posts;
+    set_transient($cache_key, $post_ids, 15 * MINUTE_IN_SECONDS);
 
-    return $query;
+    return new WP_Query([
+        'post__in' => $post_ids ?: [0],
+        'post_type' => $postType,
+        'post_status' => 'publish',
+        'posts_per_page' => $postCount,
+        'orderby' => 'post__in',
+    ]);
 }
 
 function getTopViewPosts($postType = 'post', $postCount = null)
@@ -368,15 +378,19 @@ function getTopViewPosts($postType = 'post', $postCount = null)
         'meta_key' => '_gm_view_count',
         'orderby' => 'meta_value_num',
         'order' => 'DESC',
+        'fields' => 'ids', // Optimization
     ]);
 
-    // Cache post IDs for 30 minutes (view counts change less frequently)
-    if ($query->have_posts()) {
-        $post_ids = wp_list_pluck($query->posts, 'ID');
-        set_transient($cache_key, $post_ids, 30 * MINUTE_IN_SECONDS);
-    }
+    $post_ids = $query->posts;
+    set_transient($cache_key, $post_ids, 30 * MINUTE_IN_SECONDS);
 
-    return $query;
+    return new WP_Query([
+        'post__in' => $post_ids ?: [0],
+        'post_type' => $postType,
+        'post_status' => 'publish',
+        'posts_per_page' => $postCount,
+        'orderby' => 'post__in',
+    ]);
 }
 
 function getListAllPages()
@@ -384,7 +398,7 @@ function getListAllPages()
     $pages = get_posts([
         'post_type' => 'page',
         'posts_per_page' => -1,
-        'lang' => get_icl_language_code(),
+        'lang' => function_exists('get_icl_language_code') ? get_icl_language_code() : '',
     ]);
 
     $list = [];
@@ -551,6 +565,10 @@ function moomsdev_check_spam_form_cf7($html)
 add_action('wpcf7_posted_data', 'laca_check_spam_form_cf7_vaild');
 function laca_check_spam_form_cf7_vaild($posted_data)
 {
+    if (!class_exists('WPCF7_Submission')) {
+        return $posted_data;
+    }
+
     $submission = WPCF7_Submission::get_instance();
     if (!empty($posted_data['moomsdev'])) {
         $submission->set_status('spam');

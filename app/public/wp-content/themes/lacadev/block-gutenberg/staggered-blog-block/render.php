@@ -41,6 +41,13 @@ if ($mode === 'manual' && !empty($post_ids)) {
 
 $query = new WP_Query($args);
 
+// START: N+1 Prevention
+if ($query->have_posts()) {
+    $post_ids = wp_list_pluck($query->posts, 'ID');
+    update_post_caches($query->posts, 'post', true, true);
+}
+// END: N+1 Prevention
+
 $class_name = 'block-staggered-blog';
 if (!empty($attributes['className'])) {
     $class_name .= ' ' . $attributes['className'];
