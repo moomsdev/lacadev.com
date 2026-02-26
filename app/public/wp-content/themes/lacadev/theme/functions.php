@@ -133,7 +133,7 @@ require_once APP_APP_DIR . 'hooks.php';
 // =============================================================================
 add_action('after_setup_theme', function () {
     // Load textdomain
-    load_theme_textdomain('laca', APP_DIR . 'languages');
+    load_theme_textdomain('laca', APP_THEME_DIR . 'languages');
 
     // Load theme components
     require_once APP_APP_SETUP_DIR . 'theme-support.php';

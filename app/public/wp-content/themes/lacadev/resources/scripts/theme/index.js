@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Swup from 'swup';
 import Swiper from 'swiper';
 import { initAboutLacaHero } from './pages/about-laca';
+import { initContactPage } from './pages/contact';
 
 gsap.registerPlugin( ScrollTrigger );
 
@@ -38,6 +39,7 @@ function initializePageFeatures() {
 	initAnimations();
 	initHeaderScroll();
 	initMobileMenu();
+	initContactPage();
 	animateText();
 
 	// Refresh ScrollTrigger after items are initialized

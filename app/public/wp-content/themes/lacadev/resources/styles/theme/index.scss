@@ -17,5 +17,10 @@
 @use "./pages/cpt.scss" as *;
 @use "./pages/contact.scss" as *;
 
+#wpadminbar .logo-admin-bar {
+  max-height: 1.2rem !important;
+  width: auto !important;
+}
+
 @import "~@csstools/normalize.css";
 @import "swiper/swiper-bundle.css";

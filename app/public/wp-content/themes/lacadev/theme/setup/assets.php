@@ -181,6 +181,22 @@ function app_action_admin_enqueue_assets()
 
     // Enqueue front-end styles in admin area
     //  Assets::enqueueStyle('theme-css-bundle', $template_dir . '/dist/styles/theme.css');
+
+    // Inject dynamic admin colors as CSS variables
+    $primary_color_ad = carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc';
+    $secondary_color_ad = carbon_get_theme_option('secondary_color_ad') ?: '#1d2327';
+    $bg_color_ad = carbon_get_theme_option('bg_color_ad') ?: '#f0f0f1';
+    $text_color_ad = carbon_get_theme_option('text_color_ad') ?: '#3c434a';
+
+    $custom_css = "
+        :root {
+            --primary-color-ad: {$primary_color_ad};
+            --secondary-color-ad: {$secondary_color_ad};
+            --bg-color-ad: {$bg_color_ad};
+            --text-color-ad: {$text_color_ad};
+        }
+    ";
+    wp_add_inline_style('theme-admin-css-bundle', $custom_css);
 }
 
 /**

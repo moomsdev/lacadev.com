@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: La Cà Dev\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-30 08:23+0000\n"
-"PO-Revision-Date: 2025-12-30 08:26+0000\n"
+"PO-Revision-Date: 2026-02-26 18:19+0000\n"
 "Last-Translator: La Cà Dev\n"
 "Language-Team: English (United States)\n"
 "Language: en_US\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "%1$s at %2$s"
 msgstr ""
 
-#: search.php:224
+#: search.php:237
 #, php-format
 msgid "%s liên quan"
 msgstr ""
@@ -54,15 +54,11 @@ msgstr ""
 msgid "All Custom Taxonomies"
 msgstr ""
 
-#: setup/theme-support.php:150
-msgid "Amber"
-msgstr ""
-
-#: setup/theme-options.php:25
+#: setup/theme-options.php:23
 msgid "Background color"
 msgstr ""
 
-#: setup/theme-options.php:35
+#: setup/theme-options.php:30
 msgid "Background color dark"
 msgstr ""
 
@@ -76,14 +72,6 @@ msgstr ""
 
 #: setup/blocks/blog.php:11
 msgid "Block blog"
-msgstr ""
-
-#: setup/blocks/service.php:8
-msgid "BLOCK SERVICE"
-msgstr ""
-
-#: setup/blocks/service.php:6
-msgid "Block Service"
 msgstr ""
 
 #: setup/blocks/slider.php:8
@@ -106,20 +94,8 @@ msgstr ""
 msgid "Blog Tags"
 msgstr ""
 
-#: setup/theme-support.php:110
-msgid "Blue"
-msgstr ""
-
-#: setup/theme-support.php:175
-msgid "Blue Grey"
-msgstr ""
-
 #: setup/theme-options.php:18
 msgid "Branding | Thương hiệu"
-msgstr ""
-
-#: setup/theme-support.php:165
-msgid "Brown"
 msgstr ""
 
 #. post author attribution
@@ -128,43 +104,53 @@ msgstr ""
 msgid "by %s"
 msgstr ""
 
-#: search.php:123
+#: search.php:132
 msgid "Bài viết liên quan"
 msgstr ""
 
-#: header.php:94
+#: page_templates/template-contact.php:38
+msgid ""
+"Bạn có ý tưởng mới, một dự án hay ho hay đơn giản là muốn chia sẻ một hành "
+"trình? Đừng ngần ngại, trạm luôn mở cửa đón chờ!"
+msgstr ""
+
+#: page_templates/template-contact.php:107
+msgid "Bạn tên là gì?"
+msgstr ""
+
+#: header.php:192
 msgid "Chuyển chế độ tối/sáng"
 msgstr ""
 
-#: setup/users/auth.php:244
+#: setup/users/auth.php:262
 #, php-format
 msgid "Chào buổi chiều %s"
 msgstr ""
 
-#: setup/users/auth.php:240
+#: setup/users/auth.php:252
 #, php-format
 msgid "Chào buổi sáng %s"
 msgstr ""
 
-#: setup/users/auth.php:248
+#: setup/users/auth.php:267
 #, php-format
 msgid "Chào buổi tối %s"
 msgstr ""
 
-#: setup/users/auth.php:44 setup/users/auth.php:150
+#: footer.php:78
+msgid "Chính sách bảo mật"
+msgstr ""
+
+#: setup/users/auth.php:46 setup/users/auth.php:152
 msgid "Chúc mừng bạn đã đăng nhập thành công"
 msgstr ""
 
-#: setup/users/auth.php:181
+#: setup/users/auth.php:183
 msgid "Chúc mừng bạn đã đăng nhập thành công với quyền admin"
 msgstr ""
 
 #: setup/blocks/blog.php:37
 msgid "Chọn bài viết thủ công"
-msgstr ""
-
-#: setup/blocks/service.php:14
-msgid "Chọn dịch vụ hiển thị:"
 msgstr ""
 
 #: setup/blocks/slider.php:9
@@ -175,7 +161,12 @@ msgstr ""
 msgid "Comments are closed."
 msgstr ""
 
-#: setup/theme-options.php:49
+#. Name of the template
+#: page_templates/template-contact.php:2
+msgid "Contact Page"
+msgstr ""
+
+#: setup/theme-options.php:41
 msgid "Contact | Liên hệ"
 msgstr ""
 
@@ -183,23 +174,11 @@ msgstr ""
 msgid "Custom Taxonomy"
 msgstr ""
 
-#: setup/users/auth.php:234
+#: setup/users/auth.php:245
 msgid "Cuối tuần vui vẻ, "
 msgstr ""
 
-#: setup/theme-support.php:120
-msgid "Cyan"
-msgstr ""
-
-#: setup/theme-support.php:160
-msgid "Deep Orange"
-msgstr ""
-
-#: setup/theme-support.php:100
-msgid "Deep Purple"
-msgstr ""
-
-#: setup/theme-options.php:43
+#: setup/theme-options.php:37
 msgid "Default image | Hình ảnh mặc định"
 msgstr ""
 
@@ -211,11 +190,23 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: setup/theme-support.php:224
+#: page_templates/template-contact.php:53
+msgid "Email"
+msgstr ""
+
+#: page_templates/template-contact.php:111
+msgid "Email liên hệ"
+msgstr ""
+
+#: setup/users/auth.php:18 setup/users/auth.php:56
+msgid "Empty request."
+msgstr ""
+
+#: setup/theme-support.php:116
 msgid "extra large"
 msgstr ""
 
-#: setup/theme-support.php:200
+#: setup/theme-support.php:92
 msgid "extra small"
 msgstr ""
 
@@ -223,39 +214,48 @@ msgstr ""
 msgid "Footer Menu"
 msgstr ""
 
-#: setup/theme-options.php:93
+#: setup/theme-options.php:87
 msgid "Footer Script"
 msgstr ""
 
-#: setup/users/auth.php:245
-msgid "Giữ vững năng lượng để hoàn thành nốt công việc nào! ☀️"
+#: setup/users/auth.php:263
+msgid "Giữ vững sự tập trung, sắp hoàn thành mục tiêu ngày rồi! 💪"
 msgstr ""
 
-#: setup/theme-support.php:130
-msgid "Green"
+#: footer.php:52
+msgid "Gặp tôi tại"
 msgstr ""
 
-#: setup/theme-support.php:170
-msgid "Grey"
+#: page_templates/template-contact.php:128
+msgid "Gửi lời nhắn"
 msgstr ""
 
-#: setup/theme-options.php:76
+#: setup/theme-options.php:70
 msgid "Header  |  Footer"
 msgstr ""
 
-#: setup/theme-options.php:92
+#: setup/theme-options.php:86
 msgid "Header Script"
 msgstr ""
 
-#: setup/users/auth.php:235
-msgid "Hãy làm việc nhẹ nhàng và thư giãn nhé."
+#: footer.php:15
+msgid "HÃY CÙNG NHAU LA CÀ VÀ"
 msgstr ""
 
-#: setup/theme-support.php:105
-msgid "Indigo"
+#: setup/users/auth.php:246
+msgid ""
+"Hãy gác lại công việc, dành thời gian nghỉ ngơi và sạc đầy năng lượng nhé! ✨"
 msgstr ""
 
-#: search.php:259
+#: setup/recaptcha.php:133
+msgid "Hệ thống nghi ngờ bạn là robot. Điểm tín nhiệm thấp."
+msgstr ""
+
+#: page_templates/template-contact.php:108
+msgid "Họ và tên của bạn"
+msgstr ""
+
+#: search.php:272
 #, php-format
 msgid "Không tìm thấy kết quả nào cho \"%s\""
 msgstr ""
@@ -264,7 +264,7 @@ msgstr ""
 msgid "Kết quả tìm kiếm"
 msgstr ""
 
-#: setup/theme-support.php:219
+#: setup/theme-support.php:111
 msgid "L"
 msgstr ""
 
@@ -284,7 +284,7 @@ msgstr ""
 msgid "lacadev/lacadev/theme"
 msgstr ""
 
-#: setup/theme-support.php:218
+#: setup/theme-support.php:110
 msgid "large"
 msgstr ""
 
@@ -292,32 +292,19 @@ msgstr ""
 msgid "Leave a Reply"
 msgstr ""
 
-#: setup/theme-support.php:115
-msgid "Light Blue"
-msgstr ""
-
-#: setup/theme-support.php:135
-msgid "Light Green"
-msgstr ""
-
-#: setup/theme-support.php:140
-msgid "Lime"
-msgstr ""
-
-#. Name of the template
-#: page_templates/template-contact.php:2
-msgid "Liên hệ"
-msgstr ""
-
-#: setup/theme-options.php:39
+#: setup/theme-options.php:33
 msgid "Logo"
 msgstr ""
 
-#: setup/theme-options.php:41
+#: setup/theme-options.php:35
 msgid "Logo Dark"
 msgstr ""
 
-#: setup/theme-support.php:213
+#: setup/recaptcha.php:122
+msgid "Lỗi kết nối đến máy chủ xác thực."
+msgstr ""
+
+#: setup/theme-support.php:105
 msgid "M"
 msgstr ""
 
@@ -325,16 +312,20 @@ msgstr ""
 msgid "Main Menu"
 msgstr ""
 
-#: header.php:119
-msgid "Menu chính"
+#: header.php:123
+msgid "Main menu"
 msgstr ""
 
 #: setup/menus.php:30
 msgid "Menu image"
 msgstr ""
 
-#: header.php:120
-msgid "Mở menu"
+#: setup/users/auth.php:253
+msgid "Một tách cà phê thơm và bắt đầu ngày mới thật hứng khởi nào! ☕"
+msgstr ""
+
+#: header.php:208
+msgid "NAVIGATION"
 msgstr ""
 
 #: setup/taxonomies/blog_cat.php:38
@@ -353,12 +344,13 @@ msgstr ""
 msgid "Next Entry »"
 msgstr ""
 
-#: header.php:148
-msgid "Nhập từ khóa tìm kiếm"
+#: setup/users/auth.php:257
+#, php-format
+msgid "Nghỉ trưa thôi %s"
 msgstr ""
 
-#: setup/users/auth.php:241
-msgid "Nhớ uống một tách cà phê trước khi bắt đầu nhé! ☕"
+#: header.php:173
+msgid "Nhập từ khóa tìm kiếm"
 msgstr ""
 
 #: loop_templates/post_meta.php:32
@@ -369,12 +361,16 @@ msgstr ""
 msgid "No Responses"
 msgstr ""
 
-#: comments.php:20
-msgid "One Response"
+#: page_templates/template-contact.php:123
+msgid "Nơi bạn viết nên những ý tưởng hoặc lời nhắn gửi..."
 msgstr ""
 
-#: setup/theme-support.php:155
-msgid "Orange"
+#: page_templates/template-contact.php:122
+msgid "Nội dung"
+msgstr ""
+
+#: comments.php:20
+msgid "One Response"
 msgstr ""
 
 #: setup/taxonomies/blog_cat.php:33
@@ -385,8 +381,12 @@ msgstr ""
 msgid "Parent Taxonomy"
 msgstr ""
 
-#: setup/theme-support.php:90
-msgid "Pink"
+#: footer.php:21
+msgid "Ping tôi"
+msgstr ""
+
+#: page_templates/template-contact.php:37
+msgid "Ping tôi tại đây"
 msgstr ""
 
 #. generic error page content; placeholders represents homepage opening and closing anchor tags
@@ -405,27 +405,19 @@ msgstr ""
 msgid "Primary color"
 msgstr ""
 
-#: setup/theme-options.php:29
+#: setup/theme-options.php:26
 msgid "Primary color dark"
 msgstr ""
 
-#: setup/theme-support.php:95
-msgid "Purple"
-msgstr ""
-
-#: setup/security.php:83
+#: setup/security.php:109
 msgid "Quá nhiều lần đăng nhập thất bại. Vui lòng thử lại sau 15 phút."
 msgstr ""
 
-#: setup/theme-support.php:85
-msgid "Red"
-msgstr ""
-
-#: setup/theme-support.php:212
+#: setup/theme-support.php:104
 msgid "regular"
 msgstr ""
 
-#: setup/theme-support.php:207
+#: setup/theme-support.php:99
 msgid "S"
 msgstr ""
 
@@ -433,7 +425,7 @@ msgstr ""
 msgid "says:"
 msgstr ""
 
-#: setup/theme-options.php:91
+#: setup/theme-options.php:85
 msgid "Scripts"
 msgstr ""
 
@@ -453,23 +445,23 @@ msgstr ""
 msgid "Search for:"
 msgstr ""
 
-#: setup/theme-options.php:22
+#: setup/theme-options.php:21
 msgid "Secondary color"
 msgstr ""
 
-#: setup/theme-options.php:32
+#: setup/theme-options.php:28
 msgid "Secondary color dark"
 msgstr ""
 
-#: header.php:79
+#: header.php:106
 msgid "Skip to content"
 msgstr ""
 
-#: setup/theme-support.php:206
+#: setup/theme-support.php:98
 msgid "small"
 msgstr ""
 
-#: search.php:75
+#: search.php:79
 msgid "Sản phẩm liên quan"
 msgstr ""
 
@@ -481,15 +473,15 @@ msgstr ""
 msgid "Tags:"
 msgstr ""
 
-#: setup/theme-support.php:125
-msgid "Teal"
+#: page_templates/template-contact.php:117
+msgid "Tiêu đề"
 msgstr ""
 
-#: setup/users/auth.php:22 setup/users/auth.php:73
+#: setup/users/auth.php:22 setup/users/auth.php:60
 msgid "Token mismatch!"
 msgstr ""
 
-#: search.php:171
+#: search.php:184
 msgid "Trang liên quan"
 msgstr ""
 
@@ -497,15 +489,19 @@ msgstr ""
 msgid "Tài khoản hoặc mật khẩu không đúng, vui lòng kiểm tra lại"
 msgstr ""
 
-#: header.php:142
+#: header.php:167
 msgid "Tìm kiếm"
 msgstr ""
 
-#: header.php:147
+#: header.php:172
 msgid "Tìm kiếm ..."
 msgstr ""
 
-#: header.php:143
+#: page_templates/template-contact.php:118
+msgid "Tóm tắt ngắn gọn mục đích liên hệ"
+msgstr ""
+
+#: header.php:168
 msgid "Từ khóa tìm kiếm"
 msgstr ""
 
@@ -526,52 +522,60 @@ msgstr ""
 msgid "View Custom Taxonomy"
 msgstr ""
 
-#: setup/users/auth.php:93
+#: footer.php:16
+msgid "viết nên hành trình mới"
+msgstr ""
+
+#: setup/users/auth.php:80
 msgid "Vui lòng kiểm tra lại mật khẩu"
 msgstr ""
 
-#: setup/users/auth.php:85
-msgid "Vui lòng nhập email"
+#: setup/users/auth.php:72
+msgid "Vui lòng nhập email hợp lệ"
 msgstr ""
 
-#: setup/users/auth.php:77
+#: setup/users/auth.php:64
 msgid "Vui lòng nhập họ"
 msgstr ""
 
-#: setup/users/auth.php:89
+#: setup/users/auth.php:76
 msgid "Vui lòng nhập mật khẩu"
 msgstr ""
 
-#: setup/users/auth.php:81
+#: setup/users/auth.php:68
 msgid "Vui lòng nhập tên"
 msgstr ""
 
-#: search.php:260
+#: search.php:273
 msgid "Vui lòng thử lại với từ khóa khác."
 msgstr ""
 
-#: search.php:96 search.php:144 search.php:192 search.php:245
+#: setup/recaptcha.php:110
+msgid "Vui lòng tải lại trang để xác thực reCAPTCHA."
+msgstr ""
+
+#: search.php:100 search.php:153 search.php:205 search.php:258
 msgid "Xem thêm"
 msgstr ""
 
-#: setup/users/auth.php:43 setup/users/auth.php:149 setup/users/auth.php:180
+#: setup/users/auth.php:45 setup/users/auth.php:151 setup/users/auth.php:182
 msgid "Xin chào, "
 msgstr ""
 
-#: setup/theme-support.php:225
+#: setup/theme-support.php:117
 msgid "XL"
 msgstr ""
 
-#: setup/theme-support.php:201
+#: setup/theme-support.php:93
 msgid "XS"
 msgstr ""
 
-#: header.php:149
-msgid "Xóa tìm kiếm"
+#: setup/recaptcha.php:129
+msgid "Xác thực reCAPTCHA thất bại. Bạn có phải là robot?"
 msgstr ""
 
-#: setup/theme-support.php:145
-msgid "Yellow"
+#: header.php:174
+msgid "Xóa tìm kiếm"
 msgstr ""
 
 #: loop_templates/comment_single.php:18
@@ -590,6 +594,34 @@ msgstr ""
 msgid "« Previous Entry"
 msgstr ""
 
-#: setup/users/auth.php:249
-msgid "Đừng làm việc quá khuya nhé! 🌙"
-msgstr "Take care and don't work too late 🌙"
+#: footer.php:79
+msgid "Điều khoản sử dụng"
+msgstr ""
+
+#: footer.php:37
+msgid "Điểm dừng"
+msgstr ""
+
+#: page_templates/template-contact.php:65
+msgid "Điện thoại"
+msgstr ""
+
+#: setup/users/auth.php:268
+msgid "Đã muộn rồi, làm việc vừa sức và sớm đi ngủ nhé! 🌕"
+msgstr ""
+
+#: setup/users/auth.php:110
+msgid "Đăng ký thành công!"
+msgstr ""
+
+#: page_templates/template-contact.php:112
+msgid "Để tôi có thể gửi phản hồi"
+msgstr ""
+
+#: page_templates/template-contact.php:76
+msgid "Địa điểm"
+msgstr ""
+
+#: setup/users/auth.php:258
+msgid "Đừng quên ăn trưa và chợp mắt một lát để nạp lại pin nhé! 🍱"
+msgstr ""

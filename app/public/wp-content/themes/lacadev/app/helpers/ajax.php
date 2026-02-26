@@ -389,71 +389,129 @@ function removePostThumbnail() {
 }
 
 // -----------------------------------------------------------------------------
+// AJAX: Check submission status for returning users
+// -----------------------------------------------------------------------------
+add_action('wp_ajax_laca_check_submission_status', 'lacadev_check_submission_status');
+add_action('wp_ajax_nopriv_laca_check_submission_status', 'lacadev_check_submission_status');
+
+function lacadev_check_submission_status() {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $last_submission = get_transient('laca_contact_' . md5($ip));
+    
+    if ($last_submission) {
+        wp_send_json_success([
+            'submitted' => true,
+            'time' => date_i18n('H:i - d/m/Y', $last_submission),
+            'message' => sprintf(__('Bạn đã gửi lời nhắn vào lúc %s. Bạn có muốn gửi thêm nội dung khác?', 'laca'), date_i18n('H:i - d/m/Y', $last_submission))
+        ]);
+    }
+    
+    wp_send_json_success(['submitted' => false]);
+}
+
+// -----------------------------------------------------------------------------
 // AJAX: Gửi form liên hệ (Contact Form)
 // -----------------------------------------------------------------------------
-/**
- * Xử lý gửi form liên hệ qua Ajax, gửi email đến quản trị viên.
- *
- * @action wp_ajax_nopriv_send_contact_form
- * @action wp_ajax_send_contact_form
- */
-add_action('wp_ajax_nopriv_send_contact_form', 'sendContactForm');
-add_action('wp_ajax_send_contact_form', 'sendContactForm');
+add_action('wp_ajax_nopriv_laca_contact_submit', 'lacadev_handle_contact_submit');
+add_action('wp_ajax_laca_contact_submit', 'lacadev_handle_contact_submit');
 
-function sendContactForm() {
-    // Bắt đầu output buffering để tránh lỗi JSON
-    ob_start();
+function lacadev_handle_contact_submit() {
+    // 1. Security check
+    check_ajax_referer('laca_contact_nonce', 'nonce');
+
+    // 2. Rate Limiting Check
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $transient_key = 'laca_contact_' . md5($ip);
+    $last_submission = get_transient($transient_key);
     
-    // Kiểm tra nonce để bảo mật
-    if (!check_ajax_referer('send_contact_form', '_token', false)) {
-        ob_end_clean();
-        wp_send_json_error(['message' => __('Token mistake.')]);
+    // If they haven't explicitly confirmed they want to resubmit
+    if ($last_submission && !isset($_POST['resubmit_confirmed'])) {
+         wp_send_json_error([
+             'code' => 'recently_submitted',
+             'time' => date_i18n('H:i - d/m/Y', $last_submission),
+             'message' => sprintf(__('Bạn vừa gửi tin nhắn vào lúc %s. Đợi một chút rồi gửi tiếp nhé!', 'laca'), date_i18n('H:i - d/m/Y', $last_submission))
+         ]);
     }
 
-    // Kiểm tra các trường bắt buộc
-    if (empty($_POST['first_name']) || empty($_POST['last_name']) || empty($_POST['email']) || empty($_POST['phone_number']) || empty($_POST['message'])) {
-        wp_send_json_error(['message' => __('Please fill in all required fields.', 'mms')]);
+    // 3. Verify reCAPTCHA v3
+    $recaptcha_response = isset($_POST['recaptcha_response']) ? sanitize_text_field($_POST['recaptcha_response']) : '';
+    $secret_key = carbon_get_theme_option('recaptcha_secret_key');
+    $score_threshold = (float) carbon_get_theme_option('recaptcha_score') ?: 0.5;
+
+    if (!empty($secret_key)) {
+        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', [
+            'body' => [
+                'secret'   => $secret_key,
+                'response' => $recaptcha_response,
+                'remoteip' => $ip
+            ]
+        ]);
+
+        if (is_wp_error($response)) {
+             wp_send_json_error(['message' => __('Không thể kết nối với Google reCAPTCHA.', 'laca')]);
+        }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (!$data['success']) {
+            wp_send_json_error(['message' => __('Xác thực reCAPTCHA thất bại.', 'laca')]);
+        }
+        if ($data['score'] < $score_threshold) {
+            wp_send_json_error(['message' => __('Hệ thống nghi ngờ bạn là bot (Điểm thấp).', 'laca')]);
+        }
     }
 
-    // Lấy thông tin từ form
-    $first_name = sanitize_text_field($_POST['first_name']);
-    $last_name = sanitize_text_field($_POST['last_name']);
-    $email = sanitize_email($_POST['email']);
-    $phone_number = sanitize_text_field($_POST['phone_number']);
-    $message = sanitize_textarea_field($_POST['message']);
+    // 4. Sanitize Input
+    $name    = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
+    $email   = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+    $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
+    $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
 
-    // Lấy thông tin blog
-    $blogName = get_bloginfo('name');
-    $blogUrl = get_bloginfo('url');
+    if (empty($name) || empty($email) || empty($message)) {
+        wp_send_json_error(['message' => __('Vui lòng điền đầy đủ các thông tin bắt buộc.', 'laca')]);
+    }
 
-    // Nội dung email
-    $html = sprintf(
-        '<p>Send from: %s %s (%s)</p><p>Contact phone number: %s</p><p>Contact message:</p><p>%s</p>',
-        esc_html($first_name),
-        esc_html($last_name),
-        esc_html($email),
-        esc_html($phone_number),
-        esc_html($message)
-    );
+    if (!is_email($email)) {
+        wp_send_json_error(['message' => __('Địa chỉ email không hợp lệ.', 'laca')]);
+    }
 
-    // Thiết lập header
+    // 5. Send Email
+    $to = carbon_get_theme_option('email') ?: get_option('admin_email');
+    $site_name = get_bloginfo('name');
+    
+    $email_subject = sprintf('[%s] Lời nhắn mới từ %s', $site_name, $name);
+    if ($subject) {
+        $email_subject .= ': ' . $subject;
+    }
+
     $headers = [
         'Content-Type: text/html; charset=UTF-8',
-        'Reply-To: ' . esc_html($first_name . ' ' . $last_name) . ' <' . sanitize_email($email) . '>',
+        'Reply-To: ' . $name . ' <' . $email . '>'
     ];
 
-    // Gửi email đến quản trị viên
-    $success = wp_mail(get_option('admin_email'), $blogName . ': New Contact Form Submission', $html, $headers);
+    $email_body = "
+        <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+            <h2 style='color: #007bff;'>Lời nhắn mới từ trang Liên hệ</h2>
+            <p><strong>Người gửi:</strong> {$name}</p>
+            <p><strong>Email:</strong> {$email}</p>
+            <p><strong>Tiêu đề:</strong> " . ($subject ?: 'Không có') . "</p>
+            <hr style='border: 0; border-top: 1px solid #eee;'>
+            <p><strong>Nội dung:</strong></p>
+            <p style='background: #f9f9f9; padding: 15px; border-left: 4px solid #007bff;'>
+                " . nl2br($message) . "
+            </p>
+            <hr style='border: 0; border-top: 1px solid #eee;'>
+            <p style='font-size: 12px; color: #888;'>Tin nhắn này được gửi tự động từ hệ thống {$site_name}.</p>
+        </div>
+    ";
 
-    // Kiểm tra kết quả gửi email và phản hồi JSON
-    if ($success) {
-        ob_end_clean();
-        wp_send_json_success(['message' => __('Your request has been successfully submitted.', 'mms')]);
+    $sent = wp_mail($to, $email_subject, $email_body, $headers);
+
+    if ($sent) {
+        // Set transient for 30 minutes to prevent spam
+        set_transient($transient_key, time(), 30 * MINUTE_IN_SECONDS);
+        wp_send_json_success(['message' => __('Lời nhắn của bạn đã được gửi đi thành công. Tôi sẽ phản hồi sớm nhé!', 'laca')]);
     } else {
-        // Ghi lại log nếu gửi email thất bại
-        error_log('Email failed to send.');
-        ob_end_clean();
-        wp_send_json_error(['message' => __('An error occurred. Please try again later.', 'mms')]);
+        wp_send_json_error(['message' => __('Đã có lỗi xảy ra khi gửi mail. Vui lòng thử lại sau.', 'laca')]);
     }
 }
 
