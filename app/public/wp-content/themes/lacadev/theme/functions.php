@@ -17,6 +17,28 @@ add_filter('lacadev_super_user_logins', function($logins) {
 });
 
 /**
+ * Inject night sky background to login page
+ */
+add_action('login_header', function() {
+    ?>
+    <div class="login-night-sky" aria-hidden="true">
+        <div class="alp-stars">
+            <?php foreach (range(1, 80) as $i) : 
+                $size = rand(15, 30) / 10;
+                $left = rand(0, 10000) / 100;
+                $top = rand(0, 10000) / 100;
+                $dur = rand(20, 50) / 10;
+                $delay = rand(0, 50) / 10;
+            ?>
+                <div class="alp-star" style="left:<?php echo $left; ?>%; top:<?php echo $top; ?>%; width:<?php echo $size; ?>px; height:<?php echo $size; ?>px; --d:<?php echo $dur; ?>s; animation-delay:<?php echo $delay; ?>s;"></div>
+            <?php endforeach; ?>
+        </div>
+        <div class="alp-moon"></div>
+    </div>
+    <?php
+});
+
+/**
  * Custom check for super user status
  */
 add_filter('lacadev_is_super_user', function($is_super, $current_user) {

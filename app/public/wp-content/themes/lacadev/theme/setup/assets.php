@@ -220,6 +220,17 @@ function app_action_login_enqueue_assets()
         true
     );
 
+    wp_localize_script('theme-login-js-bundle', 'loginI18n', [
+        'userLabel' => __('Ai đang ghé trạm? (Tên / Email)', 'lacadev'),
+        'userPlaceholder' => __('Điền tên hoặc email vào đây nhé', 'lacadev'),
+        'passLabel' => __('Chìa khóa', 'lacadev'),
+        'passPlaceholder' => __('Nhập chìa khóa mở cửa', 'lacadev'),
+        'welcomeText' => __('Chào mừng về Trạm Laca!<br/>Cắm sạc, pha trà và bắt đầu nào!', 'lacadev'),
+        'forgetPwd' => __('Rớt chìa khoá?', 'lacadev'),
+        'backToBlog' => __('← Rời khỏi Trạm', 'lacadev'),
+        'language' => get_bloginfo('language')
+    ]);
+
     /**
      * Enqueue styles.
      */
