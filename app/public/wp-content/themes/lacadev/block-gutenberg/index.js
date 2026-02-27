@@ -11,3 +11,4 @@ import './staggered-blog-block';
 import './statement-block';
 import './process-block';
 import './marquee-block';
+import './tech-list-block';
