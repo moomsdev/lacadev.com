@@ -352,7 +352,10 @@ function lacadev_handle_contact_submit() {
     $secret_key = carbon_get_theme_option('recaptcha_secret_key');
     $score_threshold = (float) carbon_get_theme_option('recaptcha_score') ?: 0.5;
 
-    if (!empty($secret_key)) {
+    // Bypass reCAPTCHA check entirely for local development environments
+    $is_localhost = in_array($ip, ['127.0.0.1', '::1']) || strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false || strpos($_SERVER['HTTP_HOST'] ?? '', '.local') !== false || wp_get_environment_type() === 'local';
+
+    if (!empty($secret_key) && !$is_localhost) {
         // Debug: Check if token is empty
         if (empty($recaptcha_response)) {
             laca_send_json_error([
@@ -427,30 +430,36 @@ function lacadev_handle_contact_submit() {
         }
         
         if ($data['score'] < $score_threshold) {
-            laca_send_json_error([
-                'message' => sprintf(__('Hệ thống nghi ngờ bạn là bot (Điểm: %s/%s).', 'laca'), $data['score'], $score_threshold),
-                'debug' => [
-                    'score' => $data['score'],
-                    'threshold' => $score_threshold,
-                    'action' => isset($data['action']) ? $data['action'] : ''
-                ]
-            ], 403);
+             laca_send_json_error([
+                 'message' => sprintf(__('Hệ thống nghi ngờ bạn là bot (Điểm: %s/%s).', 'laca'), $data['score'], $score_threshold),
+                 'debug' => [
+                     'score' => $data['score'],
+                     'threshold' => $score_threshold,
+                     'action' => isset($data['action']) ? $data['action'] : ''
+                 ]
+             ], 403);
         }
     }
 
     // 4. Sanitize Input
     $name    = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
+    $phone   = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
     $email   = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
-    $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
     $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
 
-    if (empty($name) || empty($email) || empty($message)) {
+    if (empty($name) || empty($phone) || empty($message)) {
         laca_send_json_error([
             'message' => __('Vui lòng điền đầy đủ các thông tin bắt buộc.', 'laca')
         ], 400);
     }
 
-    if (!is_email($email)) {
+    if (!preg_match('/^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})$/', $phone)) {
+        laca_send_json_error([
+            'message' => __('Số điện thoại không hợp lệ.', 'laca')
+        ], 400);
+    }
+
+    if (!empty($email) && !is_email($email)) {
         laca_send_json_error([
             'message' => __('Địa chỉ email không hợp lệ.', 'laca')
         ], 400);
@@ -459,20 +468,20 @@ function lacadev_handle_contact_submit() {
     // 5. Prepare Email Data
     $admin_email = carbon_get_theme_option('email') ?: get_option('admin_email');
     $site_name = get_bloginfo('name');
-    $author_name = 'Hà Duy An';
+    $author_name = 'La cà dev';
     
     // 6. Send Email to Admin (Notification)
     $admin_subject = sprintf('[%s] Lời nhắn mới từ %s', $site_name, $name);
-    if ($subject) {
-        $admin_subject .= ': ' . $subject;
-    }
 
     $admin_headers = [
         'Content-Type: text/html; charset=UTF-8',
-        'Reply-To: ' . $name . ' <' . $email . '>'
     ];
+    
+    if (!empty($email)) {
+        $admin_headers[] = 'Reply-To: ' . $name . ' <' . $email . '>';
+    }
 
-    $admin_body = lacadev_get_admin_email_template($name, $email, $subject, $message, $site_name);
+    $admin_body = lacadev_get_admin_email_template($name, $email, $phone, $message, $site_name);
     $admin_sent = wp_mail($admin_email, $admin_subject, $admin_body, $admin_headers);
 
     // 7. Send Confirmation Email to Customer
@@ -484,8 +493,14 @@ function lacadev_handle_contact_submit() {
         'Reply-To: ' . $admin_email
     ];
 
-    $customer_body = lacadev_get_customer_email_template($name, $email, $subject, $message);
-    $customer_sent = wp_mail($email, $customer_subject, $customer_body, $customer_headers);
+    $customer_body = lacadev_get_customer_email_template($name, $email, $phone, $message);
+    $customer_sent = false;
+    
+    if (!empty($email)) {
+        $customer_sent = wp_mail($email, $customer_subject, $customer_body, $customer_headers);
+    } else {
+        $customer_sent = true; // No email provided, but we don't consider it an error
+    }
 
     // 8. Handle Results
     $sent = ($admin_sent && $customer_sent);
@@ -518,8 +533,7 @@ function lacadev_handle_contact_submit() {
  * Get Admin Email Template
  * Email gửi cho admin khi có liên hệ mới
  */
-function lacadev_get_admin_email_template($name, $email, $subject, $message, $site_name) {
-    $subject_text = $subject ?: __('Không có tiêu đề', 'laca');
+function lacadev_get_admin_email_template($name, $email, $phone, $message, $site_name) {
     $current_time = date_i18n('H:i - d/m/Y');
     $current_year = date('Y');
     $site_url = get_bloginfo('url');
@@ -528,32 +542,31 @@ function lacadev_get_admin_email_template($name, $email, $subject, $message, $si
     <!DOCTYPE html>
     <html>
     <head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head>
-    <body style='margin:0;padding:20px;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif'>
-        <div style='max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)'>
-            <div style='background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:30px 20px;text-align:center'>
-                <h1 style='margin:0;color:#fff;font-size:24px;font-weight:600'>📬 Lời Nhắn Mới</h1>
-                <p style='margin:10px 0 0;color:rgba(255,255,255,0.9);font-size:14px'>{$current_time}</p>
+    <body style='margin:0;padding:40px 20px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111111;line-height:1.6'>
+        <div style='max-width:540px;margin:0 auto;border:1px solid #e5e5e5;padding:40px'>
+            <div style='margin-bottom:30px'>
+                <h1 style='margin:0 0 5px;font-size:20px;font-weight:600;letter-spacing:-0.5px'>Thông báo liên hệ mới</h1>
+                <p style='margin:0;font-size:13px;color:#666666'>{$current_time}</p>
             </div>
-            <div style='padding:30px 20px'>
-                <div style='background:#f8f9fa;border-left:4px solid #667eea;padding:20px;margin-bottom:25px;border-radius:8px'>
-                    <h3 style='margin:0 0 15px;color:#333;font-size:16px'>👤 Thông Tin Người Gửi</h3>
-                    <p style='margin:8px 0'><strong>Tên:</strong> {$name}</p>
-                    <p style='margin:8px 0'><strong>Email:</strong> <a href='mailto:{$email}' style='color:#667eea;text-decoration:none'>{$email}</a></p>
-                    <p style='margin:8px 0'><strong>Tiêu đề:</strong> {$subject_text}</p>
-                </div>
-                <div style='margin-bottom:25px'>
-                    <h3 style='margin:0 0 15px;color:#333;font-size:16px'>💬 Nội Dung Tin Nhắn</h3>
-                    <div style='background:#f9fafb;padding:20px;border-radius:8px;border:1px solid #e5e7eb'>
-                        <p style='margin:0;white-space:pre-wrap;color:#1f2937;line-height:1.8'>" . nl2br(esc_html($message)) . "</p>
-                    </div>
-                </div>
-                <div style='text-align:center;margin:30px 0'>
-                    <a href='mailto:{$email}?subject=Re: {$subject_text}' style='display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:15px'>✉️ Trả Lời Ngay</a>
-                </div>
+            
+            <div style='margin-bottom:30px;padding-bottom:30px;border-bottom:1px solid #eeeeee'>
+                <p style='margin:0 0 10px;font-size:14px'><strong>Người gửi:</strong> {$name}</p>
+                <p style='margin:0 0 10px;font-size:14px'><strong>Số điện thoại:</strong> <a href='tel:{$phone}' style='color:#111111;text-decoration:none'>{$phone}</a></p>
+                " . (!empty($email) ? "<p style='margin:0;font-size:14px'><strong>Email:</strong> <a href='mailto:{$email}' style='color:#111111;text-decoration:underline'>{$email}</a></p>" : "") . "
             </div>
-            <div style='background:#f8f9fa;padding:20px;text-align:center;border-top:1px solid #e5e7eb'>
-                <p style='margin:0 0 8px;font-size:12px;color:#6b7280'>Email này được gửi tự động từ hệ thống <strong>{$site_name}</strong></p>
-                <p style='margin:0;font-size:12px;color:#9ca3af'>Tin nhắn từ form liên hệ tại <a href='{$site_url}' style='color:#667eea;text-decoration:none'>{$site_url}</a></p>
+
+            <div style='margin-bottom:40px'>
+                <p style='margin:0;white-space:pre-wrap;font-size:15px;line-height:1.7;color:#333333'>" . nl2br(esc_html($message)) . "</p>
+            </div>
+
+            " . (!empty($email) ? "<div>
+                <a href='mailto:{$email}?subject=Re: Liên hệ từ {$site_name}' style='display:inline-block;background:#111111;color:#ffffff;text-decoration:none;padding:12px 24px;font-size:14px;font-weight:500'>Trả lời email</a>
+            </div>" : "<div>
+                <a href='tel:{$phone}' style='display:inline-block;background:#111111;color:#ffffff;text-decoration:none;padding:12px 24px;font-size:14px;font-weight:500'>Gọi điện thoại</a>
+            </div>") . "
+            
+            <div style='margin-top:40px;padding-top:20px;border-top:1px solid #eeeeee'>
+                <p style='margin:0;font-size:12px;color:#999999'>Hệ thống {$site_name} &mdash; <a href='{$site_url}' style='color:#999999;text-decoration:none'>{$site_url}</a></p>
             </div>
         </div>
     </body>
@@ -565,98 +578,53 @@ function lacadev_get_admin_email_template($name, $email, $subject, $message, $si
  * Get Customer Confirmation Email Template
  * Email xác nhận gửi cho khách hàng
  */
-function lacadev_get_customer_email_template($name, $email, $subject, $message) {
-    $subject_text = $subject ?: __('tin nhắn của bạn', 'laca');
+function lacadev_get_customer_email_template($name, $email, $phone, $message) {
     $current_year = date('Y');
     $first_name = explode(' ', trim($name))[0];
     $site_name = get_bloginfo('name');
     $site_url = get_bloginfo('url');
     
     // Thông tin tác giả
-    $author_name = 'Hà Duy An';
-    $author_title = 'WordPress Developer & Content Creator';
+    $author_name = 'La cà dev';
+    $author_title = 'WordPress Developer';
     $author_phone = '0776.41.00.43';
     $author_email = carbon_get_theme_option('email') ?: get_option('admin_email');
-    $author_location = 'Đà Nẵng, Việt Nam';
     
     return "
     <!DOCTYPE html>
     <html>
     <head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head>
-    <body style='margin:0;padding:20px;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif'>
-        <div style='max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1)'>
+    <body style='margin:0;padding:40px 20px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111111;line-height:1.6'>
+        <div style='max-width:540px;margin:0 auto;border:1px solid #e5e5e5;padding:40px'>
             
-            <div style='background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 20px;text-align:center'>
-                <div style='width:80px;height:80px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);border-radius:50%;margin:0 auto 20px;display:inline-flex;align-items:center;justify-content:center;font-size:40px'>✅</div>
-                <h1 style='margin:0;color:#fff;font-size:26px;font-weight:700;letter-spacing:-0.5px'>Đã Nhận Lời Nhắn!</h1>
-                <p style='margin:12px 0 0;color:rgba(255,255,255,0.95);font-size:15px'>Cảm ơn bạn đã ghé trạm {$site_name}</p>
+            <div style='margin-bottom:30px'>
+                <h1 style='margin:0 0 5px;font-size:20px;font-weight:600;letter-spacing:-0.5px'>Đã nhận lời nhắn</h1>
+                <p style='margin:0;font-size:13px;color:#666666'>Cảm ơn bạn đã liên hệ với {$site_name}</p>
             </div>
             
-            <div style='padding:35px 25px'>
-                <p style='margin:0 0 8px;font-size:17px;color:#1f2937'>Chào <strong style='color:#667eea'>{$first_name}</strong>,</p>
-                <p style='margin:0 0 25px;font-size:16px;color:#4b5563;line-height:1.7'>Cảm ơn bạn đã tin tưởng và dành thời gian gửi lời nhắn. Tôi rất vui khi được kết nối với bạn! 🎉</p>
-                
-                <div style='background:linear-gradient(to right,#ecfdf5,#d1fae5);border:2px solid #10b981;padding:20px;border-radius:12px;margin:25px 0;text-align:center'>
-                    <div style='font-size:32px;margin-bottom:10px'>🎯</div>
-                    <h3 style='margin:0 0 8px;color:#065f46;font-size:16px;font-weight:700'>Lời Nhắn Đã Được Gửi Thành Công</h3>
-                    <p style='margin:0;color:#047857;font-size:14px'>Tôi thường phản hồi trong vòng <strong>24 giờ</strong></p>
-                </div>
-                
-                <div style='background:#f9fafb;padding:20px;border-radius:10px;border:1px solid #e5e7eb;margin:25px 0'>
-                    <h3 style='margin:0 0 15px;color:#374151;font-size:15px;font-weight:600'>📋 Tóm Tắt Tin Nhắn</h3>
-                    <p style='margin:8px 0;color:#6b7280;font-size:14px'><strong>Tiêu đề:</strong> {$subject_text}</p>
-                    <p style='margin:8px 0;color:#6b7280;font-size:14px'><strong>Nội dung:</strong> \"" . mb_substr(strip_tags($message), 0, 100) . (mb_strlen($message) > 100 ? '...' : '') . "\"</p>
-                </div>
-                
-                <div style='background:linear-gradient(135deg,#1e293b 0%,#334155 100%);padding:25px;border-radius:12px;margin:30px 0;color:#fff'>
-                    <div style='text-align:center;margin-bottom:20px'>
-                        <div style='width:70px;height:70px;background:rgba(255,255,255,0.1);border:3px solid rgba(255,255,255,0.2);border-radius:50%;margin:0 auto 15px;display:inline-flex;align-items:center;justify-content:center;font-size:32px;font-weight:700'>HDA</div>
-                        <h3 style='margin:0 0 5px;font-size:20px;font-weight:700'>{$author_name}</h3>
-                        <p style='margin:0;color:rgba(255,255,255,0.8);font-size:14px'>{$author_title}</p>
-                    </div>
-                    <div style='border-top:1px solid rgba(255,255,255,0.1);padding-top:20px'>
-                        <div style='margin:12px 0'>
-                            <p style='margin:0;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:0.5px'>📧 Email</p>
-                            <a href='mailto:{$author_email}' style='color:#fff;text-decoration:none;font-size:15px;font-weight:500;display:block;margin-top:5px'>{$author_email}</a>
-                        </div>
-                        <div style='margin:12px 0'>
-                            <p style='margin:0;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:0.5px'>📱 Điện Thoại</p>
-                            <a href='tel:{$author_phone}' style='color:#fff;text-decoration:none;font-size:15px;font-weight:500;display:block;margin-top:5px'>{$author_phone}</a>
-                        </div>
-                        <div style='margin:12px 0'>
-                            <p style='margin:0;color:rgba(255,255,255,0.6);font-size:12px;text-transform:uppercase;letter-spacing:0.5px'>📍 Địa Điểm</p>
-                            <span style='color:#fff;font-size:15px;font-weight:500;display:block;margin-top:5px'>{$author_location}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style='background:#fefce8;border:1px solid #fde047;padding:18px;border-radius:8px;margin:25px 0'>
-                    <h3 style='margin:0 0 10px;color:#854d0e;font-size:15px;font-weight:600'>⏰ Tiếp Theo Là Gì?</h3>
-                    <ul style='margin:8px 0;padding-left:20px;color:#713f12;font-size:14px;line-height:1.8'>
-                        <li>Tôi sẽ xem xét tin nhắn trong vòng <strong>24 giờ</strong></li>
-                        <li>Phản hồi sẽ gửi đến: <strong>{$email}</strong></li>
-                        <li>Nếu gấp, gọi: <strong>{$author_phone}</strong></li>
-                    </ul>
-                </div>
-                
-                <div style='text-align:center;margin:30px 0 20px'>
-                    <p style='margin:0 0 20px;color:#6b7280;font-size:15px'>Trong khi chờ, khám phá thêm:</p>
-                    <div style='display:inline-block'>
-                        <a href='{$site_url}/ky-su/tram-code/' style='display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;font-size:14px;margin:5px'>💻 Trạm Code</a>
-                        <a href='{$site_url}/la-ca-co-gi/' style='display:inline-block;background:#f3f4f6;color:#374151;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;font-size:14px;margin:5px;border:2px solid #e5e7eb'>🎯 Dịch Vụ</a>
-                    </div>
-                </div>
-                
-                <div style='margin-top:35px;padding-top:25px;border-top:2px solid #f3f4f6'>
-                    <p style='margin:0 0 15px;color:#4b5563;font-size:15px;line-height:1.7'>Một lần nữa, cảm ơn bạn đã liên hệ. Tôi mong chờ được trao đổi với bạn!</p>
-                    <p style='margin:0;color:#1f2937;font-size:16px;font-weight:600'>Thân ái,<br/><span style='color:#667eea;font-size:18px'>{$author_name}</span></p>
+            <div style='margin-bottom:30px'>
+                <p style='margin:0 0 15px;font-size:15px'>Chào <strong>{$first_name}</strong>,</p>
+                <p style='margin:0;font-size:15px;color:#444444'>Tôi đã nhận được tin nhắn cùng số điện thoại <strong>{$phone}</strong> của bạn.</p>
+                <p style='margin:10px 0 0;font-size:15px;color:#444444'>Tôi sẽ xem xét và phản hồi trong vòng 24 giờ.</p>
+            </div>
+            
+            <div style='margin-bottom:30px;padding:25px;background:#fafafa;border:1px solid #eeeeee'>
+                <p style='margin:0 0 10px;font-size:12px;color:#888888;text-transform:uppercase;letter-spacing:0.5px'>Tóm tắt nội dung</p>
+                <p style='margin:0;font-size:14px;color:#555555'>\"" . mb_substr(strip_tags($message), 0, 100) . (mb_strlen($message) > 100 ? '...' : '') . "\"</p>
+            </div>
+            
+            <div style='margin-bottom:40px'>
+                <p style='margin:0 0 15px;font-size:15px'>Trân trọng,</p>
+                <p style='margin:0 0 2px;font-size:15px;font-weight:600'>{$author_name}</p>
+                <p style='margin:0;font-size:13px;color:#666666'>{$author_title}</p>
+                <div style='margin-top:12px'>
+                    <a href='mailto:{$author_email}' style='color:#111111;text-decoration:underline;font-size:13px;margin-right:15px'>{$author_email}</a>
+                    <a href='tel:{$author_phone}' style='color:#111111;text-decoration:underline;font-size:13px'>{$author_phone}</a>
                 </div>
             </div>
             
-            <div style='background:#f8f9fa;padding:25px 20px;text-align:center;border-top:1px solid #e5e7eb'>
-                <p style='margin:0 0 12px;color:#374151;font-size:14px;font-weight:600'>{$site_name}</p>
-                <p style='margin:0 0 15px;color:#6b7280;font-size:13px'>🚀 WordPress • 🎨 Design • ✈️ Travelling</p>
-                <p style='margin:15px 0 0;color:#9ca3af;font-size:11px'>© {$current_year} {$site_name}. Email tự động - Không trả lời.</p>
+            <div style='margin-top:40px;padding-top:20px;border-top:1px solid #eeeeee'>
+                <p style='margin:0;font-size:12px;color:#999999'>&copy; {$current_year} {$site_name}. Đây là email xác nhận tự động.</p>
             </div>
         </div>
     </body>

@@ -13,7 +13,15 @@
     <div class="container">
         <div class="footer-cta">
             <p class="cta-label"><?php _e('HÃY CÙNG NHAU LA CÀ VÀ', 'laca'); ?></p>
-            <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="cta-main-link"><?php _e('viết nên hành trình mới', 'laca'); ?></a>
+            <?php
+            // Lấy động URL của trang đang sử dụng template-contact.php
+            $contact_pages = get_pages([
+                'meta_key' => '_wp_page_template',
+                'meta_value' => 'theme/page_templates/template-contact.php'
+            ]);
+            $contact_url = !empty($contact_pages) ? get_permalink($contact_pages[0]->ID) : home_url('/contact/');
+            ?>
+            <a href="<?php echo esc_url($contact_url); ?>" class="cta-main-link"><?php _e('viết nên hành trình mới', 'laca'); ?></a>
         </div>
 
         <div class="footer-grid">

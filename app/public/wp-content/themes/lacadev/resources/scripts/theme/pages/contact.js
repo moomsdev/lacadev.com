@@ -63,12 +63,17 @@ export const initContactPage = () => {
 
         // Helper: Clear all errors
         const clearAllErrors = () => {
-            ['form-name', 'form-email', 'form-message'].forEach(clearFieldError);
+            ['form-name', 'form-phone', 'form-email', 'form-message'].forEach(clearFieldError);
         };
 
         // Helper: Validate email
         const isValidEmail = (email) => {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        // Helper: Validate Vietnam phone number
+        const isValidPhone = (phone) => {
+            return /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(phone);
         };
 
         // Helper: Client-side validation
@@ -77,6 +82,7 @@ export const initContactPage = () => {
             let isValid = true;
 
             const name = document.getElementById('form-name').value.trim();
+            const phone = document.getElementById('form-phone').value.trim();
             const email = document.getElementById('form-email').value.trim();
             const message = document.getElementById('form-message').value.trim();
 
@@ -85,10 +91,15 @@ export const initContactPage = () => {
                 isValid = false;
             }
 
-            if (!email) {
-                showFieldError('form-email', 'Vui lòng nhập email');
+            if (!phone) {
+                showFieldError('form-phone', 'Vui lòng nhập số điện thoại');
                 isValid = false;
-            } else if (!isValidEmail(email)) {
+            } else if (!isValidPhone(phone)) {
+                showFieldError('form-phone', 'Số điện thoại không hợp lệ');
+                isValid = false;
+            }
+
+            if (email && !isValidEmail(email)) {
                 showFieldError('form-email', 'Email không hợp lệ');
                 isValid = false;
             }
@@ -102,7 +113,7 @@ export const initContactPage = () => {
         };
 
         // Add real-time validation on blur
-        ['form-name', 'form-email', 'form-message'].forEach(fieldId => {
+        ['form-name', 'form-phone', 'form-email', 'form-message'].forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
                 field.addEventListener('blur', () => {

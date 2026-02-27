@@ -107,7 +107,7 @@ $site_key = carbon_get_theme_option('recaptcha_site_key');
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="form-name"><?php _e('Bạn tên là gì?', 'laca'); ?> <span class="required">*</span></label>
+                                <label for="form-name"><?php _e('Họ và tên', 'laca'); ?> <span class="required">*</span></label>
                                 <input 
                                     type="text" 
                                     id="form-name" 
@@ -120,27 +120,28 @@ $site_key = carbon_get_theme_option('recaptcha_site_key');
                                 <span class="error-message" id="name-error" role="alert"></span>
                             </div>
                             <div class="form-group">
-                                <label for="form-email"><?php _e('Email liên hệ', 'laca'); ?> <span class="required">*</span></label>
+                                <label for="form-phone"><?php _e('Số điện thoại', 'laca'); ?> <span class="required">*</span></label>
                                 <input 
-                                    type="email" 
-                                    id="form-email" 
-                                    name="email" 
-                                    placeholder="<?php _e('Để tôi có thể gửi phản hồi', 'laca'); ?>" 
+                                    type="tel" 
+                                    id="form-phone" 
+                                    name="phone" 
+                                    placeholder="<?php _e('09xx xxx xxx', 'laca'); ?>" 
                                     required
                                     aria-required="true"
-                                    aria-describedby="email-error">
-                                <span class="error-message" id="email-error" role="alert"></span>
+                                    aria-describedby="phone-error">
+                                <span class="error-message" id="phone-error" role="alert"></span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="form-subject"><?php _e('Tiêu đề', 'laca'); ?></label>
+                            <label for="form-email"><?php _e('Email liên hệ', 'laca'); ?></label>
                             <input 
-                                type="text" 
-                                id="form-subject" 
-                                name="subject" 
-                                placeholder="<?php _e('Tóm tắt ngắn gọn mục đích liên hệ', 'laca'); ?>"
-                                aria-describedby="subject-hint">
+                                type="email" 
+                                id="form-email" 
+                                name="email" 
+                                placeholder="<?php _e('Để tôi có thể gửi phản hồi (Không bắt buộc)', 'laca'); ?>"
+                                aria-describedby="email-error">
+                            <span class="error-message" id="email-error" role="alert"></span>
                         </div>
 
                         <div class="form-group">

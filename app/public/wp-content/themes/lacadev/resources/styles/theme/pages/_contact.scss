@@ -153,10 +153,12 @@
                 display: flex;
                 align-items: center;
                 gap: 5px;
+                font-size: 1.6rem;
+                font-weight: $semiBold;
 
                 .required {
                     color: #ff4d4d;
-                    font-size: 1.1rem;
+                    font-size: 1.6rem;
                 }
             }
 
@@ -166,10 +168,13 @@
                 border-radius: 12px;
                 padding: 15px 20px;
                 color: inherit;
+                font-size: 1.6rem;
+                font-family: inherit;
                 transition: all 0.3s ease;
 
                 &::placeholder {
                     opacity: 0.4;
+                    font-size: 1.5rem;
                 }
 
                 &:focus {
@@ -191,9 +196,9 @@
 
             .error-message {
                 color: #ff4d4d;
-                font-size: 0.85rem;
+                font-size: 1.3rem;
                 display: none;
-                margin-top: -4px;
+                margin-top: 4px;
                 animation: slideDown 0.3s ease;
 
                 &::before {
