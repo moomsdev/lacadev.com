@@ -12,6 +12,11 @@ import { initContactPage } from './pages/contact';
 
 gsap.registerPlugin( ScrollTrigger );
 
+// Simple device check – used to avoid heavy animations on mobile
+const isMobileDevice =
+	window.matchMedia &&
+	window.matchMedia( '(max-width: 768px)' ).matches;
+
 let flickerInterval;
 
 /**
@@ -27,8 +32,8 @@ const shouldShowLoader = () => {
 	return !lastShown || ( now - parseInt( lastShown ) ) >= HOURS_24;
 };
 
-// Show loader immediately if needed
-if ( shouldShowLoader() ) {
+// Show loader immediately if needed (desktop/tablet only)
+if ( ! isMobileDevice && shouldShowLoader() ) {
 	console.log( '🎬 Preparing page loader...' );
 	document.documentElement.classList.add( 'loading' );
 }
@@ -49,16 +54,20 @@ document.addEventListener( 'DOMContentLoaded', () => {
 } );
 
 function initializePageFeatures() {
-	initCustomCursor();
+	// Skip heavy visual effects on mobile for better performance
+	if ( ! isMobileDevice ) {
+		initCustomCursor();
+		setupGsap404();
+		initAnimations();
+		animateText();
+	}
+
 	initHoverService();
-	setupGsap404();
 	initToggleDarkMode();
 	initAboutLacaHero();
-	initAnimations();
 	initHeaderScroll();
 	initMobileMenu();
 	initContactPage();
-	animateText();
 
 	// Refresh ScrollTrigger after items are initialized
 	setTimeout( () => {
@@ -157,6 +166,15 @@ function stopFlicker() {
 function initPageLoader() {
 	const loader = document.querySelector( '.page-loader' );
 	if ( ! loader ) {
+		return;
+	}
+
+	// Do not show blocking loader on mobile – keep experience snappy
+	if ( isMobileDevice ) {
+		loader.style.display = 'none';
+		loader.classList.remove( 'active' );
+		document.body.classList.remove( 'overflow-hidden' );
+		document.documentElement.classList.remove( 'loading' );
 		return;
 	}
 
