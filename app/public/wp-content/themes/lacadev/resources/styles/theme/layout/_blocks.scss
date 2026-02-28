@@ -142,6 +142,29 @@
         }
       }
     }
+
+    &-glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: inherit;
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+    }
+
+    &-text-only {
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 5px;
+      &:hover {
+        color: $primaryColor;
+      }
+    }
   }
 
   h2.block-title {
@@ -795,6 +818,21 @@
       animation-play-state: paused;
     }
   }
+
+  // Button Block
+  .block-button {
+    display: flex;
+    width: 100%;
+
+    &.align-left { justify-content: flex-start; text-align: left; }
+    &.align-center { justify-content: center; text-align: center; }
+    &.align-right { justify-content: flex-end; text-align: right; }
+
+    .btn.is-full-width {
+      width: 100%;
+    }
+  }
+
 
   @keyframes marquee-scroll {
     0% { transform: translateX(0); }
