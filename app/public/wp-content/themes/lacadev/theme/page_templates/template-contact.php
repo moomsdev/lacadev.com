@@ -17,16 +17,7 @@ $site_key = carbon_get_theme_option('recaptcha_site_key');
 ?>
 
 <main id="main-content" class="contact-page-template">
-    <div class="contact-hero">
-        <div class="container">
-            <div class="hero-content" data-aos="fade-up">
-                <h1 class="page-title"><?php the_title(); ?></h1>
-                <?php if (has_excerpt()) : ?>
-                    <div class="page-excerpt"><?php the_excerpt(); ?></div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
+    <?php get_template_part('template-parts/page-hero'); ?>
 
     <section class="contact-section">
         <div class="container">

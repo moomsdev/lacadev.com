@@ -18,8 +18,8 @@ if (is_front_page()):
     the_content();
 else:
     ?>
+		<?php get_template_part('template-parts/page-hero'); ?>
 		<div class="wrapper-content">
-			<h1 class="single-title screen-reader-text"><?php the_title(); ?></h1>
 			<?php
 			the_content();
 			?>

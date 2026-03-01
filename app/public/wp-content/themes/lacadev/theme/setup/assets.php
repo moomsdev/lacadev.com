@@ -13,8 +13,12 @@ use WPEmergeTheme\Facades\Assets;
  */
 function app_action_theme_enqueue_assets()
 {
-    $template_dir = Theme::uri();
     $version = wp_get_theme()->get('Version');
+    $theme_root_dir = dirname(get_template_directory());
+    $theme_root_uri = dirname(get_template_directory_uri());
+    
+    $dist_path = $theme_root_dir . '/dist/';
+    $dist_url  = $theme_root_uri . '/dist/';
 
     /**
      * Enqueue the built-in comment-reply script for singular pages.
@@ -26,63 +30,50 @@ function app_action_theme_enqueue_assets()
     /**
      * Critical JS (inline or very small) - load in head for critical functionality
      */
-    if (file_exists(get_template_directory() . '/dist/critical.js')) {
-        wp_enqueue_script('theme-critical-js', $template_dir . '/dist/critical.js', [], $version, false);
+    if (file_exists($dist_path . 'critical.js')) {
+        wp_enqueue_script('theme-critical-js', $dist_url . 'critical.js', [], $version, false);
     }
 
     /**
-     * Vendors bundle (contains all node_modules dependencies)
-     * Only exists in production build (yarn build), not in dev mode (yarn dev)
-     * 
-     * NOTE: dist/ is in the theme root directory (parent of /theme/ subdirectory)
-     * So we need to go up one level from get_template_directory()
+     * Vendors bundle
      */
     $vendors_deps = [];
-    $theme_root = dirname(get_template_directory());  // Go up one level to theme root
-    $vendors_path = $theme_root . '/dist/vendors.js';
-    
-    // Build URL manually: get base theme URI and go up one level, then add /dist/vendors.js
-    // This avoids the /theme/ subdirectory issue
-    $base_uri = get_template_directory_uri();  // e.g. http://lacadev.local/wp-content/themes/lacadev/theme
-    $theme_uri = dirname($base_uri);           // e.g. http://lacadev.local/wp-content/themes/lacadev
-    $vendors_url = $theme_uri . '/dist/vendors.js';
-    
-    if (file_exists($vendors_path)) {
-        wp_enqueue_script('theme-vendors-js', $vendors_url, [], $version, true);
+    if (file_exists($dist_path . 'vendors.js')) {
+        wp_enqueue_script('theme-vendors-js', $dist_url . 'vendors.js', [], $version, true);
         $vendors_deps = ['theme-vendors-js'];
     }
 
     /**
      * Main JavaScript bundle (deferred)
      */
-    Assets::enqueueScript('theme-js-bundle', $template_dir . '/dist/theme.js', [], true);
+    Assets::enqueueScript('theme-js-bundle', $dist_url . 'theme.js', $vendors_deps, true);
 
     /**
      * Conditional assets based on page type
      */
     if (is_home() || is_archive() || is_search()) {
-        if (file_exists(get_template_directory() . '/dist/archive.js')) {
-            wp_enqueue_script('theme-archive-js', $template_dir . '/dist/archive.js', ['theme-js-bundle'], $version, true);
+        if (file_exists($dist_path . 'archive.js')) {
+            wp_enqueue_script('theme-archive-js', $dist_url . 'archive.js', ['theme-js-bundle'], $version, true);
         }
     }
 
     if (is_single() && comments_open()) {
-        if (file_exists(get_template_directory() . '/dist/comments.js')) {
-            wp_enqueue_script('theme-comments-js', $template_dir . '/dist/comments.js', ['theme-js-bundle'], $version, true);
+        if (file_exists($dist_path . 'comments.js')) {
+            wp_enqueue_script('theme-comments-js', $dist_url . 'comments.js', ['theme-js-bundle'], $version, true);
         }
     }
 
     /**
      * Enqueue styles with preload optimization
      */
-    Assets::enqueueStyle('theme-css-bundle', $template_dir . '/dist/styles/theme.css');
+    Assets::enqueueStyle('theme-css-bundle', $dist_url . 'styles/theme.css');
 
     /**
      * Conditional CSS based on page type
      */
     if (is_single()) {
-        if (file_exists(get_template_directory() . '/dist/styles/single.css')) {
-            wp_enqueue_style('theme-single-css', $template_dir . '/dist/styles/single.css', ['theme-css-bundle'], $version);
+        if (file_exists($dist_path . 'styles/single.css')) {
+            wp_enqueue_style('theme-single-css', $dist_url . 'styles/single.css', ['theme-css-bundle'], $version);
         }
     }
 
@@ -203,17 +194,18 @@ function app_action_admin_enqueue_assets()
  * Preload critical assets in admin_head
  */
 add_action('admin_head', function() {
-    $template_dir = get_template_directory_uri();
+    $theme_root_uri = dirname(get_template_directory_uri());
+    $dist_url = $theme_root_uri . '/dist/';
     
     // Preload important fonts
     $fonts = [
-        'dist/fonts/BeVietnamPro-Regular.bbe77399f9.ttf',
-        'dist/fonts/BeVietnamPro-SemiBold.fbc3f74acb.ttf',
-        'dist/fonts/Quicksand-Regular.61504eaec8.ttf',
+        'fonts/BeVietnamPro-Regular.bbe77399f9.ttf',
+        'fonts/BeVietnamPro-SemiBold.fbc3f74acb.ttf',
+        'fonts/Quicksand-Regular.61504eaec8.ttf',
     ];
 
     foreach ($fonts as $font) {
-        echo '<link rel="preload" href="' . $template_dir . '/' . $font . '" as="font" type="font/ttf" crossorigin>' . "\n";
+        echo '<link rel="preload" href="' . $dist_url . $font . '" as="font" type="font/ttf" crossorigin>' . "\n";
     }
 }, 1);
 
@@ -382,30 +374,31 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
  * FIXED: Preload critical assets in wp_head (Agent Skills: Performance)
  */
 add_action('wp_head', function() {
-    $template_dir = get_template_directory_uri();
+    $theme_root_dir = dirname(get_template_directory());
+    $theme_root_uri = dirname(get_template_directory_uri());
+    
+    $dist_path = $theme_root_dir . '/dist/';
+    $dist_url  = $theme_root_uri . '/dist/';
     
     // 1. Preload Critical JS
-    if (file_exists(get_template_directory() . '/dist/critical.js')) {
-        echo '<link rel="preload" href="' . $template_dir . '/dist/critical.js" as="script">' . "\n";
+    if (file_exists($dist_path . 'critical.js')) {
+        echo '<link rel="preload" href="' . $dist_url . 'critical.js" as="script">' . "\n";
     }
 
     // 2. Preload Main CSS Bundle (if not using Critical CSS inline)
-    // If critical.css exists, we async load the main bundle (handled in style_loader_tag above)
-    // If NOT, we should preload it here to prioritize it
-    if (!file_exists(get_template_directory() . '/dist/styles/critical.css')) {
-         echo '<link rel="preload" href="' . $template_dir . '/dist/styles/theme.css" as="style">' . "\n";
+    if (!file_exists($dist_path . 'styles/critical.css')) {
+         echo '<link rel="preload" href="' . $dist_url . 'styles/theme.css" as="style">' . "\n";
     }
 
     // 3. Preload important fonts (Agent Skills: Performance)
-    // Preload Regular and SemiBold weights to prevent Flash of Unstyled Text (FOUT)
     $fonts = [
-        'dist/fonts/BeVietnamPro-Regular.bbe77399f9.ttf',
-        'dist/fonts/BeVietnamPro-SemiBold.fbc3f74acb.ttf',
-        'dist/fonts/Quicksand-Regular.61504eaec8.ttf',
+        'fonts/BeVietnamPro-Regular.bbe77399f9.ttf',
+        'fonts/BeVietnamPro-SemiBold.fbc3f74acb.ttf',
+        'fonts/Quicksand-Regular.61504eaec8.ttf',
     ];
 
     foreach ($fonts as $font) {
-        echo '<link rel="preload" href="' . $template_dir . '/' . $font . '" as="font" type="font/ttf" crossorigin>' . "\n";
+        echo '<link rel="preload" href="' . $dist_url . $font . '" as="font" type="font/ttf" crossorigin>' . "\n";
     }
 }, 1);
 

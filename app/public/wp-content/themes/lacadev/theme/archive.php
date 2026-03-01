@@ -12,6 +12,8 @@
 theBreadcrumb();
 ?>
 
+<?php get_template_part('template-parts/page-hero'); ?>
+
 <div class="archive-content">
 	<div class="container">
 		<div class="wrapper-content">

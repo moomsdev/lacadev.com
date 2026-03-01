@@ -15,11 +15,22 @@
             <p class="cta-label"><?php _e('HÃY CÙNG NHAU LA CÀ VÀ', 'laca'); ?></p>
             <?php
             // Lấy động URL của trang đang sử dụng template-contact.php
+            // Thử cả 2 trường hợp có và không có prefix 'theme/' tùy theo cách WP lưu meta
+            $template_path = 'theme/page_templates/template-contact.php';
             $contact_pages = get_pages([
                 'meta_key' => '_wp_page_template',
-                'meta_value' => 'theme/page_templates/template-contact.php'
+                'meta_value' => $template_path
             ]);
-            $contact_url = !empty($contact_pages) ? get_permalink($contact_pages[0]->ID) : home_url('/contact/');
+
+            // Nếu không tìm thấy, thử tìm bản không có prefix 'theme/'
+            if (empty($contact_pages)) {
+                $contact_pages = get_pages([
+                    'meta_key' => '_wp_page_template',
+                    'meta_value' => 'page_templates/template-contact.php'
+                ]);
+            }
+
+            $contact_url = !empty($contact_pages) ? get_permalink($contact_pages[0]->ID) : home_url('/ghe-tram/');
             ?>
             <a href="<?php echo esc_url($contact_url); ?>" class="cta-main-link"><?php _e('viết nên hành trình mới', 'laca'); ?></a>
         </div>
