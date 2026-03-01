@@ -22,6 +22,13 @@
 				<span class="meta-separator">•</span>
 				<span class="meta-item"><?php echo get_the_date(); ?></span>
 			</div>
+			<div class="toc">
+				<?php 
+					if ( function_exists( 'lwptoc_display' ) ) : 
+						lwptoc_display(); 
+					endif; 
+				?>
+			</div>
 		</div>
 	</section>
 

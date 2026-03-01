@@ -167,6 +167,13 @@
     }
   }
 
+  p a, .wp-block-list.has-marker a {
+    color: $primaryColor;
+    text-decoration: underline !important;
+    text-underline-position: under;
+    text-decoration-color: #0064d1 !important;
+}
+
   h2.block-title {
     margin-bottom: 2rem;
     text-transform: uppercase;

@@ -11,10 +11,21 @@ $excerpt = '';
 if (is_archive()) {
     if (is_post_type_archive()) {
         $title = post_type_archive_title('', false);
+    } elseif (is_category()) {
+        $title = single_cat_title('', false);
+    } elseif (is_tag()) {
+        $title = single_tag_title('', false);
     } else {
         $title = get_the_archive_title();
     }
     $excerpt = get_the_archive_description();
+} elseif (is_home()) {
+    $title = single_post_title('', false);
+    // Usually the posts page doesn't show its own excerpt by default in WP, but we can fetch it
+    $posts_page_id = get_option('page_for_posts');
+    if ($posts_page_id) {
+        $excerpt = get_the_excerpt($posts_page_id);
+    }
 } else {
     $title = get_the_title();
     if (has_excerpt()) {

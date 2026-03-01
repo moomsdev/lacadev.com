@@ -52,6 +52,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		console.log( '🔄 Swup navigation - re-initializing features' );
 		initializePageFeatures();
 	} );
+
+	swup.hooks.on( 'visit:start', () => {
+		console.log( '🚪 Swup visit start - resetting states' );
+		resetCustomCursor();
+	} );
 } );
 
 function initializePageFeatures() {
@@ -514,11 +519,54 @@ function animateText( selector ) {
 /**
  * Custom Mouse Cursor
  */
+let cursorInitialized = false;
+
+function resetCustomCursor() {
+	const cursorOuter = document.querySelector( '.cursor-outer' );
+	const cursorInner = document.querySelector( '.cursor-inner' );
+	if ( cursorInner && cursorOuter ) {
+		cursorInner.classList.remove( 'is-hover', 'is-visible' );
+		cursorOuter.classList.remove( 'is-hover', 'is-visible' );
+	}
+}
+
 function initCustomCursor() {
 	const cursorOuter = document.querySelector( '.cursor-outer' );
 	const cursorInner = document.querySelector( '.cursor-inner' );
 
 	if ( ! cursorOuter || ! cursorInner ) {
+		return;
+	}
+
+	// Define event handlers outside to reused them
+	const handleMouseEnter = ( e ) => {
+		const target = e.currentTarget;
+		if ( target.hasAttribute( 'data-cursor-arrow' ) ) {
+			cursorInner.classList.add( 'is-hover', 'is-visible' );
+			cursorOuter.classList.add( 'is-hover', 'is-visible' );
+		}
+	};
+
+	const handleMouseLeave = () => {
+		resetCustomCursor();
+	};
+
+	const addCursorEvents = () => {
+		const interactiveElements = document.querySelectorAll(
+			'[data-cursor-arrow]'
+		);
+		interactiveElements.forEach( ( el ) => {
+			// Always clean up before adding to avoid duplicates
+			el.removeEventListener( 'mouseenter', handleMouseEnter );
+			el.removeEventListener( 'mouseleave', handleMouseLeave );
+			el.addEventListener( 'mouseenter', handleMouseEnter );
+			el.addEventListener( 'mouseleave', handleMouseLeave );
+		} );
+	};
+
+	// If already initialized, just refresh the events for new elements and return
+	if ( cursorInitialized ) {
+		addCursorEvents();
 		return;
 	}
 
@@ -544,35 +592,9 @@ function initCustomCursor() {
 		} );
 	} );
 
-	// Handle hover states
-	const handleMouseEnter = ( e ) => {
-		const target = e.currentTarget;
-		if ( target.hasAttribute( 'data-cursor-arrow' ) ) {
-			cursorInner.classList.add( 'is-hover', 'is-visible' );
-			cursorOuter.classList.add( 'is-hover', 'is-visible' );
-		}
-	};
-
-	const handleMouseLeave = () => {
-		cursorInner.classList.remove( 'is-hover', 'is-visible' );
-		cursorOuter.classList.remove( 'is-hover', 'is-visible' );
-	};
-
-	const addCursorEvents = () => {
-		const interactiveElements = document.querySelectorAll(
-			'[data-cursor-arrow]'
-		);
-		interactiveElements.forEach( ( el ) => {
-			el.removeEventListener( 'mouseenter', handleMouseEnter );
-			el.removeEventListener( 'mouseleave', handleMouseLeave );
-			el.addEventListener( 'mouseenter', handleMouseEnter );
-			el.addEventListener( 'mouseleave', handleMouseLeave );
-		} );
-	};
-
 	addCursorEvents();
 
-	// Support for dynamically added elements (like after Swup content replacement)
+	// Support for dynamically added elements
 	const observer = new MutationObserver( () => {
 		addCursorEvents();
 	} );
@@ -581,4 +603,6 @@ function initCustomCursor() {
 		childList: true,
 		subtree: true,
 	} );
+
+	cursorInitialized = true;
 }
