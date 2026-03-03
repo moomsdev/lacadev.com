@@ -65,21 +65,24 @@ $optionsPage = Container::make('theme_options', __('Laca Theme', 'laca'))
 			->set_attribute('placeholder', 'tiktok'),
 		Field::make('text', 'youtube' . currentLanguage(), __('', 'laca'))->set_width(50)
 			->set_attribute('placeholder', 'youtube'),
+		Field::make('text', 'zalo' . currentLanguage(), __('', 'laca'))->set_width(50)
+			->set_attribute('placeholder', 'zalo'),
 	])
 
-	->add_tab(__('Header  |  Footer', 'laca'), [
-		Field::make('html', 'header', __('', 'laca'))
-			->set_html('----<i> Header </i>----'),
-		Field::make('text', 'header_label' . currentLanguage(), __('', 'laca'))->set_width(50),
+	->add_tab(__('Archive pages | List bài viết CPT', 'laca'), [
+		Field::make('html', 'service', __('', 'laca'))
+			->set_html('----<i> Service </i>----'),
+		Field::make('text', 'service_page_title' . currentLanguage(), __('', 'laca'))
+			->set_attribute('placeholder', 'Service page title | Tiêu đề trang dịch vụ'),
+		Field::make('text', 'service_page_description' . currentLanguage(), __('', 'laca'))
+			->set_attribute('placeholder', 'Service page description | Mô tả trang dịch vụ'),
 
-		Field::make('html', 'footer', __('', 'laca'))
-			->set_html('----<i> Footer </i>----'),
-		Field::make('text', 'contact_label' . currentLanguage(), __('', 'laca'))->set_width(50)
-			->set_attribute('placeholder', 'Contact label | Nhãn liên hệ'),
-		Field::make('text', 'contact_url' . currentLanguage(), __('', 'laca'))->set_width(50)
-			->set_attribute('placeholder', 'Contact URL | Liên kết liên hệ'),
-		Field::make('textarea', 'contact_message' . currentLanguage(), __('', 'laca'))
-			->set_attribute('placeholder', 'Contact description | Mô tả liên hệ'),
+		Field::make('html', 'project', __('', 'laca'))
+			->set_html('----<i> Project </i>----'),
+		Field::make('text', 'project_page_title' . currentLanguage(), __('', 'laca'))
+			->set_attribute('placeholder', 'Project page title | Tiêu đề trang dự án'),
+		Field::make('text', 'project_page_description' . currentLanguage(), __('', 'laca'))
+			->set_attribute('placeholder', 'Project page description | Mô tả trang dự án'),
 	])
 
 	->add_tab(__('Scripts', 'laca'), [

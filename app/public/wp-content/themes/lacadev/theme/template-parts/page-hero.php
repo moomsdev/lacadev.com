@@ -45,8 +45,20 @@ if (is_post_type_archive('service')) {
     }
     if ($service_desc) {
         $excerpt = $service_desc;
-    } elseif (empty($excerpt)) {
-        $excerpt = __('Khám phá các giải pháp công nghệ chuyên sâu giúp bạn bứt phá hành trình số.', 'laca');
+    }
+
+    $title_class .= ' block-title-scroll';
+}
+
+if (is_post_type_archive('project')) {
+    $project_title = getOption('project_page_title');
+    $project_desc = getOption('project_page_description');
+
+    if ($project_title) {
+        $title = $project_title;
+    }
+    if ($project_desc) {
+        $excerpt = $project_desc;
     }
 
     $title_class .= ' block-title-scroll';
