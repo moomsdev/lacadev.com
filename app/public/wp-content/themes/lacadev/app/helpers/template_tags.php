@@ -174,20 +174,13 @@ function thePagination($query = null) {
     }
 
     // Preload post metadata to prevent N+1 queries
-    // This optimizes performance when looping through posts after pagination
     if ($query instanceof WP_Query && !empty($query->posts)) {
-        // Preload post data, meta, and terms cache
         update_post_caches($query->posts);
         
-        // Preload terms for all posts to avoid N+1 queries in get_the_terms()
         $post_ids = wp_list_pluck($query->posts, 'ID');
         if (!empty($post_ids)) {
-            // Get all taxonomies for this post type
             $post_type = !empty($query->posts[0]) ? $query->posts[0]->post_type : 'post';
             $taxonomies = get_object_taxonomies($post_type);
-            
-            // Preload terms for all posts using wp_get_object_terms
-            // This loads all terms in one query instead of N queries
             foreach ($taxonomies as $taxonomy) {
                 wp_get_object_terms($post_ids, $taxonomy, ['fields' => 'all']);
             }
@@ -200,19 +193,24 @@ function thePagination($query = null) {
         'format'    => '?paged=%#%',
         'current'   => $paged,
         'total'     => $query->max_num_pages,
-        'mid_size'  => 2, // Hiển thị 2 trang trước và 2 trang sau trang hiện tại
+        'mid_size'  => 2,
         'type'      => 'array',
         'prev_next' => true,
         'prev_text' => '&laquo;',
         'next_text' => '&raquo;',
     ]);
     
-
     if (is_array($pages)) {
         $pagination = '<nav class="pagination-container" aria-label="Page navigation"><ul class="pagination-list">';
 
         foreach ($pages as $page) {
-            $pagination .= '<li class="pagination-item">' . $page . '</li>';
+            $is_current = strpos($page, 'current') !== false;
+            $is_dots = strpos($page, 'dots') !== false;
+            $item_class = 'pagination-item';
+            if ($is_current) $item_class .= ' is-active';
+            if ($is_dots) $item_class .= ' is-dots';
+
+            $pagination .= '<li class="' . esc_attr($item_class) . '">' . $page . '</li>';
         }
 
         $pagination .= '</ul></nav>';
