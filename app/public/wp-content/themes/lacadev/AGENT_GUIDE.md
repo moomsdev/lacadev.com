@@ -119,7 +119,7 @@ Dưới đây là danh sách các kỹ năng chuyên biệt đã được tích 
 | **seo-content-writer** | Viết SEO-optimized content theo keywords và topic briefs, best practices. | `@seo-content-writer create blog post` | Viết nội dung SEO |
 | **programmatic-seo** | Thiết kế programmatic SEO strategies: tạo SEO pages at scale với templates. | `@programmatic-seo design location pages` | SEO pages at scale |
 
-### F. Development Tools & Workflow
+### F. Development Tools, Clean Code & Workflow
 
 | Kỹ năng | Mô tả chi tiết | Câu lệnh sử dụng ví dụ | Khi nào dùng |
 | :--- | :--- | :--- | :--- |
@@ -127,6 +127,15 @@ Dưới đây là danh sách các kỹ năng chuyên biệt đã được tích 
 | **git-advanced-workflows** | Git nâng cao: rebasing, cherry-picking, bisect, worktrees, reflog, clean history. | `@git-advanced-workflows clean commit history` | Quản lý Git phức tạp |
 | **code-reviewer** | Elite code review expert: AI-powered analysis, security scanning, performance optimization. | `@code-reviewer review pull request` | Review code chất lượng cao |
 | **typescript-expert** | TypeScript expert: type-level programming, performance optimization, monorepo management. | `@typescript-expert fix type issues` | TypeScript advanced |
+| **cc-skill-coding-standards** | Tiêu chuẩn lập trình phổ quát, bao gồm các pattern tốt nhất cho Frontend. | `@cc-skill-coding-standards audit source code` | Đảm bảo chuẩn code chung |
+| **frontend-dev-guidelines** | Quy tắc frontend hiện đại, cấu trúc mã nguồn dễ bảo trì và mở rộng. | `@frontend-dev-guidelines setup component` | Thiết lập kiến trúc Frontend |
+| **clean-code** | Áp dụng nguyên lý Clean Code, giúp mã (đặc biệt CSS/SCSS) dễ đọc, tránh specificity issues. | `@clean-code refactor scss code` | Dọn dẹp, refactor mã nguồn |
+
+#### 🏛️ Kiến thức Chuyên sâu về CSS/SCSS Architecture
+Ngoài các module trên, Agent được trang bị kiến thức sâu rộng về các chuẩn CSS để duy trì mã nguồn Frontend bền vững:
+- **BEM (Block Element Modifier):** Phương pháp đặt tên class giúp tránh xung đột và dễ hiểu cấu trúc HTML (VD: `.block__element--modifier`).
+- **Sass 7-1 Pattern:** Cấu trúc tổ chức file SCSS chuyên nghiệp chia theo các thư mục (`abstracts`, `components`, `layout`, `pages`,...) dành cho dự án quy mô lớn.
+- **CSS Architecture (ITCSS, SMACSS):** Các nguyên lý thiết kế hệ thống CSS giúp quản lý độ ưu tiên (specificity) rành mạch và tăng khả năng tái sử dụng của module. Khuyến cáo khắt khe: **KHÔNG lồng (nest) code SCSS quá 3 cấp**.
 
 ### G. Hướng dẫn Sử dụng Chi tiết
 
