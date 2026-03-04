@@ -4,6 +4,116 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Filter Projects by Category (AJAX)
+ */
+add_action('wp_ajax_nopriv_laca_filter_projects', 'laca_ajax_filter_projects');
+add_action('wp_ajax_laca_filter_projects', 'laca_ajax_filter_projects');
+
+function laca_ajax_filter_projects() {
+    $category_id        = isset($_POST['category']) ? absint($_POST['category']) : 0;
+    $allowed_categories = isset($_POST['allowed_categories']) ? sanitize_text_field($_POST['allowed_categories']) : '';
+    $order_by           = isset($_POST['order_by']) ? sanitize_text_field($_POST['order_by']) : 'date';
+    $count_desktop      = isset($_POST['count_desktop']) ? absint($_POST['count_desktop']) : 6;
+    $count_mobile       = isset($_POST['count_mobile']) ? absint($_POST['count_mobile']) : 4;
+    
+    $max_count = max($count_desktop, $count_mobile);
+
+    $args = [
+        'post_type'      => 'project',
+        'post_status'    => 'publish',
+        'posts_per_page' => $max_count,
+    ];
+
+    if ($order_by === 'rand') {
+        $args['orderby'] = 'rand';
+    } elseif ($order_by === 'hand_made') {
+        $args['meta_key'] = '_is_real';
+        $args['meta_value'] = 'yes';
+        $args['orderby'] = 'date';
+        $args['order'] = 'DESC';
+    } else {
+        $args['orderby'] = 'date';
+        $args['order']   = 'DESC';
+    }
+
+    // Filter logic
+    if ($category_id > 0) {
+        // Specific tab selected
+        $args['tax_query'] = [
+            [
+                'taxonomy' => 'project_cat',
+                'field'    => 'term_id',
+                'terms'    => $category_id,
+            ],
+        ];
+    } elseif (!empty($allowed_categories)) {
+        // "All" tab clicked, but restricted by block settings
+        $cat_array = array_map('intval', explode(',', $allowed_categories));
+        $args['tax_query'] = [
+            [
+                'taxonomy' => 'project_cat',
+                'field'    => 'term_id',
+                'terms'    => $cat_array,
+            ],
+        ];
+    }
+
+    $query = new WP_Query($args);
+    $html  = '';
+
+    if ($query->have_posts()) {
+        $index = 0;
+        while ($query->have_posts()) {
+            $query->the_post();
+            $index++;
+            
+            $quick_view_img_url = getPostMetaImageUrl( 'quick_view_img', get_the_ID(), null, null );
+            
+            // Fallback if the helper above doesn't work as expected for this specific field type
+            if ( ! $quick_view_img_url ) {
+                $quick_view_img_id = carbon_get_post_meta( get_the_ID(), 'quick_view_img' );
+                if ( is_numeric( $quick_view_img_id ) ) {
+                    $quick_view_img_url = wp_get_attachment_image_url( $quick_view_img_id, 'full' );
+                } else {
+                    $quick_view_img_url = $quick_view_img_id;
+                }
+            }
+            
+            $item_class = 'laca-project-block__item';
+            if ($index > $count_mobile) $item_class .= ' hidden-on-mobile';
+            if ($index > $count_desktop) $item_class .= ' hidden-on-desktop';
+
+            ob_start();
+            ?>
+            <div class="<?php echo esc_attr($item_class); ?>">
+                <a href="<?php the_permalink(); ?>" class="laca-project-block__card-link" data-cursor-arrow>
+                    <div class="laca-project-block__image-wrap">
+                        <?php if (function_exists('theResponsivePostThumbnail')) : ?>
+                            <?php theResponsivePostThumbnail('large', ['alt' => esc_attr(get_the_title()), 'class' => 'laca-project-block__img']); ?>
+                        <?php else : ?>
+                            <?php the_post_thumbnail('large', ['class' => 'laca-project-block__img']); ?>
+                        <?php endif; ?>
+                        
+                        <?php if ($quick_view_img_url) : ?>
+                            <div class="laca-project-block__hover-img-wrap">
+                                <img src="<?php echo esc_url($quick_view_img_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="laca-project-block__hover-img" loading="lazy">
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </a>
+            </div>
+            <?php
+            $html .= ob_get_clean();
+        }
+        wp_reset_postdata();
+    } else {
+        $html = '<p>' . __('No projects found.', 'laca') . '</p>';
+    }
+
+    laca_send_json_success(['html' => $html]);
+}
+
+/**
  * Custom JSON response helpers with proper Vietnamese encoding
  */
 function laca_send_json_success($data = null, $status_code = null) {

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "lacadev/project-block",
+  "title": "Laca Project V2",
+  "description": "Hiển thị danh sách dự án (Project) với phân loại Tab",
+  "category": "lacadev-blocks",
+  "icon": "portfolio",
+  "keywords": ["project", "portfolio", "laca"],
+  "textdomain": "laca",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Selected Works"
+    },
+    "description": {
+      "type": "string",
+      "default": "A curated showcase by La Cà Dev. Rugged, minimalist, and bold, blending dark charcoal backgrounds with earthy sand accents."
+    },
+    "categoryIds": {
+      "type": "array",
+      "default": []
+    },
+    "orderBy": {
+      "type": "string",
+      "default": "date"
+    },
+    "countDesktop": {
+      "type": "number",
+      "default": 6
+    },
+    "countMobile": {
+      "type": "number",
+      "default": 4
+    },
+    "buttonText": {
+      "type": "string",
+      "default": ""
+    },
+    "buttonUrl": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

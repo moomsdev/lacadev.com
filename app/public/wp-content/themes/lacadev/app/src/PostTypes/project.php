@@ -34,12 +34,18 @@ class Project extends \App\Abstracts\AbstractPostType
         Container::make('post_meta', __('Project Settings | Cài đặt dự án', 'laca'))
             ->where('post_type', '=', $this->post_type)
             ->add_tab(__('Visuals', 'laca'), [
+                Field::make('select', 'is_real', __('Đã làm thực tế', 'laca'))
+                    ->add_options([
+                        'yes' => 'Có',
+                        'no' => 'Không',
+                    ]),
                 Field::make('text', 'live_url', __('Live Demo URL', 'laca'))
-                    ->set_width(50)
                     ->set_attribute('placeholder', 'https://...'),
+                Field::make('image', 'quick_view_img', __('Quick view', 'laca'))
+                    ->set_width(30),
                 Field::make('media_gallery', 'gallery', __('Thư viện ảnh (Gallery)', 'laca'))
                     ->set_type(['image'])
-                    ->set_width(50),
+                    ->set_width(70),
             ])
             ->add_tab(__('Tech Specs', 'laca'), [
                 Field::make('multiselect', 'platform', __('Nền tảng (Platform)', 'laca'))

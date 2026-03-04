@@ -13,3 +13,4 @@ import './process-block';
 import './marquee-block';
 import './tech-list-block';
 import './button-block';
+import './project-block';

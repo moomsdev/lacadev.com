@@ -34,7 +34,7 @@ function lacadev_register_gutenberg_blocks_assets() {
         'lacadev-gutenberg-blocks',
         $theme_root_uri . '/dist/gutenberg/index.js',
         $asset['dependencies'],
-        $asset['version'],
+        time(), // Force refresh by using current timestamp
         false
     );
 }

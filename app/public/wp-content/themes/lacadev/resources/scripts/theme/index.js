@@ -10,6 +10,7 @@ import Swiper from 'swiper';
 import { initAboutLacaHero } from './pages/about-laca';
 import { initContactPage } from './pages/contact';
 import { initCommentForm } from './pages/comments';
+import './project-block.js';
 
 gsap.registerPlugin( ScrollTrigger );
 
@@ -530,7 +531,7 @@ function resetCustomCursor() {
 	}
 }
 
-function initCustomCursor() {
+window.initCustomCursor = function() {
 	const cursorOuter = document.querySelector( '.cursor-outer' );
 	const cursorInner = document.querySelector( '.cursor-inner' );
 
