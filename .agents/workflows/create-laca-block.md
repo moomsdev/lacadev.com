@@ -1,51 +1,58 @@
 ---
-description: Hướng dẫn tạo mới Gutenberg Block chuẩn kiến trúc theme LacaDev
+description: Hướng dẫn tạo mới hoặc chuyển đổi Gutenberg Block chuẩn kiến trúc theme LacaDev
 ---
-# Tiêu chuẩn và Quy trình phát triển Block Gutenberg - Theme LacaDev
+# LacaDev Gutenberg Block Creation & Conversion Workflow
 
-Khi nhận được yêu cầu tạo thêm 1 Block Gutenberg mới cho theme, Agent phải tuân thủ nghiêm ngặt các quy tắc kiến trúc, an toàn, hiệu năng của theme dựa trên các chuẩn đã được chứng minh của dự án. 
+Quy trình tự động hóa việc khởi tạo, phát triển hoặc chuyển đổi một Gutenberg Block cho theme LacaDev. Agent sử dụng quy trình này khi người dùng yêu cầu tạo block mới (từ thiết kế mẫu) HOẶC yêu cầu chuyển đổi một block cũ (thuần PHP/HTML/CSS) sang kiến trúc Gutenberg hiện tại.
 
-Vị trí gốc của theme là: `app/public/wp-content/themes/lacadev`
+Vị trí gốc của theme: `app/public/wp-content/themes/lacadev`
 
-## 1. Cấu trúc thư mục Block Gutenberg
-Tuân thủ cấu trúc tạo file Dynamic Rendering.
-- Tạo thư mục cho Block mới nằm trong: `block-gutenberg/[tên-block-của-bạn]/` 
-- Trong thư mục đó phải có đầy đủ 5 files cơ bản:
-  1. `block.json`: Metadata của block (`name`, `title`, `attributes`,...). Tên block phải bắt đầu với prefix `lacadev/[tên-block]`. Text domain: `laca`.
-  2. `index.js`: Nơi register block.
-  3. `edit.js`: Chứa React code để render UI trong Backend (Editor).
-  4. `save.js`: Vì là dynamic block nên thường chỉ return `null`, hãy return hàm export tĩnh tương tự cấu trúc các block lân cận.
-  5. `render.php`: Chứa PHP logic để xuất HTML ra ngoài màn hình người dùng.
+## 1. Kích hoạt Kỹ năng (Skills Validation)
+Trước khi bắt đầu code, Agent BẮT BUỘC nhận thức và áp dụng tổ hợp các kỹ năng sau:
+- **WordPress Core & Development**: `@wordpress`, `@wordpress-theme-development`, `@wp-block-development`.
+- **Hiệu năng & Bảo mật**: `@wp-performance`, `@database-optimizer`, `@security-auditor`, `@xss-html-injection`.
+- **SEO & Trải nghiệm**: `@seo-structure-architect`, `@accessibility-compliance-accessibility-audit`.
+- **Mã nguồn sạch & Chuẩn mực**: `@cc-skill-coding-standards`, `@frontend-dev-guidelines`, `@clean-code`.
+- **Thiết kế UI/UX**: `@ui-ux-pro-max`, `@frontend-design`, BEM, Sass 7-1, CSS Architecture.
 
-## 2. Tổ chức Style (CSS/SCSS)
-- SCSS **không** nên ném lung tung trong thư mục của block.
-- Khai báo class chuẩn BEM naming convention, ví dụ: `.block-[tên-block] { ... }`
-- Chèn code SCSS của block vào trong tệp tin: `resources/styles/theme/layout/_blocks.scss`
-- Webpack của theme sẽ tự động minify quy hoạch và bundle tệp styles này.
+## 2. Phân Tích Yêu Cầu (Tạo Mới hoặc Chuyển Đổi)
+Agent xác định mục tiêu của người dùng:
+- **Tạo mới:** Phân tích hình ảnh mẫu hoặc yêu cầu text để bóc tách UI Component, Block Attributes và cấu trúc HTML.
+- **Chuyển đổi (Refactor):** Phân tích mã nguồn cũ (file PHP thuần, file SCSS cũ, js cũ). Bóc tách các phần nội dung tĩnh thành biến động (Block Attributes) để admin có thể sửa được trong Editor.
 
-## 3. Tổ chức Script (JS Frontend)
-- Script JS phục vụ các effect, tính toán trên Frontend được khai báo trong: `resources/scripts/theme/` (Có thể tạo file js mới tại đây sau đó import vào `index.js` chính của theme).
-- Hạn chế tối đa dùng jQuery. Khuyến khích Vanilla JS hoặc tích hợp theo thư viện animation có sẵn (GSAP,...).
-- Không tự ý nhúng thẻ `<script>` vào `render.php`.
+## 3. Khởi tạo Cấu trúc Block Gutenberg
+Tạo thư mục block mới trong `block-gutenberg/[tên-block]/` với đủ 5 files cơ bản:
+1. `block.json`: Metadata của block. Prefix tên phải là `lacadev/[tên-block]`. Xác định rõ thuộc tính `attributes` dựa trên phân tích ở bước 2.
+2. `index.js`: Nơi register block.
+3. `edit.js`: Chứa React code để render UI trong Editor (Backend). Giao diện trong editor phải sử dụng các components chuẩn của `@wordpress/components` như `TextControl`, `RichText`, `InspectorControls`, `PanelBody`...
+4. `save.js`: Thường return `null` đối với dynamic block.
+5. `render.php`: Chứa cấu trúc HTML và gọi dữ liệu PHP.
+   - **Bảo mật**: Sử dụng `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`.
+   - **Semantic SEO**: Bao bọc bằng thẻ HTML phù hợp (`<section>`, `<article>`, `<header>`). Phân cấp Heading (`<h2>`, `<h3>`) hợp lý.
+   - **Xử lý tài nguyên cũ (Khi chuyển đổi)**: Lọc bỏ các thẻ script/style nội tuyến cũ nếu có, đưa chúng vào đúng kiến trúc hệ thống hiện đại.
 
-## 4. Tối ưu Hiệu năng (Performance) và Clean Code trong `render.php`
-- **Hình ảnh:** BẮT BUỘC sử dụng hàm helper theme để render để tự động xuất WebP, kích thước đính kèm: `theResponsivePostThumbnail($size, $args)` hoặc `getResponsivePostThumbnail($post_id, ...)`.
-- **Custom Post Queries:** 
-  - Nếu query list bài viết bằng `WP_Query`, hãy thêm dòng `'no_found_rows' => true` để loại bỏ thao tác đếm tổng số trang cực chậm trong SQL nếu block đó không có tính năng Phân Trang (Pagination).
-  - Không viết đoạn code `update_post_caches()` thừa vào vì core WP_Query mặc định đã làm sẵn tác vụ chống N+1 Caching.
-  - **Tối kỵ `orderby => 'rand'`:** Rất tốn CPU cho MySQL DB, thay thế bằng cách get array data bình thường rồi dùng `shuffle($query->posts)` tại vòng lặp PHP nếu list trả về nhỏ. 
+## 4. Kiến trúc SCSS/Sass và Tiêu chuẩn BEM
+Quy định khắt khe về cách viết style cho block:
+- **KHÔNG tạo file SCSS rời** cho từng block.
+- **Vị trí viết code**: Toàn bộ SCSS của block phải được đặt bên trong `@mixin block-styles { ... }` (hoặc cấu trúc module tương đương) tại tệp tin:
+  `resources/styles/theme/layout/_blocks.scss`
+  (Mục đích: đảm bảo hiển thị đồng nhất giữa Admin Editor và Frontend ngoài website).
+- **Phương pháp BEM**: 
+  - Khai báo class bao ngoài tuân thủ chuẩn BEM, ví dụ: `.laca-[tên-block]`.
+  - Các thành phần con theo chuẩn Element: `__element`, Modifier: `--modifier`.
+- **Refactor CSS/SCSS Cũ (Khi chuyển đổi)**: Nếu người dùng đưa class cũ (ví dụ: `.my-hero-section .title`), phải viết lại (refactor) hoàn toàn sang chuẩn BEM (ví dụ: `.laca-hero__title`). KHÔNG ĐƯỢC lồng (nest) code SCSS quá 3 cấp.
+- Tận dụng biến và mixin sẵn có của hệ thống trong `abstracts/_variables.scss` và `abstracts/_mixin.scss`.
 
-## 5. Bảo mật (Security) trong PHP
-- **XSS & Data Wrapping:** Tất cả biến động in ra HTML phải qua hàm escape: 
-  - `esc_html()` cho Text
-  - `esc_attr()` cho class, id, attribute html
-  - `esc_url()` cho link (href)
-  - `wp_kses_post()` cho Rich text có format của wysiwyg editor content.
-- **SQLi:** Mọi custom MySQL query được code thẳng với class `$wpdb` đều bắt buộc đưa vào `$wpdb->prepare()`.
+## 5. Kiến trúc JS & Tối ưu Hiệu năng (Performance)
+- **Xử lý JS (Nếu có)**: Nếu block có JS (chẳng hạn hiệu ứng trượt, slider), thêm logic Script vào `resources/scripts/theme/` thay vì viết file thẻ `<script>` ở `render.php`.
+- **Output Ảnh**: BẮT BUỘC dùng helper function của theme như `theResponsivePostThumbnail()` hiển thị WebP và sizes. Khuyến khích Image ID attribute thay vì URL trực tiếp.
+- **WP_Query**: 
+  - Thêm `'no_found_rows' => true` nếu không phân trang.
+  - KHÔNG dùng `'orderby' => 'rand'`, tốn CPU.
 
-## 6. Accessiblity Component (A11y)
-- Thẻ block bao bọc bên ngoài thường là `<section>`, hãy cẩn thật định dạng Heading (h2, h3, h4) không bị sai cấp độ tài liệu. Tương phản màu sắc rõ ràng. Thêm các thẻ `aria-label` cho những btn, thẻ `<a>` mà mất Text/chỉ hiện viền icon.
-
-## 7. Cập nhật & Biên dịch 
-Sau khi bạn đã hoàn thiện code cho block mới. Hãy nhắc nhở tôi chạy (hoặc tự chạy nếu có turbo) câu lệnh Build của theme:
-`yarn install && yarn build` (hoặc `npm run build`) tại thư mục root của theme để Webpack thực hiện phiên dịch file JS Editor, JS frontend và SCSS Layout.
+## 6. Quy trình Review & Hỗ trợ (Final Step)
+1. Xác nhận mã nguồn đã bóc tách rõ ràng các thành phần động (cho Editor) và tĩnh chưa?
+2. Code có tuân thủ 100% chuẩn Clean Code và BEM không? SCSS đã chính xác nằm trong `_blocks.scss` chưa?
+3. Các dữ liệu động từ Block Attributes đã được escape hợp lý trong `render.php` chưa?
+4. Nếu là tác vụ **Chuyển đổi**, xác nhận xem code mới có tương đương hoặc tối ưu hơn giao diện cũ không?
+5. Thông báo hoàn tất, hỏi user có cần review lại code không, nhắc người dùng chạy `yarn build` / `npm run build` để Webpack build output.
