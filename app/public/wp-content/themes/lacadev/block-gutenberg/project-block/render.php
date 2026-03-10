@@ -14,7 +14,7 @@ $max_count = max( $count_desktop, $count_mobile );
 
 // Prepare initial query for "All" tab
 $args = [
-	'post_type'           => 'project',
+	'post_type'           => 'template',
 	'post_status'         => 'publish',
 	'ignore_sticky_posts' => 1,
 	'posts_per_page'      => $max_count,
@@ -37,7 +37,7 @@ if ( $order_by === 'rand' ) {
 if ( ! empty( $category_ids ) ) {
 	$args['tax_query'] = [
 		[
-			'taxonomy' => 'project_cat',
+			'taxonomy' => 'template_cat',
 			'field'    => 'term_id',
 			'terms'    => $category_ids,
 		],
@@ -55,7 +55,7 @@ if ( ! empty( $attributes['className'] ) ) {
 $selected_cats = [];
 if ( ! empty( $category_ids ) ) {
 	foreach ( $category_ids as $cat_id ) {
-		$term = get_term( $cat_id, 'project_cat' );
+		$term = get_term( $cat_id, 'template_cat' );
 		if ( ! is_wp_error( $term ) && $term ) {
 			$selected_cats[] = $term;
 		}

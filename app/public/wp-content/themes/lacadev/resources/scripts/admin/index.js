@@ -1,6 +1,6 @@
-/* eslint-disable no-console, no-unused-vars, no-alert */
 import '@styles/admin';
 import './custom_thumbnail_support.js';
+import './project.js';
 
 import Swal from 'sweetalert2';
 window.Swal = Swal;

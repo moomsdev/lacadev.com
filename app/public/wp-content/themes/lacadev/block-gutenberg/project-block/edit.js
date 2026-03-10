@@ -33,7 +33,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	} );
 
 	const categories = useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords( 'taxonomy', 'project_cat', {
+		return select( 'core' ).getEntityRecords( 'taxonomy', 'template_cat', {
 			per_page: -1,
 			hide_empty: true,
 		} );
@@ -53,11 +53,11 @@ export default function Edit( { attributes, setAttributes } ) {
 
 			if ( categoryIds && categoryIds.length > 0 ) {
 				// FORCE STRING FORMAT
-				query.project_cat = categoryIds.map(id => String(id)).join(',');
+				query.template_cat = categoryIds.map(id => String(id)).join(',');
 			}
 
-			const records = getEntityRecords( 'postType', 'project', query );
-			const resolving = isResolvingSelector( 'getEntityRecords', [ 'postType', 'project', query ] );
+			const records = getEntityRecords( 'postType', 'template', query );
+			const resolving = isResolvingSelector( 'getEntityRecords', [ 'postType', 'template', query ] );
 			
 			return {
 				displayPosts: records || [],

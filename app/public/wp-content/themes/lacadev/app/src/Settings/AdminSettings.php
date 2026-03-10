@@ -33,6 +33,7 @@ class AdminSettings
 
 		$this->applyAdminColorVariables();
 		$this->addDashboardContactWidget();
+		$this->addProjectManagerWidget(); // NEW: Project Manager Widget
 		$this->removeDefaultWidgets();
 		$this->removeDashboardWidgets();
 		$this->changeHeaderUrl();
@@ -157,6 +158,105 @@ class AdminSettings
 					</div>
 				</div>
 <?php });
+		});
+	}
+
+	public function addProjectManagerWidget()
+	{
+		add_action('wp_dashboard_setup', static function () {
+			if (!current_user_can('edit_posts')) {
+				return;
+			}
+
+			wp_add_dashboard_widget(
+				'laca_project_manager_widget',
+				'LacaDev | 🗂️ Quản lý dự án',
+				static function () {
+					global $wpdb;
+					
+					// Đếm tổng số projects
+					$sqlCount = "SELECT meta_value AS status, COUNT(post_id) AS count 
+								 FROM {$wpdb->postmeta} 
+								 WHERE meta_key = '_project_status' 
+								   AND post_id IN (SELECT ID FROM {$wpdb->posts} WHERE post_type = 'project' AND post_status = 'publish')
+								 GROUP BY meta_value";
+					$statusCounts = $wpdb->get_results($sqlCount, OBJECT_K) ?: [];
+					
+					$total      = wp_count_posts('project')->publish;
+					$inProgress = $statusCounts['in_progress']->count ?? 0;
+					$done       = $statusCounts['done']->count ?? 0;
+					$maintenance= $statusCounts['maintenance']->count ?? 0;
+
+					// Đếm projects sắp hết hạn hosting/domain (trong vòng 30 ngày)
+					$expirySql = "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta} 
+								  WHERE meta_key IN ('_domain_expiry', '_hosting_expiry', '_ssl_expiry')
+								  AND meta_value != ''";
+					$expiries = $wpdb->get_results($expirySql);
+					
+					$expiringSoon = 0;
+					$expiringCritical = 0;
+					$today = new \DateTime();
+					
+					foreach ($expiries as $exp) {
+						try {
+							$exDate = new \DateTime($exp->meta_value);
+							$diff = $today->diff($exDate);
+							$days = (int) $diff->format('%r%a');
+							
+							if ($days >= 0 && $days <= 7) {
+								$expiringCritical++;
+							} elseif ($days > 7 && $days <= 30) {
+								$expiringSoon++;
+							} elseif ($days < 0) {
+								$expiringCritical++; // Overdue
+							}
+						} catch (\Exception $e) {
+							// Ignore invalid dates
+						}
+					}
+
+					// Đếm cảnh báo từ custom table
+					$alertsCount = class_exists('\App\Models\ProjectAlert') ? \App\Models\ProjectAlert::countActive() : 0;
+					?>
+					<div style="display:flex;gap:15px;margin-bottom:15px;">
+						<div style="flex:1;background:#f8f9fa;padding:15px;border-radius:8px;text-align:center;">
+							<div style="font-size:24px;font-weight:700;color:#2271b1;"><?php echo esc_html($total); ?></div>
+							<div style="font-size:13px;color:#666;">Tổng dự án</div>
+						</div>
+						<div style="flex:1;background:#f8f9fa;padding:15px;border-radius:8px;text-align:center;">
+							<div style="font-size:24px;font-weight:700;color:#f0ad4e;"><?php echo esc_html($inProgress); ?></div>
+							<div style="font-size:13px;color:#666;">Đang làm</div>
+						</div>
+						<div style="flex:1;background:#f8f9fa;padding:15px;border-radius:8px;text-align:center;">
+							<div style="font-size:24px;font-weight:700;color:#5cb85c;"><?php echo esc_html($done); ?></div>
+							<div style="font-size:13px;color:#666;">Hoàn thành</div>
+						</div>
+					</div>
+
+					<div style="background:#fff;border:1px solid #ccd0d4;padding:10px 15px;border-radius:8px;margin-bottom:15px;">
+						<h4 style="margin-top:0;margin-bottom:10px;">Cần chú ý</h4>
+						<ul style="margin:0;padding-left:20px;">
+							<?php if ($expiringCritical > 0): ?>
+								<li style="color:#d9534f;font-weight:600;">🔴 Có <?php echo esc_html($expiringCritical); ?> dịch vụ sắp/đã hết hạn (&le; 7 ngày)</li>
+							<?php endif; ?>
+							<?php if ($expiringSoon > 0): ?>
+								<li style="color:#f0ad4e;">🟡 Có <?php echo esc_html($expiringSoon); ?> dịch vụ sắp gia hạn (&le; 30 ngày)</li>
+							<?php endif; ?>
+							<?php if ($alertsCount > 0): ?>
+								<li style="color:#d9534f;">⚠️ Có <?php echo esc_html($alertsCount); ?> cảnh báo lỗi/bảo mật chưa xử lý</li>
+							<?php endif; ?>
+							<?php if ($expiringCritical == 0 && $expiringSoon == 0 && $alertsCount == 0): ?>
+								<li style="color:#5cb85c;">✅ Mọi thứ đều ổn, không có cảnh báo nào.</li>
+							<?php endif; ?>
+						</ul>
+					</div>
+
+					<div style="text-align:right;">
+						<a href="<?php echo esc_url(admin_url('edit.php?post_type=project')); ?>" class="button button-primary">Xem tất cả dự án</a>
+					</div>
+					<?php
+				}
+			);
 		});
 	}
 
@@ -920,6 +1020,33 @@ class AdminSettings
 						->set_attribute('min', '0.0')
 						->set_attribute('max', '1.0')
 						->set_help_text('Bot thường < 0.5. Người dùng thật thường > 0.5.'),
+				]);
+
+			// LacaDev Project Notifications
+			Container::make('theme_options', __('LacaDev PM & Bots', 'laca'))
+				->set_page_parent($options)
+				->set_page_file(__('laca-project-notifications', 'laca'))
+				->add_tab(__('Zalo OA (Project Manager)', 'laca'), [
+					Field::make('html', 'zalo_oa_info')
+						->set_html('<div class="carbon-field-description">Cấu hình Zalo Official Account (OA) để nhận cảnh báo về dự án (hết hạn hosting, domain, lỗi bảo mật).</div>'),
+
+					Field::make('checkbox', 'enable_zalo_notify', __('Bật thông báo Zalo', 'laca')),
+
+					Field::make('text', 'zalo_oa_access_token', __('Access Token', 'laca'))
+						->set_width(50),
+						
+					Field::make('text', 'zalo_oa_refresh_token', __('Refresh Token', 'laca'))
+						->set_width(50),
+
+					Field::make('text', 'zalo_default_receiver', __('Zalo User ID nhận mặc định', 'laca'))
+						->set_help_text('Nhập danh sách Zalo User ID (cách nhau bằng dấu phẩy) của Admin để nhận các cảnh báo quan trọng.'),
+				])
+				->add_tab(__('Email (Project Manager)', 'laca'), [
+					Field::make('checkbox', 'enable_email_notify', __('Bật thông báo qua Email', 'laca')),
+
+					Field::make('text', 'project_admin_email', __('Email nhận thông báo', 'laca'))
+						->set_default_value(get_option('admin_email'))
+						->set_help_text('Bạn có thể nhập nhiều email cách nhau bởi dấu phẩy (,).'),
 				]);
 
             Container::make('theme_options', __('Login Socials', 'laca'))

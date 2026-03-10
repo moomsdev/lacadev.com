@@ -19,12 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 // phpcs:disable
 add_action('init', function () {
 	register_taxonomy(
-		'project_tags',
-		array( 'project' ),
+		'template_tags',
+		array( 'template' ),
 		array(
 			'hierarchical'  => false,
 			'label'         => __( 'Tags', 'laca' ),
-			'singular_name' => __( 'Project Tags', 'laca' ),
+			'singular_name' => __( 'Template Tags', 'laca' ),
 			'rewrite'       => true,
 			'query_var'     => true
 		)

@@ -112,3 +112,129 @@ function app_render_featured_image_column($column, $postId) {
 }
 add_action('manage_page_posts_custom_column', 'app_render_featured_image_column', 10, 2);
 add_action('manage_post_posts_custom_column', 'app_render_featured_image_column', 10, 2);
+
+/**
+ * ============================================================================
+ * PROJECT MANAGER — DB TABLES & AUTO-GENERATE TRACKER KEY
+ * ============================================================================
+ */
+
+/**
+ * Tạo custom DB tables khi activate theme lần đầu
+ * Cũng chạy trên `init` để upgrade version nếu cần
+ */
+add_action('after_switch_theme', 'laca_install_project_manager_tables');
+add_action('init', 'laca_install_project_manager_tables', 5);
+
+function laca_install_project_manager_tables(): void
+{
+    \App\Databases\ProjectLogTable::install();
+    \App\Databases\ProjectAlertTable::install();
+}
+
+/**
+ * Khởi tạo Handler xử lý Notifications & Cron (Project Manager)
+ * và Export PDF Quote
+ */
+add_action('init', function() {
+    if (class_exists('\App\Settings\LacaTools\ProjectNotificationHandler')) {
+        (new \App\Settings\LacaTools\ProjectNotificationHandler())->init();
+    }
+    
+    if (class_exists('\App\Settings\LacaTools\ProjectPdfExporter')) {
+        (new \App\Settings\LacaTools\ProjectPdfExporter())->init();
+    }
+    
+    if (class_exists('\App\Settings\LacaTools\TrackerEndpointHandler')) {
+        (new \App\Settings\LacaTools\TrackerEndpointHandler())->init();
+    }
+    
+    if (class_exists('\App\Settings\LacaTools\ProjectTrackerGenerator')) {
+        (new \App\Settings\LacaTools\ProjectTrackerGenerator())->init();
+    }
+});
+
+/**
+ * Auto-generate Tracker Secret Key khi tạo/lưu project lần đầu
+ * Hook: save_post_project — chỉ chạy cho post_type=project
+ */
+add_action('save_post_project', 'laca_auto_generate_tracker_key', 20, 2);
+
+function laca_auto_generate_tracker_key(int $postId, \WP_Post $post): void
+{
+    // Bỏ qua autosave, revision, trash
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if ($post->post_status === 'trash' || $post->post_status === 'auto-draft') {
+        return;
+    }
+    if (!current_user_can('edit_post', $postId)) {
+        return;
+    }
+
+    // Chỉ tạo mới nếu chưa có key
+    $existingKey = get_post_meta($postId, '_tracker_secret_key', true);
+    if (empty($existingKey)) {
+        $secretKey = bin2hex(random_bytes(32)); // 64-char hex, cryptographically secure
+        update_post_meta($postId, '_tracker_secret_key', $secretKey);
+    }
+
+    // Cập nhật tracker endpoint URL (readonly, hiển thị cho dev copy)
+    $endpoint = rest_url('laca/v1/projects/' . $postId . '/log');
+    update_post_meta($postId, '_tracker_endpoint', esc_url_raw($endpoint));
+}
+
+/**
+ * Enqueue nonce cho AJAX của Project Manager (admin only)
+ */
+add_action('admin_enqueue_scripts', 'laca_project_manager_admin_scripts');
+
+function laca_project_manager_admin_scripts(string $hook): void
+{
+    $screen = get_current_screen();
+    if (!$screen || $screen->post_type !== 'project') {
+        return;
+    }
+
+    // Inline script cung cấp nonce cho AJAX
+    $data = [
+        'ajaxurl'   => admin_url('admin-ajax.php'),
+        'nonce'     => wp_create_nonce('laca_project_manager'),
+        'post_id'   => (int) (get_the_ID() ?: ($_GET['post'] ?? 0)),
+        'i18n'      => [
+            'confirm_delete' => __('Bạn có chắc muốn xoá?', 'laca'),
+            'resolving'      => __('Đang xử lý...', 'laca'),
+            'deleted'        => __('Đã xoá', 'laca'),
+            'resolved'       => __('Đã đánh dấu xử lý', 'laca'),
+        ],
+    ];
+    wp_add_inline_script(
+        'jquery',
+        'var lacaProjectManager = ' . wp_json_encode($data) . ';',
+        'before'
+    );
+}
+
+/**
+ * Thêm CSS cho admin list view của project
+ */
+add_action('admin_head', 'laca_project_list_admin_styles');
+
+function laca_project_list_admin_styles(): void
+{
+    $screen = get_current_screen();
+    if (!$screen || $screen->post_type !== 'project') {
+        return;
+    }
+    ?>
+    <style>
+        .column-laca_status  { width: 120px; }
+        .column-laca_expiry  { width: 160px; }
+        .column-laca_alerts  { width: 80px; text-align: center; }
+        .column-laca_client  { width: 150px; }
+        .column-laca_domain  { width: 150px; }
+        .wp-list-table .column-laca_expiry { font-size: 12px; line-height: 1.4; }
+    </style>
+    <?php
+}

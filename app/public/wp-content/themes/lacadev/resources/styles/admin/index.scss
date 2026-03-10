@@ -2,6 +2,7 @@
 @use "../theme/base/fonts";
 
 @use "admin-custom";
+@use "project";
 
 html :where(.wp-block) {
   max-width: 144rem !important;

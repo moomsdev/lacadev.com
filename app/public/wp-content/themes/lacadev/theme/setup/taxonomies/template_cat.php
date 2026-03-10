@@ -21,11 +21,11 @@ if (!defined('ABSPATH')) {
 
 add_action('init', function () {
     register_taxonomy(
-        'project_cat',
-        array('project'),
+        'template_cat',
+        array('template'),
         array(
             'labels'            => array(
-                'name'              => __('Project Category', 'laca'),
+                'name'              => __('Template Category', 'laca'),
 				'singular_name'     => __('Custom Taxonomy', 'laca'),
 				'search_items'      => __('Search Custom Taxonomies', 'laca'),
 				'all_items'         => __('All Custom Taxonomies', 'laca'),
@@ -36,15 +36,15 @@ add_action('init', function () {
 				'update_item'       => __('Update', 'laca'),
 				'add_new_item'      => __('Add new', 'laca'),
 				'new_item_name'     => __('New Custom Taxonomy Name', 'laca'),
-                'menu_name'         => __('Project Category', 'laca'),
+                'menu_name'         => __('Template Category', 'laca'),
             ),
             'hierarchical'      => true,
             'show_ui'           => true,
             'show_admin_column' => true,
             'query_var'         => true,
             'show_in_rest'      => true,
-            'rest_base'         => 'project_cat',
-            'rewrite'           => array('slug' => 'project-category'),
+            'rest_base'         => 'template_cat',
+            'rewrite'           => array('slug' => 'template-category'),
         )
     );
 });

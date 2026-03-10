@@ -1,0 +1,15 @@
+.laca-pm-wrap { display: flex; gap: 20px; }
+.laca-pm-col { flex: 1; background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px; box-sizing: border-box; }
+.laca-pm-list { max-height: 400px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
+.laca-pm-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+.laca-pm-item:last-child { border-bottom: none; }
+.laca-pm-meta { font-size: 11px; color: #888; margin-bottom: 4px; display: flex; justify-content: space-between; }
+.laca-pm-badge { padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px; }
+.laca-pm-alert-critical { background: #d9534f; color: #fff; }
+.laca-pm-alert-warning { background: #f0ad4e; color: #fff; }
+.laca-pm-alert-info { background: #5bc0de; color: #fff; }
+.laca-form-group { margin-bottom: 10px; }
+.laca-form-group select, .laca-form-group textarea, .laca-form-group input { width: 100%; border: 1px solid #ddd; padding: 6px; }
+.laca-form-group textarea { height: 60px; }
+.laca-action-btn { font-size: 11px; cursor: pointer; color: #b32d2e; text-decoration: underline; }
+.laca-resolve-btn { font-size: 11px; cursor: pointer; color: #0073aa; text-decoration: underline; }
