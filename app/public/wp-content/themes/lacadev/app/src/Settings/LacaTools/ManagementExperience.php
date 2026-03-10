@@ -38,6 +38,9 @@ class ManagementExperience
             
             // Duplication support
             $this->enableDuplication();
+
+            // AI Translation
+            new AITranslationManager();
         });
         
         // Navigation & UX

@@ -88,4 +88,34 @@ $optionsPage = Container::make('theme_options', __('Laca Theme', 'laca'))
 	->add_tab(__('Scripts', 'laca'), [
 		Field::make('header_scripts', 'crb_header_script', __('Header Script', 'laca')),
 		Field::make('footer_scripts', 'crb_footer_script', __('Footer Script', 'laca')),
+	])
+
+	->add_tab(__('AI Translation | Dịch thuật AI', 'laca'), [
+		Field::make('html', 'ai_intro', __('', 'laca'))
+			->set_html('Cấu hình API Key để kích hoạt tính năng tự động dịch nội dung bằng trí tuệ nhân tạo. Bạn nên ưu tiên dùng Gemini hoặc Groq vì có gói miễn phí rất tốt.'),
+		
+		Field::make('text', 'ai_gemini_key', __('Gemini API Key', 'laca'))
+			->set_help_text('Model: Gemini 1.5 Pro/Flash. Lấy tại: <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>'),
+		
+		Field::make('text', 'ai_groq_key', __('Groq API Key', 'laca'))
+			->set_help_text('Model: Llama 3/3.1. Lấy tại: <a href="https://console.groq.com/keys" target="_blank">Groq Console</a>'),
+
+		Field::make('text', 'ai_deepseek_key', __('DeepSeek API Key', 'laca'))
+			->set_help_text('Model: DeepSeek Chat. Lấy tại: <a href="https://platform.deepseek.com/" target="_blank">DeepSeek Platform</a>'),
+
+		Field::make('text', 'ai_openai_key', __('OpenAI API Key', 'laca'))
+			->set_help_text('Model: GPT-4o, GPT-4o-mini. Lấy tại: <a href="https://platform.openai.com/" target="_blank">OpenAI Platform</a>'),
+
+		Field::make('text', 'ai_anthropic_key', __('Anthropic API Key', 'laca'))
+			->set_help_text('Model: Claude 3.5 Sonnet/Haiku. Lấy tại: <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>'),
+
+		Field::make('select', 'ai_default_provider', __('Bô xử lý ưu tiên', 'laca'))
+			->set_options([
+				'gemini' => 'Google Gemini (Khuyên dùng)',
+				'groq'   => 'Groq (Llama 3 - Tốc độ cực nhanh)',
+				'deepseek' => 'DeepSeek (Giá rẻ/Chất lượng cao)',
+				'openai' => 'OpenAI GPT',
+				'anthropic' => 'Anthropic Claude',
+			])
+			->set_default_value('gemini'),
 	]);

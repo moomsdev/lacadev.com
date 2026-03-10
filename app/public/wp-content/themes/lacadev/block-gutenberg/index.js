@@ -14,3 +14,6 @@ import './marquee-block';
 import './tech-list-block';
 import './button-block';
 import './project-block';
+
+// AI Translation Plugin — adds a "Dịch AI" button to every block's toolbar
+import './ai-translate-plugin';
