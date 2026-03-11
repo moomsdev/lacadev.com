@@ -15,11 +15,7 @@ class Project extends \App\Abstracts\AbstractPostType
         $this->showThumbnailOnList = true;
         $this->supports            = [
             'title',
-            'editor',
             'thumbnail',
-            'excerpt',
-            'page-attributes',
-            'comments',
         ];
 
         $this->menuIcon         = 'dashicons-layout';
