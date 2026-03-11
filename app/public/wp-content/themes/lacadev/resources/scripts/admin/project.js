@@ -9,37 +9,112 @@ document.addEventListener('DOMContentLoaded', () => {
         const nonce = nonceInput ? nonceInput.value : (typeof ajaxurl_params !== 'undefined' ? ajaxurl_params.nonce : '');
         const ajaxurl = window.ajaxurl;
 
-        function ajaxRequest(action, data, onSuccess) {
+        function toastSuccess(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: message || 'Thành công',
+                    showConfirmButton: false,
+                    timer: 1600,
+                    timerProgressBar: true,
+                });
+                return;
+            }
+
+            alert(message || 'Thành công');
+        }
+
+        function toastError(message) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: message || 'Có lỗi xảy ra',
+                    showConfirmButton: false,
+                    timer: 2200,
+                    timerProgressBar: true,
+                });
+                return;
+            }
+
+            alert(message || 'Có lỗi xảy ra');
+        }
+
+        function confirmAction(message) {
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title: 'Xác nhận',
+                    text: message || 'Bạn chắc chắn muốn thực hiện thao tác này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy',
+                    reverseButtons: true,
+                }).then((r) => Boolean(r.isConfirmed));
+            }
+
+            return Promise.resolve(confirm(message || 'Bạn chắc chắn muốn thực hiện thao tác này?'));
+        }
+
+        function ajaxRequest(action, data, onSuccess, onError) {
             data.action = action;
             data.nonce = nonce;
             data.project_id = postId;
-            
+
             jQuery.post(ajaxurl, data, function(res) {
                 if (res.success) {
-                    onSuccess();
-                    location.reload(); // Reload for simplicity to show new data
+                    if (typeof onSuccess === 'function') onSuccess(res);
                 } else {
-                    alert(res.data.message || 'Có lỗi xảy ra');
+                    if (typeof onError === 'function') onError(res);
+                    toastError((res && res.data && res.data.message) ? res.data.message : 'Có lỗi xảy ra');
                 }
             }).fail(function() {
-                alert('Lỗi kết nối máy chủ');
+                if (typeof onError === 'function') onError();
+                toastError('Lỗi kết nối máy chủ');
             });
         }
 
         // Giải quyết Alert
         jQuery('.laca-resolve-btn').on('click', function(e) {
             e.preventDefault();
-            if(confirm('Xác nhận đã xử lý?')) {
-                ajaxRequest('laca_resolve_alert', { alert_id: jQuery(this).data('id') }, function(){});
-            }
+            const $btn = jQuery(this);
+            const alertId = $btn.data('id');
+
+            confirmAction('Đánh dấu cảnh báo này là đã xử lý?').then((ok) => {
+                if (!ok) return;
+
+                $btn.addClass('disabled').css({ pointerEvents: 'none', opacity: 0.6 });
+                ajaxRequest('laca_resolve_alert', { alert_id: alertId }, function(res){
+                    toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã đánh dấu xử lý');
+                    const $item = jQuery('#alert-' + alertId);
+                    if ($item.length) $item.slideUp(160, () => $item.remove());
+                }, function(){
+                    $btn.removeClass('disabled').css({ pointerEvents: '', opacity: '' });
+                });
+            });
         });
 
         // Xoá Log
         jQuery('.delete-log').on('click', function(e) {
             e.preventDefault();
-            if(confirm('Xác nhận xoá log này?')) {
-                ajaxRequest('laca_delete_log', { log_id: jQuery(this).data('id') }, function(){});
-            }
+            const $btn = jQuery(this);
+            const logId = $btn.data('id');
+
+            confirmAction('Xóa log này? Thao tác không thể hoàn tác.').then((ok) => {
+                if (!ok) return;
+
+                $btn.addClass('disabled').css({ pointerEvents: 'none', opacity: 0.6 });
+                ajaxRequest('laca_delete_log', { log_id: logId }, function(res){
+                    toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã xoá');
+                    const $item = jQuery('#log-' + logId);
+                    if ($item.length) $item.slideUp(160, () => $item.remove());
+                }, function(){
+                    $btn.removeClass('disabled').css({ pointerEvents: '', opacity: '' });
+                });
+            });
         });
 
         // Thêm Log
@@ -50,7 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ajaxRequest('laca_add_log', {
                 log_type: jQuery('#new_log_type').val(),
                 log_content: jQuery('#new_log_msg').val()
-            }, function(){});
+            }, function(res){
+                toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã thêm log thành công');
+                btn.prop('disabled', false).text('Lưu nhật ký');
+                jQuery('#new_log_msg').val('');
+                // Hiện tại API không trả về ID/log HTML → reload để đồng bộ danh sách.
+                location.reload();
+            }, function(){
+                btn.prop('disabled', false).text('Lưu nhật ký');
+            });
         });
 
         // Thêm Alert
@@ -62,7 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert_type: jQuery('#new_alert_type').val(),
                 alert_level: jQuery('#new_alert_level').val(),
                 alert_msg: jQuery('#new_alert_msg').val()
-            }, function(){});
+            }, function(res){
+                toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã gửi cảnh báo');
+                btn.prop('disabled', false).text('Gửi cảnh báo');
+                jQuery('#new_alert_msg').val('');
+                // Hiện tại API không trả về ID/alert HTML → reload để đồng bộ danh sách.
+                location.reload();
+            }, function(){
+                btn.prop('disabled', false).text('Gửi cảnh báo');
+            });
         });
 
         // Lấy mã Auto Tracker và Download
@@ -108,11 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } else {
-                    alert(res.data.message || 'Lỗi');
+                    toastError((res && res.data && res.data.message) ? res.data.message : 'Lỗi');
                 }
                 $btn.text(originalText).prop('disabled', false);
             }).fail(function() {
-                alert('Lỗi kết nối máy chủ');
+                toastError('Lỗi kết nối máy chủ');
                 $btn.text(originalText).prop('disabled', false);
             });
         });
@@ -126,7 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let val = jQuery(this).val();
             val = val.replace(/[^0-9]/g, ''); // chỉ lấy số
             if (val !== '') {
-                val = parseInt(val, 10).toLocaleString('en-US'); // format string có dấu phẩy
+                // Format theo kiểu VN (dấu chấm), tránh lệch với PHP number_format.
+                val = parseInt(val, 10).toLocaleString('vi-VN');
                 jQuery(this).val(val);
             } else {
                 jQuery(this).val('');
@@ -142,43 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }, 1000);
 
-        // Tự động tính Payment Status trực tiếp trên giao diện
-        function calcPaymentStatus() {
-            let $buildInput = jQuery('.laca-price-build input[type="text"]');
-            if ($buildInput.length === 0) return; // Chưa kịp render
-            
-            let valStr = $buildInput.val() || '';
-            let buildPrice = parseInt(valStr.replace(/[^0-9]/g, ''), 10) || 0;
-
-            let totalPaid = 0;
-            jQuery('.laca-pay-amount input[type="text"]').each(function() {
-                let amountStr = jQuery(this).val() || '0';
-                totalPaid += parseInt(amountStr.replace(/[^0-9]/g, ''), 10) || 0;
-            });
-
-            let newStatus = 'pending';
-            if (buildPrice > 0) {
-                if (totalPaid <= 0) newStatus = 'pending';
-                else if (totalPaid < buildPrice) newStatus = 'partial';
-                else newStatus = 'paid';
-            }
-
-            let $select = jQuery('.laca-payment-status select');
-            if ($select.length && $select.val() !== newStatus) {
-                // Kích hoạt React change event
-                let nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
-                nativeInputValueSetter.call($select[0], newStatus);
-                $select[0].dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }
-
-        // Lắng nghe thay đổi input và sau đó tính toán lại
-        jQuery(document).on('input blur change', '.laca-price-build input, .laca-pay-amount input', function() {
-            setTimeout(calcPaymentStatus, 100);
-        });
-
-        // Do Carbon Fields render DOM lazy, chạy interval cẩn thận
-        setInterval(calcPaymentStatus, 1500);
+        // Payment Status đã được xử lý bằng script footer trong PHP (MutationObserver + delegation).
     }
 
     // 3. Password Toggle & Copy
@@ -246,5 +302,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    setInterval(setupCopyableFields, 1000);
+    // Tránh polling liên tục: chạy 1 lần + dùng MutationObserver để bắt CF render thêm fields.
+    setupCopyableFields();
+    const copyObserverTarget = document.querySelector('#post-body') || document.body;
+    let copyObserverTimer;
+    const copyObserver = new MutationObserver(() => {
+        clearTimeout(copyObserverTimer);
+        copyObserverTimer = setTimeout(setupCopyableFields, 120);
+    });
+    copyObserver.observe(copyObserverTarget, { childList: true, subtree: true });
 });

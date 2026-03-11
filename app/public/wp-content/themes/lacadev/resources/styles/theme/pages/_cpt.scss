@@ -712,6 +712,47 @@ html[data-theme="dark"] .badge {
   font-size: 1.5rem;
   line-height: 1.7;
 
+  // ── VALUE-CENTRIC METRICS (Hero grid) ────────────────────────────────
+  .qd-metrics {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+    margin: 2rem 0 2.6rem;
+  }
+
+  .qd-metric {
+    grid-column: span 3;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+
+    @media (max-width: 760px) {
+      grid-column: span 6;
+    }
+
+    @media (max-width: 420px) {
+      grid-column: span 12;
+    }
+
+    &__label {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(0,0,0,0.55);
+      margin-bottom: 0.4rem;
+      font-weight: $semiBold;
+    }
+
+    &__value {
+      font-size: 1.8rem;
+      font-weight: $extraBold;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+  }
+
   // ── HEADER ──────────────────────────────────────────────────────────
   .qd-header {
     display: flex;
@@ -719,7 +760,7 @@ html[data-theme="dark"] .badge {
     align-items: flex-start;
     gap: 2rem;
     padding-bottom: 2rem;
-    border-bottom: 2px solid #1a1a1a;
+    border-bottom: 1px solid rgba(0,0,0,0.85);
     margin-bottom: 2.5rem;
 
     &__brand {
@@ -741,7 +782,7 @@ html[data-theme="dark"] .badge {
     &__title {
       font-size: 2rem;
       font-weight: $extraBold;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       text-align: right;
       margin: 0 0 1rem;
       color: #1a1a1a;
@@ -780,14 +821,16 @@ html[data-theme="dark"] .badge {
   }
 
   .qd-party {
-    background: #f8f8f8;
-    border-radius: 8px;
+    background: #fff;
+    border-radius: 10px;
     padding: 1.5rem 1.8rem;
-    border-left: 3px solid #d0d0d0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-left: 3px solid rgba(0,0,0,0.35);
 
     &--client {
       border-left-color: $primaryColor;
-      background: rgba($primaryColor, 0.04);
+      background: rgba($primaryColor, 0.03);
+      border-color: rgba($primaryColor, 0.18);
     }
 
     &__role {
@@ -823,7 +866,7 @@ html[data-theme="dark"] .badge {
   // ── HORIZONTAL RULE ─────────────────────────────────────────────────
   .qd-rule {
     border: none;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid rgba(0,0,0,0.12);
     margin: 0 0 3rem;
   }
 
@@ -832,17 +875,28 @@ html[data-theme="dark"] .badge {
     margin-bottom: 3.5rem;
 
     &__heading {
-      display: flex;
+      display: grid;
+      grid-template-columns: 2.8rem 1fr;
       align-items: center;
-      gap: 1rem;
+      column-gap: 1rem;
       font-size: 1.55rem;
       font-weight: $bold;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.14em;
       color: #1a1a1a;
-      border-bottom: 2px solid $primaryColor;
-      padding-bottom: 0.5rem;
+      padding-bottom: 0.6rem;
       margin: 0 0 1.8rem;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: rgba(0,0,0,0.14);
+      }
     }
 
     &--sign {
@@ -869,7 +923,7 @@ html[data-theme="dark"] .badge {
     font-size: 1.4rem;
     font-weight: $semiBold;
     color: #444;
-    margin: 1.8rem 0 1rem;
+    margin: 3rem 0 1rem;
     padding-left: 0.8rem;
     border-left: 3px solid $primaryColor;
   }
@@ -897,16 +951,18 @@ html[data-theme="dark"] .badge {
   // ── TABLES ──────────────────────────────────────────────────────────
   .qd-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 1.4rem;
     margin-bottom: 1.5rem;
 
     th {
-      background: #f2f2f2;
+      background: rgba(0,0,0,0.03);
       font-weight: $semiBold;
       text-align: left;
       padding: 0.7rem 1rem;
-      border: 1px solid #e0e0e0;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
       color: #444;
       font-size: 1.25rem;
       text-transform: uppercase;
@@ -915,13 +971,14 @@ html[data-theme="dark"] .badge {
 
     td {
       padding: 0.7rem 1rem;
-      border: 1px solid #e8e8e8;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
       vertical-align: top;
       color: #1a1a1a;
     }
 
     tbody tr:nth-child(even) td {
-      background: #fafafa;
+      background: rgba(0,0,0,0.015);
     }
 
     &__col-num {
@@ -947,14 +1004,15 @@ html[data-theme="dark"] .badge {
 
     &__total-row {
       td {
-        background: #f0f4ff;
-        border-top: 2px solid $primaryColor;
+        background: rgba($primaryColor, 0.06);
+        border-bottom-color: rgba($primaryColor, 0.18);
+        border-top: 1px solid rgba($primaryColor, 0.45);
         font-weight: $semiBold;
       }
     }
 
     &__note-row td {
-      background: #fafafa;
+      background: rgba(0,0,0,0.015);
       color: #666;
       font-size: 1.3rem;
       font-style: italic;
@@ -972,6 +1030,175 @@ html[data-theme="dark"] .badge {
       color: #333;
       white-space: nowrap;
     }
+
+    // Premium minimal: cost table becomes card list on screen
+    &--cost {
+      thead {
+        border: 0;
+      }
+
+      @media screen {
+        thead { display: none; }
+
+        tbody {
+          display: grid;
+          gap: 0.9rem;
+        }
+
+        tbody tr {
+          display: grid;
+          grid-template-columns: 1fr 180px;
+          grid-auto-rows: minmax(0, auto);
+          gap: 0.55rem 1.2rem;
+          padding: 1.05rem 1.1rem;
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.08);
+          border-radius: 14px;
+        }
+
+        tbody tr:nth-child(even) td { background: transparent; }
+
+        tbody td {
+          border: 0;
+          padding: 0;
+        }
+
+        tbody td::before {
+          content: attr(data-label);
+          display: block;
+          font-size: 1.05rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(0,0,0,0.52);
+          font-weight: $extraBold;
+          margin-bottom: 0.25rem;
+        }
+
+        tbody td.qd-table__col-num {
+          grid-column: 1 / -1;
+          display: none;
+        }
+
+        tbody td:nth-child(2) {
+          grid-column: 1 / 2;
+          font-weight: $extraBold;
+          font-size: 1.45rem;
+        }
+
+        tbody td.qd-table__col-price,
+        tbody td.qd-table__col-qty {
+          grid-column: 2 / 3;
+          text-align: right;
+        }
+      }
+
+      @media (max-width: 640px) {
+        @media screen {
+          tbody tr {
+            grid-template-columns: 1fr;
+          }
+          tbody td.qd-table__col-price,
+          tbody td.qd-table__col-qty {
+            grid-column: auto;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+
+  // ── STEP-BY-STEP FLOW (Timeline cards) ───────────────────────────────
+  .qd-flow {
+    list-style: none;
+    padding: 0;
+    margin: 1.2rem 0 0;
+    position: relative;
+  }
+
+  .qd-flow__item {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    column-gap: 1.2rem;
+    align-items: start;
+    position: relative;
+    padding-bottom: 1.4rem;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 18px;
+      bottom: 0;
+      width: 1px;
+      background: rgba(0,0,0,0.12);
+    }
+
+    &:last-child::before {
+      display: none;
+    }
+  }
+
+  .qd-flow__node {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid rgba($primaryColor, 0.8);
+    margin-top: 2px;
+    box-shadow: 0 0 0 4px rgba($primaryColor, 0.08);
+  }
+
+  .qd-flow__card {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    background: #fff;
+    padding: 1.1rem 1.2rem 1rem;
+  }
+
+  .qd-flow__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 0.6rem;
+  }
+
+  .qd-flow__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    font-weight: $semiBold;
+    font-size: 1.35rem;
+    color: #1a1a1a;
+  }
+
+  .qd-flow__index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 8px;
+    background: rgba($primaryColor, 0.08);
+    border: 1px solid rgba($primaryColor, 0.18);
+    color: $primaryColor;
+    font-weight: $extraBold;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qd-flow__meta {
+    font-size: 1.2rem;
+    color: rgba(0,0,0,0.55);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .qd-flow__body {
+    color: #2a2a2a;
   }
 
   // ── AMOUNTS ─────────────────────────────────────────────────────────
@@ -1017,43 +1244,107 @@ html[data-theme="dark"] .badge {
   .qd-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.55rem;
   }
 
   .qd-tag {
     display: inline-block;
-    padding: 0.3rem 0.9rem;
+    padding: 0.38rem 0.95rem;
     border-radius: 100px;
     font-size: 1.2rem;
-    font-weight: $medium;
-    background: rgba($primaryColor, 0.08);
-    color: $primaryColor;
-    border: 1px solid rgba($primaryColor, 0.2);
+    font-weight: $semiBold;
+    letter-spacing: 0.01em;
+    background: rgba(0,0,0,0.03);
+    color: rgba(0,0,0,0.78);
+    border: 1px solid rgba(0,0,0,0.12);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 
     &--platform {
-      background: rgba($primaryColor, 0.15);
+      background: rgba($primaryColor, 0.12);
+      border-color: rgba($primaryColor, 0.28);
+      color: $primaryColor;
+      font-weight: $extraBold;
+    }
+
+    &--builder {
+      background: rgba(0,0,0,0.02);
+      border-style: dashed;
+      border-color: rgba(0,0,0,0.18);
+      color: rgba(0,0,0,0.68);
       font-weight: $semiBold;
     }
 
-    &--builder { background: #f0f0f0; color: #555; border-color: #d0d0d0; }
-    &--custom   { background: #fff8e1; color: #796000; border-color: #f0d050; }
+    &--custom {
+      background: rgba(234,179,8,0.12);
+      border-color: rgba(234,179,8,0.35);
+      color: #7a5b00;
+      font-weight: $semiBold;
+    }
   }
 
   // ── FEATURE GRID ────────────────────────────────────────────────────
-  .qd-feature-grid { display: flex; flex-direction: column; gap: 1rem; }
+  .qd-feature-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
 
   .qd-feature-group {
     display: flex;
     align-items: flex-start;
-    gap: 1.2rem;
+    gap: 1.1rem;
+    padding: 0.25rem 0;
 
     &__label {
       min-width: 10rem;
-      font-size: 1.3rem;
-      font-weight: $semiBold;
-      color: #555;
-      padding-top: 0.3rem;
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: $primaryColor;
     }
+  }
+
+  // ── BRAND COLOR PALETTE ──────────────────────────────────────────────
+  .qd-color-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding-top: 0.25rem;
+  }
+
+  .qd-color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.75);
+    white-space: nowrap;
+  }
+
+  .qd-color-chip__swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.16);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+    flex-shrink: 0;
+  }
+
+  .qd-color-chip__code {
+    font-weight: $extraBold;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 1.15rem;
+    color: rgba(0,0,0,0.78);
+  }
+
+  .qd-color-chip__label {
+    font-size: 1.15rem;
+    color: rgba(0,0,0,0.55);
+    font-weight: $semiBold;
   }
 
   // ── TIMELINE SUMMARY CHIPS ──────────────────────────────────────────
@@ -1100,6 +1391,118 @@ html[data-theme="dark"] .badge {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+  }
+
+  // ── CTA (Document end) ───────────────────────────────────────────────
+  .qd-cta {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.4rem 1.6rem;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.015);
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .qd-cta__title {
+    font-size: 1.55rem;
+    font-weight: $extraBold;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.01em;
+  }
+
+  .qd-cta__desc {
+    margin: 0;
+    color: rgba(0,0,0,0.62);
+    font-size: 1.35rem;
+    line-height: 1.65;
+  }
+
+  .qd-cta__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.2rem;
+    margin-top: 1rem;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .qd-cta__meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .qd-cta__meta-label {
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.52);
+    font-weight: $extraBold;
+  }
+
+  .qd-cta__meta-value {
+    font-size: 1.35rem;
+    color: $primaryColor;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  .qd-cta__actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
+
+  .qd-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.16);
+    background: #fff;
+    color: #1a1a1a;
+    font-weight: $extraBold;
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+  }
+
+  .qd-btn--ghost {
+    background: transparent;
+    border-color: rgba(0,0,0,0.18);
+  }
+
+  .qd-btn--primary {
+    background: $primaryColor;
+    border-color: rgba($primaryColor, 0.35);
+    color: #fff;
+
+    &:hover { filter: brightness(1.05); }
   }
 
   // ── MAINTENANCE ──────────────────────────────────────────────────────
@@ -1150,7 +1553,21 @@ html[data-theme="dark"] .badge {
     }
 
     .qd-header { break-after: avoid; }
-    .qd-section { break-inside: avoid; }
+
+    .qd-metric,
+    .qd-flow__item,
+    .qd-flow__card,
+    .qd-cta {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .qd-btn { display: none !important; }
+
+    .qd-metric,
+    .qd-flow__card {
+      box-shadow: none !important;
+    }
   }
 
   // Ẩn WordPress header/footer khi in trang project

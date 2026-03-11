@@ -60,9 +60,51 @@ class Project extends \App\Abstracts\AbstractPostType
         add_filter('carbon_fields_post_meta_value_load', [$this, 'formatCurrencyOnLoad'], 11, 4);
         add_action('admin_footer', [$this, 'addCurrencyFormatterScript']);
 
+        // Chuẩn hoá mã màu HEX cho brand_colors (tự thêm #, UPPERCASE)
+        add_filter('carbon_fields_post_meta_value_save', [$this, 'normalizeBrandColorsOnSave'], 12, 4);
+        add_filter('carbon_fields_post_meta_value_load', [$this, 'normalizeBrandColorsOnLoad'], 12, 4);
+
         // Tự động tính toán Payment Status
         // Priority 9999: đảm bảo chạy SAU KHI Carbon Fields đã lưu xong tất cả meta
         add_action('save_post_project', [$this, 'autoCalculatePaymentStatus'], 9999, 2);
+    }
+
+    private function normalizeHexColor(string $hex): string
+    {
+        $hex = trim($hex);
+        if ($hex === '') {
+            return '';
+        }
+
+        if ($hex[0] !== '#') {
+            $hex = '#' . $hex;
+        }
+
+        $hex = strtoupper($hex);
+        if (!preg_match('/^#([0-9A-F]{3}|[0-9A-F]{6})$/', $hex)) {
+            return '';
+        }
+
+        return $hex;
+    }
+
+    public function normalizeBrandColorsOnSave($value, $id, $name, $field)
+    {
+        if (strpos((string) $name, '_brand_colors|hex|') !== false) {
+            return $this->normalizeHexColor((string) $value);
+        }
+
+        return $value;
+    }
+
+    public function normalizeBrandColorsOnLoad($value, $id, $name, $field)
+    {
+        if (strpos((string) $name, '_brand_colors|hex|') !== false) {
+            $normalized = $this->normalizeHexColor((string) $value);
+            return $normalized !== '' ? $normalized : $value;
+        }
+
+        return $value;
     }
 
     public function encryptPasswordsOnSave($value, $name, $id, $type)
@@ -467,6 +509,22 @@ class Project extends \App\Abstracts\AbstractPostType
             Field::make('text', 'demo_design_url', __('URL web mẫu / Link Figma', 'laca'))
                 ->set_attribute('placeholder', 'https://'),
 
+            Field::make('separator', 'sep_brand_colors', __('Màu sắc chủ đạo', 'laca')),
+
+            Field::make('complex', 'brand_colors', __('Tối đa 3 màu', 'laca'))
+                ->set_max(3)
+                ->setup_labels([
+                    'plural_name'   => 'Màu',
+                    'singular_name' => 'Màu',
+                ])
+                ->add_fields([
+                    Field::make('color', 'hex', __('Mã màu (HEX)', 'laca'))
+                        ->set_help_text('Ví dụ: #0F172A'),
+                    Field::make('text', 'label', __('Ghi chú (tuỳ chọn)', 'laca'))
+                        ->set_attribute('placeholder', 'Primary / Accent / Background...'),
+                ])
+                ->set_header_template('<% if (hex) { %><%-hex%><% } else { %>Màu mới<% } %>'),
+
             Field::make('multiselect', 'platform', __('Nền tảng (Platform)', 'laca'))
                 ->set_width(50)
                 ->add_options([
@@ -683,12 +741,16 @@ class Project extends \App\Abstracts\AbstractPostType
     {
         check_ajax_referer('laca_project_manager', 'nonce');
 
-        if (!current_user_can('edit_posts')) {
-            wp_send_json_error(['message' => 'Không có quyền'], 403);
-        }
-
         $alertId   = absint($_POST['alert_id'] ?? 0);
         $projectId = absint($_POST['project_id'] ?? 0);
+
+        if (!$projectId || get_post_type($projectId) !== 'project') {
+            wp_send_json_error(['message' => 'Project không hợp lệ'], 400);
+        }
+
+        if (!current_user_can('edit_post', $projectId)) {
+            wp_send_json_error(['message' => 'Không có quyền'], 403);
+        }
 
         if (!$alertId) {
             wp_send_json_error(['message' => 'Thiếu alert_id']);
@@ -706,12 +768,20 @@ class Project extends \App\Abstracts\AbstractPostType
     {
         check_ajax_referer('laca_project_manager', 'nonce');
 
-        if (!current_user_can('edit_posts')) {
+        $logId     = absint($_POST['log_id'] ?? 0);
+        $projectId = absint($_POST['project_id'] ?? 0);
+
+        if (!$projectId || get_post_type($projectId) !== 'project') {
+            wp_send_json_error(['message' => 'Project không hợp lệ'], 400);
+        }
+
+        if (!current_user_can('edit_post', $projectId)) {
             wp_send_json_error(['message' => 'Không có quyền'], 403);
         }
 
-        $logId     = absint($_POST['log_id'] ?? 0);
-        $projectId = absint($_POST['project_id'] ?? 0);
+        if (!$logId) {
+            wp_send_json_error(['message' => 'Thiếu log_id'], 400);
+        }
 
         $result = ProjectLog::delete($logId, $projectId);
         if ($result) {
@@ -725,15 +795,19 @@ class Project extends \App\Abstracts\AbstractPostType
     {
         check_ajax_referer('laca_project_manager', 'nonce');
 
-        if (!current_user_can('edit_posts')) {
-            wp_send_json_error(['message' => 'Không có quyền'], 403);
-        }
-
         $projectId = absint($_POST['project_id'] ?? 0);
         $content   = sanitize_textarea_field($_POST['log_content'] ?? '');
         $type      = sanitize_key($_POST['log_type'] ?? 'note');
 
-        if (!$projectId || !$content) {
+        if (!$projectId || get_post_type($projectId) !== 'project') {
+            wp_send_json_error(['message' => 'Project không hợp lệ'], 400);
+        }
+
+        if (!current_user_can('edit_post', $projectId)) {
+            wp_send_json_error(['message' => 'Không có quyền'], 403);
+        }
+
+        if (!$content) {
             wp_send_json_error(['message' => 'Vui lòng nhập nội dung']);
         }
 
@@ -754,16 +828,20 @@ class Project extends \App\Abstracts\AbstractPostType
     {
         check_ajax_referer('laca_project_manager', 'nonce');
 
-        if (!current_user_can('edit_posts')) {
-            wp_send_json_error(['message' => 'Không có quyền'], 403);
-        }
-
         $projectId = absint($_POST['project_id'] ?? 0);
         $msg       = sanitize_textarea_field($_POST['alert_msg'] ?? '');
         $type      = sanitize_key($_POST['alert_type'] ?? 'other');
         $level     = sanitize_key($_POST['alert_level'] ?? 'info');
 
-        if (!$projectId || !$msg) {
+        if (!$projectId || get_post_type($projectId) !== 'project') {
+            wp_send_json_error(['message' => 'Project không hợp lệ'], 400);
+        }
+
+        if (!current_user_can('edit_post', $projectId)) {
+            wp_send_json_error(['message' => 'Không có quyền'], 403);
+        }
+
+        if (!$msg) {
             wp_send_json_error(['message' => 'Vui lòng nhập nội dung cảnh báo']);
         }
 
@@ -940,7 +1018,7 @@ class Project extends \App\Abstracts\AbstractPostType
     {
         // Handle normal fields
         $currencyFields = ['price_build', 'price_maintenance_yearly', 'hosting_price'];
-        if (in_array($name, $currencyFields) && !empty($value)) {
+        if (in_array($name, $currencyFields, true) && !empty($value)) {
             return preg_replace('/[^0-9]/', '', $value);
         }
         
@@ -955,7 +1033,7 @@ class Project extends \App\Abstracts\AbstractPostType
     public function formatCurrencyOnLoad($value, $id, $name, $field)
     {
         $currencyFields = ['price_build', 'price_maintenance_yearly', 'hosting_price'];
-        if (in_array($name, $currencyFields) && is_numeric($value)) {
+        if (in_array($name, $currencyFields, true) && is_numeric($value)) {
             return number_format((float)$value, 0, ',', '.');
         }
 
@@ -996,8 +1074,6 @@ class Project extends \App\Abstracts\AbstractPostType
             $totalPaid += (int) preg_replace('/[^0-9]/', '', (string) $amt);
         }
 
-        error_log("[LACA] autoCalculate post={$postId} totalBuild={$totalBuild} totalPaid={$totalPaid}");
-
         // 3. Xác định trạng thái
         $currentStatus = get_post_meta($postId, '_payment_status', true) ?: 'pending';
         $newStatus     = $currentStatus;
@@ -1021,8 +1097,116 @@ class Project extends \App\Abstracts\AbstractPostType
     public function addCurrencyFormatterScript()
     {
         $screen = get_current_screen();
-        if ($screen && $screen->id === 'project') {
-            // JS moved to JS build pipeline
+        if (!$screen || $screen->id !== 'project') {
+            return;
         }
+        ?>
+        <script>
+        (function () {
+            'use strict';
+
+            /**
+             * Chuyển chuỗi tiền tệ ("5.500.000" hoặc "5,500,000") thành số nguyên.
+             */
+            function parseCurrency(str) {
+                if (!str) return 0;
+                return parseInt(str.toString().replace(/[^0-9]/g, ''), 10) || 0;
+            }
+
+            /**
+             * Tính và cập nhật payment_status dropdown dựa vào giá trị hiện tại
+             * của price_build và tất cả pay_amount trong complex field.
+             */
+            function recalcPaymentStatus() {
+                // CF input names (stable):
+                // - carbon_fields_compact_input[_price_build]
+                // - carbon_fields_compact_input[_payment_history][0][pay_amount], ...
+                var buildInput = document.querySelector('input[name="carbon_fields_compact_input[_price_build]"]');
+                if (!buildInput) return;
+
+                var totalBuild = parseCurrency(buildInput.value);
+
+                // Chỉ lấy pay_amount thuộc payment_history để tránh cộng nhầm field khác.
+                var payAmountInputs = document.querySelectorAll(
+                    'input[name^="carbon_fields_compact_input[_payment_history]"][name$="[pay_amount]"]'
+                );
+
+                var totalPaid = 0;
+                payAmountInputs.forEach(function (input) {
+                    totalPaid += parseCurrency(input.value);
+                });
+
+                // Xác định status mới
+                var newStatus;
+                if (totalBuild <= 0) {
+                    return; // Chưa có giá build → không can thiệp
+                } else if (totalPaid <= 0) {
+                    newStatus = 'pending';
+                } else if (totalPaid < totalBuild) {
+                    newStatus = 'partial';
+                } else {
+                    newStatus = 'paid';
+                }
+
+                // CF select: name="carbon_fields_compact_input[_payment_status]"
+                var statusSelect = document.querySelector('select[name="carbon_fields_compact_input[_payment_status]"]');
+                if (statusSelect && statusSelect.value !== newStatus) {
+                    // CF dùng React controlled component → set .value trực tiếp bị React reset.
+                    // Phải dùng native setter để bypass React reconciliation.
+                    var nativeSetter = Object.getOwnPropertyDescriptor(
+                        window.HTMLSelectElement.prototype, 'value'
+                    ).set;
+                    nativeSetter.call(statusSelect, newStatus);
+
+                    // Dispatch input + change để React nhận biết và cập nhật state
+                    statusSelect.dispatchEvent(new Event('input',  { bubbles: true }));
+                    statusSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            /**
+             * Gắn event listeners cho tất cả inputs liên quan.
+             * Dùng MutationObserver để bắt khi complex field thêm/xóa row.
+             */
+            function attachListeners() {
+                var container = document.querySelector('.cf-container, #post-body, #cf-container');
+                if (!container) container = document.body;
+
+                // Lắng nghe input/change trên toàn bộ container (event delegation)
+                container.addEventListener('input', function (e) {
+                    var name = e.target.name || '';
+                    var isRelevant = (
+                        name.indexOf('price_build') !== -1 ||
+                        name.indexOf('pay_amount') !== -1
+                    );
+                    if (isRelevant) {
+                        recalcPaymentStatus();
+                    }
+                });
+
+                // Debounce: tránh recalc quá nhiều khi CF đang render nhiều DOM node
+                var debounceTimer;
+                function debouncedRecalc() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(recalcPaymentStatus, 200);
+                }
+
+                // Xử lý khi complex field thêm/xóa row
+                var observer = new MutationObserver(debouncedRecalc);
+                observer.observe(container, { childList: true, subtree: true });
+
+                // Chạy lần đầu sau khi CF load xong (CF dùng React/Vue nên cần delay nhỏ)
+                setTimeout(recalcPaymentStatus, 800);
+            }
+
+            // Khởi động sau khi DOM sẵn sàng
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', attachListeners);
+            } else {
+                attachListeners();
+            }
+        })();
+        </script>
+        <?php
     }
 }
