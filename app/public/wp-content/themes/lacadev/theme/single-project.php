@@ -48,6 +48,8 @@
 		// --- Finance ---
 		$priceBuild       = carbon_get_post_meta($postId, 'price_build');
 		$priceMaintenance = carbon_get_post_meta($postId, 'price_maintenance_yearly');
+		$domainPrice      = carbon_get_post_meta($postId, 'domain_price');
+		$hostingPrice     = carbon_get_post_meta($postId, 'hosting_price');
 		$paymentHistory   = carbon_get_post_meta($postId, 'payment_history');
 		$paymentStatus    = carbon_get_post_meta($postId, 'payment_status');
 
@@ -534,10 +536,23 @@
 									?>
 								</td>
 							</tr>
+
 							<?php if ($priceMaintenance) : ?>
 								<tr class="qd-table__note-row">
 									<td colspan="4"><?php echo esc_html__('Phí bảo trì hàng năm (sau bàn giao)', 'laca'); ?></td>
 									<td class="qd-table__col-price qd-amount"><?php echo esc_html($priceMaintenance); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></td>
+								</tr>
+							<?php endif; ?>
+							<?php if ($domainPrice) : ?>
+								<tr class="qd-table__note-row">
+									<td colspan="4"><?php echo esc_html__('Gia hạn domain / năm', 'laca'); ?></td>
+									<td class="qd-table__col-price qd-amount"><?php echo esc_html($domainPrice); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></td>
+								</tr>
+							<?php endif; ?>
+							<?php if ($hostingPrice) : ?>
+								<tr class="qd-table__note-row">
+									<td colspan="4"><?php echo esc_html__('Gia hạn hosting / năm', 'laca'); ?></td>
+									<td class="qd-table__col-price qd-amount"><?php echo esc_html($hostingPrice); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></td>
 								</tr>
 							<?php endif; ?>
 						</tfoot>
@@ -553,6 +568,18 @@
 					<div class="qd-price-summary qd-price-summary--muted">
 						<span class="qd-price-summary__label"><?php echo esc_html__('Phí bảo trì hàng năm', 'laca'); ?></span>
 						<span class="qd-price-summary__value"><?php echo esc_html($priceMaintenance); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ($domainPrice) : ?>
+					<div class="qd-price-summary qd-price-summary--muted">
+						<span class="qd-price-summary__label"><?php echo esc_html__('Gia hạn domain / năm', 'laca'); ?></span>
+						<span class="qd-price-summary__value"><?php echo esc_html($domainPrice); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></span>
+					</div>
+				<?php endif; ?>
+				<?php if ($hostingPrice) : ?>
+					<div class="qd-price-summary qd-price-summary--muted">
+						<span class="qd-price-summary__label"><?php echo esc_html__('Gia hạn hosting / năm', 'laca'); ?></span>
+						<span class="qd-price-summary__value"><?php echo esc_html($hostingPrice); ?> <?php echo esc_html__('đ/năm', 'laca'); ?></span>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
