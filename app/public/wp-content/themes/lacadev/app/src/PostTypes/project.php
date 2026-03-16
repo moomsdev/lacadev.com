@@ -15,6 +15,7 @@ class Project extends \App\Abstracts\AbstractPostType
         $this->showThumbnailOnList = true;
         $this->supports            = [
             'title',
+            'editor',
             'thumbnail',
         ];
 
@@ -389,8 +390,18 @@ class Project extends \App\Abstracts\AbstractPostType
                 ->set_width(33.33)
                 ->set_attribute('placeholder', 'example.com'),
 
-            Field::make('text', 'domain_registrar', __('Nhà đăng ký', 'laca'))
+
+            Field::make('text', 'domain_price', __('Giá gia hạn / năm', 'laca'))
                 ->set_width(33.33)
+                ->set_attribute('data-type', 'currency')
+                ->set_attribute('placeholder', '500.000'),
+
+            Field::make('date', 'domain_expiry', __('📅 Ngày hết hạn Domain', 'laca'))
+                ->set_width(33.33)
+                ->set_storage_format('Y-m-d'),
+
+            Field::make('text', 'domain_registrar', __('Nhà đăng ký', 'laca'))
+                ->set_width(50)
                 ->set_attribute('placeholder', 'GoDaddy / NameSilo / PA Vietnam...'),
 
             Field::make('text', 'domain_username', __('Tài khoản đăng nhập', 'laca'))
@@ -402,10 +413,6 @@ class Project extends \App\Abstracts\AbstractPostType
                 ->set_attribute('placeholder', '••••••••')
                 ->set_attribute('type', 'password')
                 ->set_classes('laca-password-input'),
-
-            Field::make('date', 'domain_expiry', __('📅 Ngày hết hạn Domain', 'laca'))
-                ->set_width(50)
-                ->set_storage_format('Y-m-d'),
 
             Field::make('text', 'domain_notify_days', __('Cảnh báo trước (ngày)', 'laca'))
                 ->set_width(50)
@@ -1017,7 +1024,7 @@ class Project extends \App\Abstracts\AbstractPostType
     public function formatCurrencyOnSave($value, $id, $name, $field)
     {
         // Handle normal fields
-        $currencyFields = ['price_build', 'price_maintenance_yearly', 'hosting_price'];
+        $currencyFields = ['price_build', 'price_maintenance_yearly', 'domain_price', 'hosting_price'];
         if (in_array($name, $currencyFields, true) && !empty($value)) {
             return preg_replace('/[^0-9]/', '', $value);
         }
@@ -1032,7 +1039,7 @@ class Project extends \App\Abstracts\AbstractPostType
 
     public function formatCurrencyOnLoad($value, $id, $name, $field)
     {
-        $currencyFields = ['price_build', 'price_maintenance_yearly', 'hosting_price'];
+        $currencyFields = ['price_build', 'price_maintenance_yearly', 'domain_price', 'hosting_price'];
         if (in_array($name, $currencyFields, true) && is_numeric($value)) {
             return number_format((float)$value, 0, ',', '.');
         }
