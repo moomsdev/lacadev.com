@@ -97,44 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Xoá Log
-        jQuery('.delete-log').on('click', function(e) {
-            e.preventDefault();
-            const $btn = jQuery(this);
-            const logId = $btn.data('id');
-
-            confirmAction('Xóa log này? Thao tác không thể hoàn tác.').then((ok) => {
-                if (!ok) return;
-
-                $btn.addClass('disabled').css({ pointerEvents: 'none', opacity: 0.6 });
-                ajaxRequest('laca_delete_log', { log_id: logId }, function(res){
-                    toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã xoá');
-                    const $item = jQuery('#log-' + logId);
-                    if ($item.length) $item.slideUp(160, () => $item.remove());
-                }, function(){
-                    $btn.removeClass('disabled').css({ pointerEvents: '', opacity: '' });
-                });
-            });
-        });
-
-        // Thêm Log
-        jQuery('#btn_add_log').on('click', function(e) {
-            e.preventDefault();
-            var btn = jQuery(this);
-            btn.prop('disabled', true).text('Đang lưu...');
-            ajaxRequest('laca_add_log', {
-                log_type: jQuery('#new_log_type').val(),
-                log_content: jQuery('#new_log_msg').val()
-            }, function(res){
-                toastSuccess((res && res.data && res.data.message) ? res.data.message : 'Đã thêm log thành công');
-                btn.prop('disabled', false).text('Lưu nhật ký');
-                jQuery('#new_log_msg').val('');
-                // Hiện tại API không trả về ID/log HTML → reload để đồng bộ danh sách.
-                location.reload();
-            }, function(){
-                btn.prop('disabled', false).text('Lưu nhật ký');
-            });
-        });
 
         // Thêm Alert
         jQuery('#btn_add_alert').on('click', function(e) {
@@ -155,6 +117,162 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.prop('disabled', false).text('Gửi cảnh báo');
             });
         });
+
+        // ---- TASK CHECKLIST ----
+
+        function updateProgress(tasks) {
+            const total = tasks.length;
+            const done  = tasks.filter(t => t.done).length;
+            const pct   = total > 0 ? Math.round(done / total * 100) : 0;
+            const label = document.getElementById('task_progress_label');
+            const bar   = document.getElementById('task_progress_bar');
+            const pctEl = document.getElementById('task_progress_pct');
+            if (label) label.textContent = `${done}/${total} task hoàn thành`;
+            if (pctEl)  pctEl.textContent  = `${pct}%`;
+            if (bar)    bar.style.width     = `${pct}%`;
+        }
+
+        const categoryIcon = {
+            bug:     '🐛',
+            page:    '🖼️',
+            content: '📝',
+            seo:     '🔍',
+            feature: '⭐',
+            other:   '📌',
+        };
+
+        function buildTaskRow(task) {
+            const cat      = task.category || (task.source === 'page' ? 'page' : 'other');
+            const icon     = categoryIcon[cat] || '📌';
+            const demoLink = task.demo_url ? `<a href="${task.demo_url}" target="_blank" style="font-size:11px;color:#0073aa;margin-left:6px;" title="Mẫu giao diện">↗ mẫu</a>` : '';
+            const row = document.createElement('div');
+            row.className = `laca-task-item ${task.done ? 'task-done' : ''}`;
+            row.dataset.id = task.id;
+            row.innerHTML = `
+                <input type="checkbox" class="task-checkbox" data-id="${task.id}" ${task.done ? 'checked' : ''}>
+                <div style="flex:1;min-width:0;">
+                    <span class="task-name">${icon} ${task.name}</span>${demoLink}
+                </div>
+                <a class="task-delete-btn" data-id="${task.id}" title="Xoá task">✕</a>
+            `;
+            return row;
+        }
+
+        // Helper: rebuild logs list từ response
+        function renderLogs(logs) {
+            const $list = jQuery('.laca-pm-col .laca-pm-list').last();
+            if (!$list.length || !logs) return;
+            if (!logs.length) {
+                $list.html('<p style="color:#888;">Chưa có nhật ký nào.</p>');
+                return;
+            }
+            $list.empty();
+            logs.forEach(l => {
+                const typeLabels = {
+                    note: '📝 Ghi chú', task_done: '✅ Hoàn thành task',
+                    bug_fix: '🐛 Sửa lỗi', client_request: '👤 Yêu cầu',
+                    deployment: '🚀 Deploy', theme_switch: '🎨 Thiết kế',
+                };
+                const label = typeLabels[l.log_type] || l.log_type;
+                const dateStr = new Date(l.log_date).toLocaleDateString('vi-VN', {day:'2-digit',month:'2-digit',year:'2-digit'});
+                $list.append(`
+                    <div class="laca-pm-item" id="log-${l.id}">
+                        <div class="laca-pm-meta">
+                            <span style="font-weight:600;color:#0073aa;">${label}${l.is_auto ? ' <span style="color:#e67e22;font-size:10px;">(Auto)</span>' : ''}</span>
+                            <span>${dateStr} bởi ${l.log_by}</span>
+                        </div>
+                        <div style="margin:6px 0;">${l.log_content.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `);
+            });
+        }
+
+        // Delegate: Toggle task
+        jQuery(document).on('change', '.task-checkbox', function() {
+            const taskId   = jQuery(this).data('id');
+            const $cb      = jQuery(this);
+            $cb.prop('disabled', true);
+            ajaxRequest('laca_toggle_task', { task_id: taskId }, function(res) {
+                $cb.prop('disabled', false);
+                updateProgress(res.data.tasks);
+                // Update visual state
+                const $row = $cb.closest('.laca-task-item');
+                const isDone = res.data.tasks.find(t => t.id === taskId)?.done;
+                $row.toggleClass('task-done', isDone);
+                $row.find('.task-name').css({ textDecoration: isDone ? 'line-through' : '', color: isDone ? '#999' : '' });
+                // Auto-refresh logs nếu server trả về (khi vừa done)
+                if (res.data.logs) renderLogs(res.data.logs);
+                toastSuccess(isDone ? '✅ Đánh dấu hoàn thành' : '↩ Đã mở lại task');
+            }, function() {
+                $cb.prop('disabled', false);
+                $cb.prop('checked', !$cb.prop('checked')); // revert
+            });
+        });
+
+        // Delegate: Delete task
+        jQuery(document).on('click', '.task-delete-btn', function(e) {
+            e.preventDefault();
+            const taskId = jQuery(this).data('id');
+            confirmAction('Xoá task này?').then((ok) => {
+                if (!ok) return;
+                ajaxRequest('laca_delete_task', { task_id: taskId }, function(res) {
+                    jQuery(`.laca-task-item[data-id="${taskId}"]`).slideUp(160, function() { jQuery(this).remove(); });
+                    updateProgress(res.data.tasks);
+                    toastSuccess('Đã xoá task');
+                });
+            });
+        });
+
+        // Add task manually
+        jQuery('#btn_add_task').on('click', function(e) {
+            e.preventDefault();
+            const name     = jQuery('#new_task_name').val().trim();
+            const category = jQuery('#new_task_category').val() || 'other';
+            if (!name) { toastError('Vui lòng nhập tên task'); return; }
+            const $btn = jQuery(this);
+            $btn.prop('disabled', true).text('Đang thêm...');
+            ajaxRequest('laca_add_task', { task_name: name, task_category: category }, function(res) {
+                $btn.prop('disabled', false).text('+ Thêm');
+                jQuery('#new_task_name').val('');
+                const $container = jQuery('#task_list_container');
+                // Remove empty placeholder
+                $container.find('p').remove();
+                const row = buildTaskRow(res.data.task);
+                $container.append(row);
+                toastSuccess('Đã thêm task');
+            }, function() {
+                $btn.prop('disabled', false).text('+ Thêm');
+            });
+        });
+
+        // Sync pages from design_pages
+        jQuery('#btn_sync_pages').on('click', function(e) {
+            e.preventDefault();
+            const $btn = jQuery(this);
+            $btn.prop('disabled', true).text('Đang sync...');
+            ajaxRequest('laca_sync_pages', {}, function(res) {
+                $btn.prop('disabled', false).text('🔄 Sync trang');
+                toastSuccess(res.data.message || 'Đã sync xong');
+                // Rebuild task list
+                const $container = jQuery('#task_list_container');
+                $container.empty();
+                if (res.data.tasks && res.data.tasks.length) {
+                    res.data.tasks.forEach(t => $container.append(buildTaskRow(t)));
+                } else {
+                    $container.html('<p style="color:#888;font-size:13px;">Chưa có task nào.</p>');
+                }
+                updateProgress(res.data.tasks || []);
+            }, function() {
+                $btn.prop('disabled', false).text('🔄 Sync trang');
+            });
+        });
+
+        // Enter key in task input
+        jQuery('#new_task_name').on('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); jQuery('#btn_add_task').trigger('click'); }
+        });
+
+        // ---- END TASK CHECKLIST ----
 
         // Lấy mã Auto Tracker và Download
         jQuery('#btn_download_tracker, #btn_view_tracker_code').on('click', function(e) {

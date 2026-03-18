@@ -69,6 +69,41 @@ class AITranslationHandler
         return new \WP_Error('invalid_provider', 'Bộ xử lý không hợp lệ.');
     }
 
+    /**
+     * General-purpose chat method (used by AIChatHandler).
+     * System prompt is built externally; this method just calls the provider.
+     *
+     * @param string $message       The user's message.
+     * @param string $system_prompt The full system prompt.
+     * @return string|\WP_Error
+     */
+    public function chat(string $message, string $system_prompt = '')
+    {
+        if (empty($message)) {
+            return '';
+        }
+
+        $provider = $this->getAvailableProvider();
+        if (! $provider) {
+            return new \WP_Error('no_ai_key', 'Chưa có API Key nào được cấu hình. Vào Laca Admin > AI Translation để cài đặt.');
+        }
+
+        switch ($provider) {
+            case 'gemini':
+                return $this->callGemini($message, $system_prompt);
+            case 'groq':
+                return $this->callGroq($message, $system_prompt);
+            case 'deepseek':
+                return $this->callDeepSeek($message, $system_prompt);
+            case 'openai':
+                return $this->callOpenAI($message, $system_prompt);
+            case 'anthropic':
+                return $this->callAnthropic($message, $system_prompt);
+        }
+
+        return new \WP_Error('invalid_provider', 'Provider không hợp lệ.');
+    }
+
     private function getAvailableProvider()
     {
         // Try default first
@@ -139,17 +174,18 @@ class AITranslationHandler
         $url = 'https://api.groq.com/openai/v1/chat/completions';
         
         $body = [
-            'model' => 'llama-3.1-8b-instant',
+            'model' => 'llama3-8b-8192',  // model stable, không dùng llama-3.1-8b-instant (deprecated)
             'messages' => [
                 ['role' => 'system', 'content' => $system_prompt],
                 ['role' => 'user', 'content' => $text]
             ],
-            'temperature' => 0.1
+            'temperature' => 0.7,
+            'max_tokens'  => 1024,
         ];
 
         $response = wp_remote_post($url, [
             'headers' => [
-                'Content-Type' => 'application/json',
+                'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . $this->groq_key
             ],
             'body'    => json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -158,7 +194,19 @@ class AITranslationHandler
 
         if (is_wp_error($response)) return $response;
 
-        $data = json_decode(wp_remote_retrieve_body($response), true);
+        $http_code   = wp_remote_retrieve_response_code($response);
+        $raw_body    = wp_remote_retrieve_body($response);
+        $data        = json_decode($raw_body, true);
+
+        // Log raw response để debug (xoá sau khi fix xong)
+        error_log('[callGroq] HTTP ' . $http_code . ' | body: ' . substr($raw_body, 0, 500));
+
+        // Groq trả về error JSON khi HTTP != 200
+        if ($http_code !== 200) {
+            $err_msg = $data['error']['message'] ?? ('Groq API error: HTTP ' . $http_code);
+            return new \WP_Error('groq_api_error', $err_msg);
+        }
+
         return trim($data['choices'][0]['message']['content'] ?? '');
     }
 
