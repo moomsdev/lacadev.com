@@ -67,6 +67,16 @@ add_filter('login_message', 'app_login_google_admin_message');
 add_action('carbon_fields_register_fields', 'app_bootstrap_carbon_fields_register_fields');
 
 /**
+ * Theme Updater — tự động check & nhận update từ lacadev.com
+ * Chỉ chạy ở admin để tiết kiệm tài nguyên frontend
+ */
+if (is_admin()) {
+    add_action('init', static function () {
+        new \App\Settings\ThemeUpdater();
+    });
+}
+
+/**
  * Pages/Posts list table: Add Thumbnail column
  */
 function app_add_featured_image_column($cols) {
