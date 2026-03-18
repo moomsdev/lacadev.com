@@ -170,6 +170,79 @@ function app_action_admin_enqueue_assets()
         'setFeaturedImage' => __('Set featured image', 'lacadev'),
     ]);
 
+    /**
+     * Localize project chart data — chỉ inject trên trang Dashboard (index.php).
+     * Dữ liệu được đọc từ custom post type 'project' nếu đã đăng ký.
+     */
+    $current_screen = get_current_screen();
+    if ($current_screen && $current_screen->id === 'dashboard' && post_type_exists('project')) {
+        global $wpdb;
+
+        // byStatus: đếm project theo meta _project_status (Carbon Fields)
+        $status_labels = [
+            'pending'     => '🕐 Chờ làm',
+            'in_progress' => '🔨 Đang làm',
+            'done'        => '✅ Đã xong',
+            'maintenance' => '🔧 Đang bảo trì',
+            'paused'      => '⏸️ Tạm dừng',
+        ];
+
+        $status_rows = $wpdb->get_results("
+            SELECT
+                COALESCE(pm.meta_value, 'pending') AS `key`,
+                COUNT(*) AS `count`
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$wpdb->postmeta} pm
+                ON p.ID = pm.post_id AND pm.meta_key = '_project_status'
+            WHERE p.post_type = 'project'
+              AND p.post_status NOT IN ('trash','auto-draft','inherit')
+            GROUP BY `key`
+        ");
+
+        $by_status = [];
+        foreach ($status_rows as $row) {
+            $by_status[] = [
+                'key'   => $row->key,
+                'label' => $status_labels[$row->key] ?? ucfirst($row->key),
+                'count' => (int) $row->count,
+            ];
+        }
+
+        // byMonth: đếm project tạo mới trong 12 tháng gần nhất
+        $month_rows = $wpdb->get_results("
+            SELECT
+                DATE_FORMAT(post_date, '%Y-%m') AS ym,
+                COUNT(*) AS cnt
+            FROM {$wpdb->posts}
+            WHERE post_type = 'project'
+              AND post_status NOT IN ('trash','auto-draft','inherit')
+              AND post_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            GROUP BY ym
+            ORDER BY ym ASC
+        ");
+
+        // Lấp đầy các tháng còn thiếu
+        $month_map = [];
+        foreach ($month_rows as $r) {
+            $month_map[$r->ym] = (int) $r->cnt;
+        }
+        $by_month = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $ym    = date('Y-m', strtotime("-{$i} months"));
+            $label = 'T' . (int) date('n', strtotime("-{$i} months"));
+            $by_month[] = [
+                'month' => $label,
+                'count' => $month_map[$ym] ?? 0,
+            ];
+        }
+
+        wp_localize_script('theme-admin-js-bundle', 'lacaProjectCharts', [
+            'primary'  => carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc',
+            'byStatus' => $by_status,
+            'byMonth'  => $by_month,
+        ]);
+    }
+
     // Enqueue front-end styles in admin area
     //  Assets::enqueueStyle('theme-css-bundle', $template_dir . '/dist/styles/theme.css');
 
