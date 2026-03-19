@@ -2,6 +2,7 @@
 @use "../theme/base/fonts";
 
 @use "admin-custom";
+@use "admin-column-style";
 @use "project";
 
 html :where(.wp-block) {

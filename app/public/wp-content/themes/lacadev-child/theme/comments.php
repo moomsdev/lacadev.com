@@ -86,15 +86,3 @@ if ( post_password_required() ) {
 	);
 	?>
 </section>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var form = document.querySelector('.expandable-form');
-    var commentField = document.getElementById('comment');
-    if (form && commentField) {
-        commentField.addEventListener('focus', function() {
-            form.classList.add('is-expanded');
-        });
-    }
-});
-</script>

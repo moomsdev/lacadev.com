@@ -102,9 +102,9 @@ function app_render_featured_image_column($column, $postId) {
     
     if ($thumbnailUrl) {
         // Has thumbnail - show image with remove button (same as Service)
-        echo "<div style='position:relative;display:inline-block;'>";
+        echo "<div class='thumbnail-wrap'>";
         echo "<a href='javascript:void(0)' data-trigger-change-thumbnail-id data-post-id='{$post_id_attr}' data-nonce='{$nonce_attr}'>";
-        echo "<img src='" . esc_url($thumbnailUrl) . "' style='max-width:80px;max-height:80px;display:block;' alt='Thumbnail'/>";
+        echo "<img src='" . esc_url($thumbnailUrl) . "' class='thumbnail-preview' alt='Thumbnail'/>";
         echo "</a>";
         // Remove button (X)
         echo "<a class='remove-thumbnail' href='javascript:void(0)' data-trigger-remove-thumbnail data-post-id='{$post_id_attr}' data-nonce='{$nonce_attr}' title='Remove thumbnail'>
@@ -122,5 +122,4 @@ function app_render_featured_image_column($column, $postId) {
 }
 add_action('manage_page_posts_custom_column', 'app_render_featured_image_column', 10, 2);
 add_action('manage_post_posts_custom_column', 'app_render_featured_image_column', 10, 2);
-
 
