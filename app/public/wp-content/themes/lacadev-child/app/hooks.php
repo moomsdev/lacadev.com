@@ -73,8 +73,18 @@ add_action('carbon_fields_register_fields', 'app_bootstrap_carbon_fields_registe
 if (is_admin()) {
     add_action('init', static function () {
         new \App\Settings\ThemeUpdater();
+        new \App\Widgets\BlockSyncWidget();
     });
 }
+
+/**
+ * Block Sync Receiver — REST API endpoint nhận blocks từ lacadev.com
+ * Chạy cả frontend để REST API hoạt động đúng
+ */
+add_action('init', static function () {
+    new \App\Settings\BlockSyncReceiver();
+    new \App\Settings\BlockAutoloader();
+}, 5);
 
 /**
  * Pages/Posts list table: Add Thumbnail column

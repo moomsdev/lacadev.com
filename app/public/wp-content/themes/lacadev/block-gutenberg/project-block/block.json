@@ -1,6 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
+  "version": "1.0.0",
   "name": "lacadev/project-block",
   "title": "Layout: Tabbed Grid",
   "description": "Hiển thị nội dung dạng lưới + tab theo taxonomy (chọn được Post Type + taxonomy)",
@@ -9,7 +10,11 @@
   "editorScript": "lacadev-block-project-block-editor",
   "editorStyle": "lacadev-block-project-block-editor",
   "style": "lacadev-block-project-block",
-  "keywords": ["project", "portfolio", "laca"],
+  "keywords": [
+    "project",
+    "portfolio",
+    "laca"
+  ],
   "textdomain": "laca",
   "attributes": {
     "postType": {
@@ -59,6 +64,9 @@
   },
   "supports": {
     "html": false,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   }
 }

@@ -163,3 +163,83 @@ function lacadev_register_block_category($categories, $post) {
     );
 }
 add_filter('block_categories_all', 'lacadev_register_block_category', 10, 2);
+
+/**
+ * Đăng ký các blocks đã được sync về từ lacadev server.
+ *
+ * BlockSyncReceiver ghi files vào APP_DIR/block-gutenberg/{block_name}/
+ * (APP_DIR = lacadev-child/, rùng với lacadev_register_custom_blocks() ơ trên).
+ * Hàm này chạy sau priority 10 để không xầy ra conflict với parent theme register.
+ */
+function lacadev_child_register_synced_blocks(): void
+{
+    if (!defined('APP_DIR')) {
+        return;
+    }
+
+    $childBlocksDir = rtrim(APP_DIR, '/\\') . '/block-gutenberg';
+
+    if (!is_dir($childBlocksDir)) {
+        return;
+    }
+
+    // URL tương ứng với APP_DIR - một level trên theme/ (đã có trailing slash)
+    // APP_DIR = .../lacadev-child/  nhưng cần URI tương ứng
+    // get_stylesheet_directory_uri() = .../lacadev-child/theme
+    // nên cần dirname() để lên lacadev-child/
+    $childThemeUri = dirname(get_stylesheet_directory_uri());
+
+    $entries = scandir($childBlocksDir);
+    foreach ($entries as $blockName) {
+        if ($blockName === '.' || $blockName === '..') {
+            continue;
+        }
+
+        $blockJson = "{$childBlocksDir}/{$blockName}/block.json";
+        if (!file_exists($blockJson)) {
+            continue;
+        }
+
+        $blockArgs   = [];
+        $renderPhp   = "{$childBlocksDir}/{$blockName}/render.php";
+        $hasBuild    = is_dir("{$childBlocksDir}/{$blockName}/build");
+
+        if ($hasBuild) {
+            $assetFile = "{$childBlocksDir}/{$blockName}/build/index.asset.php";
+            $asset     = file_exists($assetFile) ? require $assetFile : ['dependencies' => [], 'version' => null];
+
+            $scriptHandle = 'lacadev-synced-' . $blockName . '-editor';
+            $styleHandle  = 'lacadev-synced-' . $blockName;
+
+            $indexJs  = "{$childThemeUri}/block-gutenberg/{$blockName}/build/index.js";
+            $indexCss = "{$childThemeUri}/block-gutenberg/{$blockName}/build/index.css";
+            $styleCss = "{$childThemeUri}/block-gutenberg/{$blockName}/build/style-index.css";
+
+            wp_register_script($scriptHandle, $indexJs, $asset['dependencies'] ?? [], $asset['version'] ?? null, true);
+
+            if (file_exists("{$childBlocksDir}/{$blockName}/build/index.css")) {
+                wp_register_style($scriptHandle, $indexCss, [], $asset['version'] ?? null);
+                $blockArgs['editor_style'] = $scriptHandle;
+            }
+
+            if (file_exists("{$childBlocksDir}/{$blockName}/build/style-index.css")) {
+                wp_register_style($styleHandle, $styleCss, [], $asset['version'] ?? null);
+                $blockArgs['style'] = $styleHandle;
+            }
+
+            $blockArgs['editor_script'] = $scriptHandle;
+        }
+
+        if (file_exists($renderPhp)) {
+            $blockArgs['render_callback'] = static function ($attributes, $content) use ($renderPhp) {
+                ob_start();
+                require $renderPhp;
+                return ob_get_clean();
+            };
+        }
+
+        register_block_type_from_metadata($blockJson, $blockArgs);
+    }
+}
+add_action('init', 'lacadev_child_register_synced_blocks', 15);
+

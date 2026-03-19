@@ -876,7 +876,36 @@ class AdminSettings
 					->set_html('<i class="fa-regular fa-lightbulb-on"></i> Giám sát hiệu suất, phát hiện bất thường.'),
 			]);
 
+			// LacaDev Block Sync
+			Container::make('theme_options', __('🧩 LacaDev', 'laca'))
+				->set_page_parent($options)
+				->set_page_file(__('laca-block-sync', 'laca'))
+				->add_fields([
+					Field::make('separator', 'sep_block_sync_heading', __('Block Sync — Nhận blocks từ lacadev.com', 'laca')),
+
+					Field::make('html', 'block_sync_api_key_display', __('API Key', 'laca'))
+						->set_html(static function () {
+							$key = \App\Settings\BlockSyncReceiver::ensureApiKey();
+							return '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:12px 16px;margin:8px 0">'
+								. '<p style="margin:0 0 6px;font-weight:600;color:#166534">🔑 API Key của site này:</p>'
+								. '<code style="font-size:13px;word-break:break-all;background:#dcfce7;padding:6px 10px;border-radius:4px;display:block">' . esc_html($key) . '</code>'
+								. '<p style="margin:8px 0 0;font-size:12px;color:#4b5563">Copy key này và dán vào tab <strong>🧩 Block Sync</strong> trong project trên <strong>lacadev.com</strong>.</p>'
+								. '</div>';
+						}),
+
+					Field::make('html', 'block_sync_endpoint_info', '')
+						->set_html(static function () {
+							$endpoint = rest_url('lacadev/v1/sync-block');
+							return '<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;padding:12px 16px;margin:8px 0">'
+								. '<p style="margin:0 0 6px;font-weight:600;color:#0369a1">🌐 Endpoint URL của site này:</p>'
+								. '<code style="font-size:13px;word-break:break-all;background:#e0f2fe;padding:6px 10px;border-radius:4px;display:block">' . esc_html($endpoint) . '</code>'
+								. '<p style="margin:8px 0 0;font-size:12px;color:#4b5563">Dán URL này vào trường <strong>Sync Endpoint URL</strong> trong project tương ứng trên lacadev.com.</p>'
+								. '</div>';
+						}),
+				]);
+
 			// Google reCAPTCHA
+
 			Container::make('theme_options', __('Google reCAPTCHA', 'laca'))
 				->set_page_parent($options)
 				->set_page_file(__('laca-recaptcha', 'laca'))

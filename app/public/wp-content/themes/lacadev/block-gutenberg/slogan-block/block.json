@@ -1,6 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
+  "version": "1.0.0",
   "name": "lacadev/slogan-block",
   "title": "LaCa Slogan",
   "description": "Block hiển thị slogan của trang web",
@@ -14,7 +15,11 @@
       "slogan": "La Cà <span>Dev</span>"
     }
   },
-  "keywords": ["slogan", "text", "quote"],
+  "keywords": [
+    "slogan",
+    "text",
+    "quote"
+  ],
   "textdomain": "laca",
   "attributes": {
     "slogan": {
@@ -24,6 +29,9 @@
   },
   "supports": {
     "html": false,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   }
 }

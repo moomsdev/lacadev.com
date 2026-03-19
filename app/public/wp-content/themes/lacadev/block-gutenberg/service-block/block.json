@@ -1,6 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
+  "version": "1.0.0",
   "name": "lacadev/service-block",
   "title": "Layout: Icon Cards",
   "description": "Hiển thị danh sách nội dung dạng card + ký tự icon (chọn được Post Type + taxonomy)",
@@ -9,7 +10,10 @@
   "editorScript": "lacadev-block-service-block-editor",
   "editorStyle": "lacadev-block-service-block-editor",
   "style": "lacadev-block-service-block",
-  "keywords": ["service", "laca"],
+  "keywords": [
+    "service",
+    "laca"
+  ],
   "textdomain": "laca",
   "attributes": {
     "postType": {
@@ -55,6 +59,9 @@
   },
   "supports": {
     "html": false,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   }
 }

@@ -6,9 +6,11 @@ use Carbon_Fields\Container\Container;
 use Carbon_Fields\Field;
 use App\Models\ProjectLog;
 use App\Models\ProjectAlert;
+use App\PostTypes\Concerns\BlockSyncSender;
 
 class Project extends \App\Abstracts\AbstractPostType
 {
+    use BlockSyncSender;
 
     public function __construct()
     {
@@ -77,6 +79,9 @@ class Project extends \App\Abstracts\AbstractPostType
 
         // Lưu portal alias khi admin save project
         add_action('save_post_project', [$this, 'savePortalAlias'], 10, 1);
+
+        // Block Sync Manager
+        $this->registerBlockSyncHooks();
     }
 
     private function normalizeHexColor(string $hex): string
@@ -158,6 +163,7 @@ class Project extends \App\Abstracts\AbstractPostType
             Field::make('separator', 'sep_design_pages', __('II. Phạm vi công việc — Danh sách trang thiết kế', 'laca')),
 
             Field::make('complex', 'design_pages', __('Danh sách trang thiết kế', 'laca'))
+                ->set_layout('tabbed-horizontal')
                 ->setup_labels([
                     'plural_name'   => 'Trang',
                     'singular_name' => 'Trang',
@@ -586,6 +592,20 @@ class Project extends \App\Abstracts\AbstractPostType
                     Field::make('text', 'name', __('Tên tính năng', 'laca')),
                 ])
                 ->set_header_template('<% if (name) { %><%-name%><% } %>'),
+        ]);
+
+        // ---- Tab 8: Block Sync ----
+        $container->add_tab(__('🧩 Block Sync', 'laca'), [
+            Field::make('separator', 'sep_block_sync_info', __('Cấu hình REST API cho client site', 'laca')),
+
+            Field::make('text', 'sync_api_key', __('API Key của client', 'laca'))
+                ->set_help_text(__('Lấy từ Settings → LacaDev trên website client. Dùng để xác thực khi push blocks.', 'laca'))
+                ->set_attribute('type', 'password')
+                ->set_width(50),
+
+            Field::make('text', 'sync_endpoint_url', __('Block Sync Endpoint URL', 'laca'))
+                ->set_help_text(__('URL đến REST endpoint. Ví dụ: https://client.com/wp-json/lacadev/v1/sync-block', 'laca'))
+                ->set_width(50),
         ]);
     }
 
