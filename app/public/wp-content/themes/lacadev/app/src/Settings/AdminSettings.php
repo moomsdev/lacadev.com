@@ -104,27 +104,22 @@ class AdminSettings
 
 	public function disableCheckboxUseWeakPassword()
 	{
-		add_action('admin_head', function () {
-?>
-			<script>
-				jQuery(document).ready(function() {
-					jQuery('.pw-weak').remove();
-				});
-			</script>
-		<?php
+		add_action('admin_enqueue_scripts', function () {
+			wp_enqueue_script('jquery');
+			wp_add_inline_script(
+				'jquery',
+				'jQuery(document).ready(function($) { $(".pw-weak").remove(); });'
+			);
 		});
 
 		add_action('login_enqueue_scripts', function () {
-		?>
-			<script>
-				document.addEventListener("DOMContentLoaded", function(event) {
-					let elements = document.getElementsByClassName('pw-weak');
-					console.log(elements);
-					let requiredElement = elements[0];
-					requiredElement.remove();
-				});
-			</script>
-			<?php
+			wp_enqueue_script(
+				'laca-remove-pw-weak',
+				get_template_directory_uri() . '/resources/scripts/login/remove-pw-weak.js',
+				[],
+				wp_get_theme()->get('Version'),
+				true
+			);
 		});
 	}
 
