@@ -198,3 +198,21 @@ button[data-toggle="password-toggle"] {
 .dashicons-before:before {
   font-family: "dashicons", sans-serif !important;
 }
+
+// Custom Screeshot theme
+.theme-browser .theme .theme-name {
+  padding: 20px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.theme-browser .theme .theme-actions,
+.theme-browser .theme.active .theme-actions {
+  background: transparent;
+  opacity: 1;
+  border: none;
+}
+
+.theme-browser .theme .theme-screenshot:after {
+  padding-top: 50%;
+}
