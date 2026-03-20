@@ -8,10 +8,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Swup from 'swup';
 import Swiper from 'swiper';
-import { initAboutLacaHero } from './pages/about-laca';
-import { initContactPage } from './pages/contact';
-import { initCommentForm } from './pages/comments';
-import './project-block.js';
+import { initAboutLacaHero } from './pages/about-laca.js';
+import { initContactPage } from './pages/contact.js';
+import { initCommentForm } from './pages/comments.js';
+
 
 gsap.registerPlugin( ScrollTrigger );
 
