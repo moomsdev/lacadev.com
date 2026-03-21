@@ -49,6 +49,8 @@ class TrackerEndpointHandler
             $type    = sanitize_key($log['type']    ?? 'other');
             // Dùng wp_strip_all_tags thay sanitize_textarea_field để giữ Unicode emoji & tiếng Việt
             $content = trim(wp_strip_all_tags($log['content'] ?? ''));
+            // Loại bỏ emoji (ký tự 4-byte, U+10000 trở lên) để DB utf8 lưu đúng
+            $content = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $content) ?? $content;
             $level   = sanitize_key($log['level']   ?? 'info');
 
             if (empty($content)) {
@@ -122,7 +124,8 @@ class TrackerEndpointHandler
     }
 
     /**
-     * Tạo cảnh báo lên hệ thống chính nếu phát hiện sửa code / file đáng ngờ
+     * Tạo cảnh báo lên hệ thống chính nếu phát hiện sửa code / file đáng ngờ.
+     * Skip nếu đã tồn tại alert chưa resolve cùng nội dung (tránh trùng lặp).
      */
     private function createAlert(int $projectId, string $msg, string $level = 'warning'): void
     {
@@ -130,10 +133,15 @@ class TrackerEndpointHandler
             return;
         }
 
+        // Dedup: không tạo alert nếu cùng nội dung + project đang chưa resolve
+        if (ProjectAlert::existsActiveByMsg($projectId, $msg)) {
+            return;
+        }
+
         ProjectAlert::add([
             'project_id'  => $projectId,
             'alert_type'  => 'security',
-            'alert_level' => $level,   // warning / critical tuỳ loại sự kiện
+            'alert_level' => $level,
             'alert_msg'   => $msg,
         ]);
     }

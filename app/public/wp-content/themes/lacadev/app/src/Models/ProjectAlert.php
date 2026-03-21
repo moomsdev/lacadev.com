@@ -43,7 +43,7 @@ class ProjectAlert
                 'project_id'  => absint($data['project_id']),
                 'alert_type'  => $type,
                 'alert_level' => $level,
-                'alert_msg'   => sanitize_textarea_field($data['alert_msg']),
+                'alert_msg'   => self::stripEmoji(sanitize_textarea_field($data['alert_msg'])),
                 'is_resolved' => 0,
                 'created_at'  => current_time('mysql'),
             ],
@@ -197,6 +197,28 @@ class ProjectAlert
     }
 
     /**
+     * Dedup theo nội dung: kiểm tra alert cùng msg + project chưa resolve.
+     * Dùng để tránh tracker bot gửi trùng cùng một cảnh báo nhiều lần.
+     */
+    public static function existsActiveByMsg(int $projectId, string $msg): bool
+    {
+        global $wpdb;
+        $table = ProjectAlertTable::getTableName();
+
+        $count = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                "SELECT COUNT(*) FROM {$table}
+                 WHERE project_id = %d AND alert_msg = %s AND is_resolved = 0",
+                $projectId,
+                sanitize_textarea_field($msg)
+            )
+        );
+
+        return $count > 0;
+    }
+
+    /**
      * Label thân thiện cho alert type
      */
     public static function getTypeLabel(string $type): string
@@ -223,5 +245,15 @@ class ProjectAlert
             'warning'  => 'laca-alert--warning',
             default    => 'laca-alert--info',
         };
+    }
+
+    /**
+     * Loại bỏ emoji và ký tự 4-byte UTF-8 để tránh lỗi với DB charset utf8 (non-mb4).
+     * Giữ nguyên tiếng Việt và ký tự Latin có dấu (≤ 3-byte).
+     */
+    public static function stripEmoji(string $text): string
+    {
+        // Xoá supplementary multilingual plane (U+10000–U+10FFFF) = emoji, flags...
+        return preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $text) ?? $text;
     }
 }

@@ -129,11 +129,7 @@ class ClientPortalEndpoint
             $taskDone  = count(array_filter($rawTasks, fn($t) => (bool)($t['done'] ?? false)));
             $progress  = $status === 'done' ? 100 : (int) round($taskDone / count($rawTasks) * 100);
         } else {
-            // Fallback: handover checklist
-            $checklist  = (array) carbon_get_post_meta($projectId, 'handover_checklist');
-            $checkItems = ['backup', 'ssl', 'speed_test', 'mobile_test', 'seo_basic', 'training', 'payment_done', 'handover_doc'];
-            $doneCount  = count(array_intersect($checklist, $checkItems));
-            $progress   = $status === 'done' ? 100 : ($doneCount > 0 ? (int) round($doneCount / count($checkItems) * 100) : $this->estimateProgress($status));
+            $progress = $status === 'done' ? 100 : $this->estimateProgress($status);
         }
 
         // Build safe task list for client

@@ -59,7 +59,7 @@ trait BlockSyncSender
     {
         add_meta_box(
             'laca_block_sync_manager',
-            '🧩 Block Sync Manager',
+            'Block Sync Manager',
             [$this, 'renderBlockSyncMetaBox'],
             'project',
             'normal',
@@ -177,10 +177,6 @@ trait BlockSyncSender
                     <?php endif; ?>
                 </tbody>
             </table>
-
-            <p style="padding:8px 16px;color:#888;font-size:12px;margin:0;border-top:1px solid #e2e4e7">
-                ⚡ Cấu hình API Key và Endpoint URL ở tab <strong>🧩 Block Sync</strong> bên dưới.
-            </p>
         </div>
         <?php
     }

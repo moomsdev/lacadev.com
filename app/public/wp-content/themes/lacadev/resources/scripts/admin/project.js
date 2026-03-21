@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Helper: rebuild logs list từ response
         function renderLogs(logs) {
-            const $list = jQuery('.laca-pm-col .laca-pm-list').last();
+            const $list = jQuery('#laca-log-list');
             if (!$list.length || !logs) return;
             if (!logs.length) {
                 $list.html('<p style="color:#888;">Chưa có nhật ký nào.</p>');
@@ -187,6 +187,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Helper: cập nhật block "Việc chưa hoàn thành" không cần reload
+        const catIcons2 = { bug:'🐛', page:'🖼️', content:'📝', seo:'🔍', feature:'⭐', other:'📌' };
+        function updatePendingBlock(tasks) {
+            const pending = tasks.filter(t => !(t.done ?? false));
+            // Tìm block pending — nằm ngay trước #laca-log-list
+            let $block = jQuery('#laca-pending-tasks-block');
+            if (!pending.length) {
+                $block.slideUp(160, () => $block.remove());
+                return;
+            }
+            if (!$block.length) {
+                // Tạo lại block nếu chưa có (trường hợp ban đầu không có pending)
+                $block = jQuery(`<div id="laca-pending-tasks-block" style="margin-bottom:16px; padding:10px 14px; background:#fff8e1; border-left:3px solid #f5a623; border-radius:4px;">
+                    <strong style="font-size:13px; color:#7c5b00;">⏳ Việc chưa hoàn thành</strong>
+                    <ul id="laca-pending-list" style="margin:8px 0 0 0; padding-left:16px; font-size:13px; color:#444;"></ul>
+                </div>`);
+                jQuery('#laca-log-list').before($block);
+            }
+            let $ul = $block.find('#laca-pending-list');
+            if (!$ul.length) {
+                $block.append('<ul id="laca-pending-list" style="margin:8px 0 0 0; padding-left:16px; font-size:13px; color:#444;"></ul>');
+                $ul = $block.find('#laca-pending-list');
+            }
+            $ul.empty();
+            pending.forEach(pt => {
+                const cat2 = pt.category || (pt.source === 'page' ? 'page' : 'other');
+                $ul.append(`<li style="margin-bottom:3px;">${catIcons2[cat2] || '📌'} ${pt.name}</li>`);
+            });
+        }
+
         // Delegate: Toggle task
         jQuery(document).on('change', '.task-checkbox', function() {
             const taskId   = jQuery(this).data('id');
@@ -195,12 +225,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ajaxRequest('laca_toggle_task', { task_id: taskId }, function(res) {
                 $cb.prop('disabled', false);
                 updateProgress(res.data.tasks);
-                // Update visual state
+                // Update visual state của task row
                 const $row = $cb.closest('.laca-task-item');
                 const isDone = res.data.tasks.find(t => t.id === taskId)?.done;
                 $row.toggleClass('task-done', isDone);
                 $row.find('.task-name').css({ textDecoration: isDone ? 'line-through' : '', color: isDone ? '#999' : '' });
-                // Auto-refresh logs nếu server trả về (khi vừa done)
+                // Cập nhật block "Việc chưa hoàn thành" ngay lập tức
+                updatePendingBlock(res.data.tasks);
+                // Render logs mới vào cột Nhật ký (không reload trang)
                 if (res.data.logs) renderLogs(res.data.logs);
                 toastSuccess(isDone ? '✅ Đánh dấu hoàn thành' : '↩ Đã mở lại task');
             }, function() {

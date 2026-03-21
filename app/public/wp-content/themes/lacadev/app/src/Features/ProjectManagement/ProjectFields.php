@@ -1,0 +1,540 @@
+<?php
+
+namespace App\Features\ProjectManagement;
+
+use Carbon_Fields\Container\Container;
+use Carbon_Fields\Field;
+
+/**
+ * Project Carbon Fields
+ *
+ * - Container chính: "Thông tin dự án" (7 tabs)
+ * - Container phụ : "Báo giá" (meta box riêng)
+ */
+class ProjectFields
+{
+    public function __construct(private string $postType = 'project') {}
+
+    public function register(): void
+    {
+        // Container chính — 7 tabs
+        $container = Container::make('post_meta', __('Thông tin dự án', 'laca'))
+            ->where('post_type', '=', $this->postType);
+
+        $this->addTabStatus($container);
+        $this->addTabFinance($container);
+        $this->addTabHostingDomain($container);
+        $this->addTabTechSpecs($container);
+        $this->addTabBlockSync($container);
+
+        // Container riêng — Báo giá (meta box độc lập)
+        $this->registerQuotationContainer();
+
+        // Default 3 đợt thanh toán cho dự án mới
+        add_filter('carbon_fields_value_default', function ($default, $name) {
+            if ($name !== '_payment_steps') {
+                return $default;
+            }
+            return [
+                ['step_number' => '1', 'step_title' => 'Tạm ứng 50%',    'step_desc' => 'Sau khi ký hợp đồng'],
+                ['step_number' => '2', 'step_title' => 'Nghiệm thu 30%',  'step_desc' => 'Sau khi hoàn thành UI/UX'],
+                ['step_number' => '3', 'step_title' => 'Bàn giao 20%',    'step_desc' => 'Sau khi nghiệm thu dự án'],
+            ];
+        }, 10, 2);
+
+        // Default 3 bước quy trình cho dự án mới
+        add_filter('carbon_fields_value_default', function ($default, $name) {
+            if ($name !== '_process_steps') {
+                return $default;
+            }
+            return [
+                ['process_number' => '01', 'process_title' => 'Discovery & Strategy',    'process_desc' => 'Thấu hiểu giá trị cốt lõi và mục tiêu kinh doanh của khách hàng.'],
+                ['process_number' => '02', 'process_title' => 'Design & Development',    'process_desc' => 'Thiết kế UI/UX và lập trình hệ thống quản trị nội dung CMS.'],
+                ['process_number' => '03', 'process_title' => 'Launch & Warranty',       'process_desc' => 'Bàn giao, hướng dẫn sử dụng và kích hoạt chế độ bảo hành trọn đời.'],
+            ];
+        }, 10, 2);
+    }
+
+    // =========================================================================
+    // Báo giá — Container riêng (meta box độc lập)
+    // =========================================================================
+
+    private function registerQuotationContainer(): void
+    {
+        $container = Container::make('post_meta', __('Báo giá', 'laca'))
+            ->where('post_type', '=', $this->postType);
+
+        // Thông tin khách hàng 
+        $container->add_tab(__('Khách hàng', 'laca'), [
+            Field::make('text', 'client_name', __('', 'laca'))
+                ->set_width(33.33)
+                ->set_required(true)
+                ->set_attribute('placeholder', 'Tên khách hàng / Công ty'),
+
+            Field::make('text', 'client_phone', __('', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'Số điện thoại')
+                ->set_attribute('type', 'tel'),
+
+            Field::make('text', 'client_email', __('', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'email@example.com')
+                ->set_attribute('type', 'email'),
+
+            Field::make('text', 'client_address', __('', 'laca'))
+                ->set_attribute('placeholder', 'Địa chỉ'),
+        ]);
+
+        // Tổng quan dự án
+        $container->add_tab(__('Tổng quan dự án', 'laca'), [
+            Field::make('rich_text', 'quotation_intro', __('', 'laca')),
+        ]);
+
+        // Danh sách trang thiết kế
+        $container->add_tab(__('Danh sách trang thiết kế', 'laca'), [
+            Field::make('complex', 'design_pages', __('', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels([
+                    'plural_name'   => 'Trang',
+                    'singular_name' => 'Trang',
+                ])
+                ->add_fields([
+                    Field::make('text', 'page_name', __('', 'laca'))
+                        ->set_width(50)
+                        ->set_attribute('placeholder', 'Tên trang'),
+
+                    Field::make('text', 'subpage_name', __('', 'laca'))
+                        ->set_width(50)
+                        ->set_attribute('placeholder', 'Subpage'),
+
+                    Field::make('text', 'page_demo_url', __('', 'laca'))
+                        ->set_width(60)
+                        ->set_attribute('placeholder', 'https://...'),
+                ])
+                ->set_header_template('<% if (page_name) { %><%-page_name%><% } else { %>Trang mới<% } %>'),
+        ]);
+
+        // Thời gian thực hiện
+        $container->add_tab(__('Giai đoạn thực hiện', 'laca'), [
+            Field::make('complex', 'timeline_phases', __('', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels([
+                    'plural_name'   => 'Giai đoạn',
+                    'singular_name' => 'Giai đoạn',
+                ])
+                ->add_fields([
+                    Field::make('text', 'phase_days', __('', 'laca'))
+                        ->set_width(20)
+                        ->set_attribute('placeholder', 'Số ngày'),
+                    Field::make('rich_text', 'phase_content', __('', 'laca'))
+                        ->set_width(80),
+                ])
+                ->set_header_template('<% if (phase_days) { %> <%- phase_days %> ngày<% } %>'),
+        ]);
+
+        // Mốc thời gian
+        $container->add_tab(__('Mốc thời gian', 'laca'), [
+            Field::make('text', 'estimated_days', __('Thời gian làm (ngày)', 'laca'))
+                ->set_width(25)
+                ->set_attribute('placeholder', 'VD: 15'),
+
+            Field::make('text', 'exclude_days', __('Thời gian không tính', 'laca'))
+                ->set_width(25)
+                ->set_default_value("Không tính Chủ nhật và ngày lễ"),
+
+            Field::make('date', 'date_start', __('Ngày bắt đầu làm', 'laca'))
+                ->set_width(25)
+                ->set_storage_format('Y-m-d'),
+
+            Field::make('date', 'date_handover', __('Ngày bàn giao (dự kiến)', 'laca'))
+                ->set_width(25)
+                ->set_storage_format('Y-m-d'),
+        ]);
+
+        // Chi phí thực hiện
+        $container->add_tab(__('Chi phí thực hiện', 'laca'), [
+            Field::make('complex', 'quotation_items', __('Bảng chi phí chi tiết', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels([
+                    'plural_name'   => 'Hạng mục',
+                    'singular_name' => 'Hạng mục',
+                ])
+                ->add_fields([
+                    Field::make('text', 'item_name', __('', 'laca'))
+                        ->set_width(40)
+                        ->set_attribute('placeholder', 'Tên hạng mục'),
+
+                    Field::make('text', 'item_desc', __('', 'laca'))
+                        ->set_width(40)
+                        ->set_attribute('placeholder', 'Mô tả hạng mục'),
+
+                    Field::make('text', 'item_unit_price', __('', 'laca'))
+                        ->set_width(20)
+                        ->set_attribute('data-type', 'currency')
+                        ->set_attribute('placeholder', 'Đơn giá')
+                        ->set_classes('laca-pay-amount'),
+                ])
+                ->set_header_template('<% if (item_name) { %><%-item_name%><% } %>'),
+        ]);
+
+        // Quy trình thực hiện
+        $container->add_tab(__('Quy trình', 'laca'), [
+            Field::make('complex', 'process_steps', __('', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels([
+                    'plural_name'   => 'Bước',
+                    'singular_name' => 'Bước',
+                ])
+                ->add_fields([
+                    Field::make('text', 'process_number', __('', 'laca'))
+                        ->set_width(10)
+                        ->set_attribute('placeholder', '01'),
+                    Field::make('text', 'process_title', __('', 'laca'))
+                        ->set_width(40)
+                        ->set_attribute('placeholder', 'Discovery & Strategy'),
+                    Field::make('text', 'process_desc', __('', 'laca'))
+                        ->set_width(50)
+                        ->set_attribute('placeholder', 'Thấu hiểu mục tiêu kinh doanh'),
+                ])
+                ->set_header_template('<% if (process_title) { %><%- process_title %><% } %>'),
+        ]);
+
+        // Tab: Tính năng kỹ thuật
+        $container->add_tab(__('Tính năng kỹ thuật', 'laca'), [
+            Field::make('rich_text', 'backend_features', __('', 'laca'))
+                ->set_default_value('
+                                        <h3>Tính năng kỹ thuật &amp; Nền tảng</h3>
+                                        <p>Chúng tôi sử dụng những công nghệ hiện đại nhất để đảm bảo website vận hành ổn định, bảo mật và thân thiện với các công cụ tìm kiếm.</p>
+                                        <p><strong>WordPress | Code thuần | Gutenberg</strong></p>
+
+                                        <h4>Module Cập nhật nội dung</h4>
+                                        <ul>
+                                        <li>Quản lý thêm, sửa, xóa bài viết</li>
+                                        <li>Sắp xếp thứ tự các blocks nội dung</li>
+                                        <li>Tối ưu hóa hình ảnh tự động</li>
+                                        </ul>
+
+                                        <h4>Module Tính năng &amp; Live Chat</h4>
+                                        <ul>
+                                        <li>Tích hợp Live Chat (Facebook/Zalo)</li>
+                                        <li>Nút gọi điện nhanh trên di động</li>
+                                        <li>Tích hợp bản đồ &amp; chỉ đường</li>
+                                        </ul>
+
+                                        <h4>Tối ưu hóa SEO</h4>
+                                        <ul>
+                                        <li>Cấu trúc URL thân thiện (Breadcrumbs)</li>
+                                        <li>Tối ưu tốc độ tải trang (LCP, FID)</li>
+                                        <li>Khai báo Schema Markup tiêu chuẩn</li>
+                                        </ul>
+
+                                        <h4>Module Liên hệ</h4>
+                                        <ul>
+                                        <li>Form gửi yêu cầu tư vấn</li>
+                                        <li>Thông báo email tự động về admin</li>
+                                        <li>Chống spam qua Google reCAPTCHA</li>
+                                        </ul>
+                                        '),
+            ]);
+
+
+        // Tab: Bảo trì & Bảo hành
+        $container->add_tab(__('Bảo trì & Bảo hành', 'laca'), [
+            Field::make('select', 'warranty_status', __('Trạng thái bảo hành', 'laca'))
+                ->set_width(30)
+                ->set_default_value('free')
+                ->add_options([
+                    'free'     => 'Bảo hành miễn phí',
+                    'paid'     => 'Bảo hành có phí',
+                    'expired'  => 'Hết bảo hành',
+                    'none'     => 'Không áp dụng',
+                ]),
+
+            Field::make('rich_text', 'warranty_policy', __('', 'laca'))
+                ->set_width(70)
+                ->set_default_value('
+                    <h3>Chính sách Bảo trì &amp; Bảo hành</h3>
+                    <ul>
+                    <li><strong>Bảo hành trọn đời:</strong> Áp dụng cho các lỗi kỹ thuật phát sinh từ phía hệ thống code do lacadev triển khai khi khách hàng sử dụng dịch vụ Hosting tại lacadev.</li>
+                    <li><strong>Hỗ trợ vận hành:</strong> Miễn phí hướng dẫn sử dụng và hỗ trợ kỹ thuật qua Hotline/Zalo trong suốt quá trình vận hành website.</li>
+                    </ul>
+                    '),
+        ]);
+
+        $container->add_tab(__('Thanh toán', 'laca'), [
+            Field::make('complex', 'payment_steps', __('Quy trình thanh toán', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels([
+                    'plural_name'   => 'Đợt thanh toán',
+                    'singular_name' => 'Đợt thanh toán',
+                ])
+                ->add_fields([
+                    Field::make('text', 'step_number', __('', 'laca'))
+                        ->set_width(10)
+                        ->set_attribute('placeholder', '1'),
+                    Field::make('text', 'step_title', __('', 'laca'))
+                        ->set_width(45)
+                        ->set_attribute('placeholder', 'Tạm ứng 50%'),
+                    Field::make('text', 'step_desc', __('', 'laca'))
+                        ->set_width(45)
+                        ->set_attribute('placeholder', 'Sau khi ký hợp đồng'),
+                ])
+                ->set_header_template('<% if (step_title) { %><%- step_title %><% } %>'),
+
+            Field::make('text', 'quotation_valid_days', __('Hiệu lực báo giá (ngày)', 'laca'))
+                ->set_attribute('placeholder', '15')
+                ->set_default_value('15')
+                ->set_help_text('Số ngày báo giá còn hiệu lực kể từ ngày lập.'),
+        ]);
+    }
+
+    // =========================================================================
+    // Tab 3: Trạng thái & Thời gian
+    // =========================================================================
+
+    private function addTabStatus(Container $container): void
+    {
+        $container->add_tab(__('Trạng thái', 'laca'), [
+            Field::make('select', 'project_status', __('Trạng thái dự án', 'laca'))
+                ->set_width(50)
+                ->add_options([
+                    'pending'     => 'Chờ làm',
+                    'in_progress' => 'Đang làm',
+                    'done'        => 'Đã xong',
+                    'maintenance' => 'Đang bảo trì',
+                    'paused'      => 'Tạm dừng',
+                ])
+                ->set_default_value('pending'),
+
+            Field::make('multiselect', 'project_tags', __('Tags / Nhãn dự án', 'laca'))
+                ->set_width(50)
+                ->add_options([
+                    'wordpress'    => 'WordPress',
+                    'woocommerce'  => 'WooCommerce',
+                    'landing_page' => 'Landing Page',
+                    'ecommerce'    => 'E-commerce',
+                    'blog'         => 'Blog',
+                    'portfolio'    => 'Portfolio',
+                    'booking'      => 'Booking',
+                ]),
+        ]);
+    }
+
+    // =========================================================================
+    // Tab 4: Tài chính
+    // =========================================================================
+
+    private function addTabFinance(Container $container): void
+    {
+        $container->add_tab(__('Tài chính', 'laca'), [
+            Field::make('text', 'price_build', __('Giá build', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('data-type', 'currency')
+                ->set_attribute('placeholder', '8.000.000')
+                ->set_classes('laca-price-build'),
+
+            Field::make('text', 'price_maintenance_yearly', __('Phí bảo trì hàng năm', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('data-type', 'currency')
+                ->set_attribute('placeholder', '2.000.000'),
+
+            Field::make('select', 'payment_status', __('Trạng thái thanh toán (Auto)', 'laca'))
+                ->set_width(33.33)
+                ->add_options([
+                    'pending' => 'Chưa thanh toán',
+                    'partial' => 'Đã thanh toán một phần',
+                    'paid'    => 'Đã thanh toán đủ',
+                    'overdue' => 'Quá hạn thanh toán',
+                ])
+                ->set_default_value('pending')
+                ->set_classes('laca-payment-status'),
+
+            Field::make('complex', 'payment_history', __('Lịch sử thanh toán từng đợt', 'laca'))
+                ->setup_labels([
+                    'plural_name'   => 'Lần thanh toán',
+                    'singular_name' => 'Lần thanh toán',
+                ])
+                ->add_fields([
+                    Field::make('date', 'pay_date', __('Ngày thanh toán', 'laca'))
+                        ->set_width(30),
+                    Field::make('text', 'pay_amount', __('Số tiền', 'laca'))
+                        ->set_width(30)
+                        ->set_attribute('data-type', 'currency')
+                        ->set_help_text('Nhập số tiền khách trả đợt này')
+                        ->set_classes('laca-pay-amount'),
+                    Field::make('text', 'pay_note', __('Ghi chú / Mã GD', 'laca'))
+                        ->set_width(40),
+                ])
+                ->set_header_template('<% if (pay_date) { %>Ngày <%-pay_date%><% } else { %>Thanh toán mới<% } %>'),
+
+            Field::make('file', 'invoice_file', __('File hóa đơn / Bằng chứng chung', 'laca'))
+                ->set_width(30)
+                ->set_type(['application/pdf', 'image']),
+
+            Field::make('textarea', 'finance_note', __('Ghi chú tài chính nội bộ', 'laca'))
+                ->set_width(70)
+                ->set_rows(2)
+                ->set_attribute('placeholder', 'Ghi chú nhắc nợ...'),
+        ]);
+    }
+
+    // =========================================================================
+    // Tab 5: Hosting & Domain
+    // =========================================================================
+
+    private function addTabHostingDomain(Container $container): void
+    {
+        $container->add_tab(__('Hosting & Domain', 'laca'), [
+            // DOMAIN
+            Field::make('separator', 'sep_domain', __('Thông tin Domain', 'laca')),
+
+            Field::make('text', 'domain_name', __('Tên miền', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'example.com'),
+
+            Field::make('text', 'domain_price', __('Giá gia hạn / năm', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('data-type', 'currency')
+                ->set_attribute('placeholder', '500.000'),
+
+            Field::make('date', 'domain_expiry', __('Ngày hết hạn Domain', 'laca'))
+                ->set_width(33.33)
+                ->set_storage_format('Y-m-d'),
+
+            Field::make('text', 'domain_registrar', __('Nhà đăng ký', 'laca'))
+                ->set_width(50)
+                ->set_attribute('placeholder', 'GoDaddy / NameSilo / PA Vietnam...'),
+
+            Field::make('text', 'domain_username', __('Tài khoản đăng nhập', 'laca'))
+                ->set_width(50)
+                ->set_attribute('placeholder', 'username'),
+
+            Field::make('text', 'domain_password', __('Mật khẩu (mã hóa khi lưu)', 'laca'))
+                ->set_width(50)
+                ->set_attribute('placeholder', '••••••••')
+                ->set_attribute('type', 'password')
+                ->set_classes('laca-password-input'),
+
+            Field::make('text', 'domain_notify_days', __('Cảnh báo trước (ngày)', 'laca'))
+                ->set_width(50)
+                ->set_default_value('30')
+                ->set_attribute('placeholder', '30'),
+
+            // HOSTING
+            Field::make('separator', 'sep_hosting', __('Thông tin Hosting', 'laca')),
+
+            Field::make('text', 'hosting_price', __('Giá gia hạn / năm', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('data-type', 'currency')
+                ->set_attribute('placeholder', '1.200.000'),
+
+            Field::make('date', 'hosting_expiry', __('Ngày hết hạn Hosting', 'laca'))
+                ->set_width(33.33)
+                ->set_storage_format('Y-m-d'),
+
+            Field::make('text', 'hosting_notify_days', __('Cảnh báo trước (ngày)', 'laca'))
+                ->set_width(33.33)
+                ->set_default_value('30')
+                ->set_attribute('placeholder', '30'),
+
+            Field::make('text', 'hosting_provider', __('Nhà cung cấp hosting', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'Azdigi / SiteGround / Vultr...'),
+
+            Field::make('text', 'hosting_user', __('Tài khoản hosting', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'username'),
+
+            Field::make('text', 'hosting_password', __('Mật khẩu hosting', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', '••••••••')
+                ->set_attribute('type', 'password')
+                ->set_classes('laca-password-input'),
+
+            Field::make('text', 'hosting_url', __('URL cPanel / DirectAdmin', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'https://cpanel.example.com:2083'),
+
+            Field::make('text', 'cpanel_username', __('Tài khoản cPanel', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'username'),
+
+            Field::make('text', 'cpanel_password', __('Mật khẩu cPanel (mã hóa)', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', '••••••••')
+                ->set_attribute('type', 'password')
+                ->set_classes('laca-password-input'),
+
+            // FTP
+            Field::make('separator', 'sep_ftp', __('FTP / SFTP', 'laca')),
+
+            Field::make('text', 'ftp_host', __('FTP Host', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'ftp.example.com'),
+
+            Field::make('text', 'ftp_username', __('FTP Username', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', 'ftpuser'),
+
+            Field::make('text', 'ftp_password', __('Mật khẩu FTP', 'laca'))
+                ->set_width(33.33)
+                ->set_attribute('placeholder', '••••••••')
+                ->set_attribute('type', 'password')
+                ->set_classes('laca-password-input'),
+        ]);
+    }
+
+    // =========================================================================
+    // Tab 7: Tech Specs
+    // =========================================================================
+
+    private function addTabTechSpecs(Container $container): void
+    {
+        $container->add_tab(__('Tech Specs', 'laca'), [
+            Field::make('text', 'demo_design_url', __('URL web mẫu / Link Figma', 'laca'))
+                ->set_width(50)
+                ->set_attribute('placeholder', 'https://'),
+
+            Field::make('text', 'live_url', __('URL website đang chạy', 'laca'))
+                ->set_width(50)
+                ->set_attribute('placeholder', 'https://example.com')
+                ->set_help_text('URL thực tế của website (dùng trong Client Portal và danh sách project).'),
+
+            Field::make('separator', 'sep_brand_colors', __('Màu sắc chủ đạo', 'laca')),
+
+            Field::make('complex', 'brand_colors', __('Tối đa 3 màu', 'laca'))
+                ->set_max(3)
+                ->setup_labels([
+                    'plural_name'   => 'Màu',
+                    'singular_name' => 'Màu',
+                ])
+                ->add_fields([
+                    Field::make('color', 'hex', __('Mã màu (HEX)', 'laca'))
+                        ->set_help_text('Ví dụ: #0F172A'),
+                    Field::make('text', 'label', __('Ghi chú (tuỳ chọn)', 'laca'))
+                        ->set_attribute('placeholder', 'Primary / Accent / Background...'),
+                ])
+                ->set_header_template('<% if (hex) { %><%-hex%><% } else { %>Màu mới<% } %>'),
+        ]);
+    }
+
+    // =========================================================================
+    // Tab 8: Block Sync
+    // =========================================================================
+
+    private function addTabBlockSync(Container $container): void
+    {
+        $container->add_tab(__('Block Sync', 'laca'), [
+            Field::make('separator', 'sep_block_sync_info', __('Cấu hình REST API cho client site', 'laca')),
+
+            Field::make('text', 'sync_api_key', __('API Key của client', 'laca'))
+                ->set_help_text(__('Lấy từ Settings → LacaDev trên website client. Dùng để xác thực khi push blocks.', 'laca'))
+                ->set_attribute('type', 'password')
+                ->set_width(50),
+
+            Field::make('text', 'sync_endpoint_url', __('Block Sync Endpoint URL', 'laca'))
+                ->set_help_text(__('URL đến REST endpoint. Ví dụ: https://client.com/wp-json/lacadev/v1/sync-block', 'laca'))
+                ->set_width(50),
+        ]);
+    }
+}

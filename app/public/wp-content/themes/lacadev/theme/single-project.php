@@ -27,9 +27,6 @@
 		$backendFeatures   = carbon_get_post_meta($postId, 'backend_features');
 		$timelinePhases    = carbon_get_post_meta($postId, 'timeline_phases');
 		$quotationItems    = carbon_get_post_meta($postId, 'quotation_items');
-		$workflowSteps     = carbon_get_post_meta($postId, 'workflow_steps');
-		$clientReqs        = carbon_get_post_meta($postId, 'client_requirements');
-		$paymentTerms      = carbon_get_post_meta($postId, 'payment_terms');
 		$validDays         = carbon_get_post_meta($postId, 'quotation_valid_days') ?: '15';
 
 		// --- Client Info ---
@@ -37,7 +34,6 @@
 		$clientEmail   = carbon_get_post_meta($postId, 'client_email');
 		$clientPhone   = carbon_get_post_meta($postId, 'client_phone');
 		$clientAddress = carbon_get_post_meta($postId, 'client_address');
-		$clientType    = carbon_get_post_meta($postId, 'client_type');
 
 		// --- Status & Timeline ---
 		$projectStatus = carbon_get_post_meta($postId, 'project_status');
@@ -54,18 +50,8 @@
 		$paymentStatus    = carbon_get_post_meta($postId, 'payment_status');
 
 		// --- Tech ---
-		$platform       = carbon_get_post_meta($postId, 'platform');
-		$builder        = carbon_get_post_meta($postId, 'builder');
-		$features       = carbon_get_post_meta($postId, 'features');
-		$customFeatures = carbon_get_post_meta($postId, 'custom_features');
 		$brandColors    = carbon_get_post_meta($postId, 'brand_colors');
 		$demoUrl        = carbon_get_post_meta($postId, 'demo_design_url');
-
-		// --- Maintenance ---
-		$maintenanceType  = carbon_get_post_meta($postId, 'maintenance_type');
-		$maintenanceStart = carbon_get_post_meta($postId, 'maintenance_start');
-		$maintenanceEnd   = carbon_get_post_meta($postId, 'maintenance_end');
-		$maintenanceScope = carbon_get_post_meta($postId, 'maintenance_scope');
 
 		// --- Site meta ---
 		$logoId    = carbon_get_theme_option('logo');
@@ -93,33 +79,7 @@
 		];
 		$paymentInfo = $paymentLabels[$paymentStatus] ?? ['label' => '—', 'class' => 'badge--neutral'];
 
-		$platformLabels = [
-			'wordpress'    => __('WordPress', 'laca'),
-			'woocommerce'  => __('WooCommerce', 'laca'),
-			'landing_page' => __('Landing Page', 'laca'),
-			'shopify'      => __('Shopify', 'laca'),
-			'laravel'      => __('Laravel', 'laca'),
-			'next_js'      => __('Next.js', 'laca'),
-			'custom'       => __('Code tuỳ chỉnh', 'laca'),
-		];
-		$builderLabels = [
-			'bricks'    => __('Bricks Builder', 'laca'),
-			'gutenberg' => __('Gutenberg', 'laca'),
-			'elementor' => __('Elementor', 'laca'),
-			'flatsome'  => __('Flatsome', 'laca'),
-			'none'      => __('Code thuần', 'laca'),
-		];
-		$featureLabels = [
-			'landing_page'   => __('Landing Page', 'laca'),
-			'multi_language' => __('Đa ngôn ngữ', 'laca'),
-			'booking'        => __('Booking System', 'laca'),
-			'payment'        => __('Cổng thanh toán', 'laca'),
-			'flash_sale'     => __('Flash Sale', 'laca'),
-			'seo'            => __('SEO Tối ưu', 'laca'),
-			'speed'          => __('Tốc độ cao', 'laca'),
-			'membership'     => __('Membership', 'laca'),
-			'chat'           => __('Live Chat', 'laca'),
-		];
+
 
 		// --- Finance calc ---
 		$totalPaid = 0;
@@ -312,7 +272,7 @@
 	<!-- ============================================================
 	     SECTION II — PHẠM VI CÔNG VIỆC
 	     ============================================================ -->
-	<?php if (!empty($designPages) || !empty($platform) || !empty($features) || !empty($customFeatures) || $backendFeatures) : ?>
+	<?php if (!empty($designPages) || $backendFeatures) : ?>
 		<section class="qd-section">
 			<h2 class="qd-section__heading"><span class="qd-section__num">II</span> <?php echo esc_html__('Phạm vi công việc', 'laca'); ?></h2>
 
@@ -347,65 +307,27 @@
 				</table>
 			<?php endif; ?>
 
-			<!-- 2B: Nền tảng & Tính năng -->
-			<?php if (!empty($platform) || !empty($features) || !empty($customFeatures) || !empty($brandColors)) : ?>
-				<h3 class="qd-subsection"><?php echo esc_html__('B. Nền tảng & Tính năng', 'laca'); ?></h3>
-				<div class="qd-feature-grid">
-					<?php if (!empty($platform)) : ?>
-						<div class="qd-feature-group">
-							<span class="qd-feature-group__label"><?php echo esc_html__('Nền tảng', 'laca'); ?></span>
-							<div class="qd-tags">
-								<?php foreach ((array)$platform as $p) : ?>
-									<span class="qd-tag qd-tag--platform"><?php echo esc_html($platformLabels[$p] ?? $p); ?></span>
-								<?php endforeach; ?>
-								<?php
-									$builders = is_array($builder) ? $builder : (empty($builder) ? [] : [$builder]);
-									foreach ($builders as $b) :
-										if (empty($b)) continue;
-								?>
-									<span class="qd-tag qd-tag--builder"><?php echo esc_html($builderLabels[$b] ?? $b); ?></span>
-								<?php endforeach; ?>
-							</div>
+			<!-- 2B: Màu sắc chủ đạo -->
+			<?php if (!empty($brandColors) && is_array($brandColors)) : ?>
+				<h3 class="qd-subsection"><?php echo esc_html__('B. Bảng màu chủ đạo', 'laca'); ?></h3>
+				<div class="qd-color-palette" aria-label="<?php echo esc_attr__('Bảng màu', 'laca'); ?>">
+					<?php foreach ($brandColors as $c) :
+						$hex = isset($c['hex']) ? (string) $c['hex'] : '';
+						$label = isset($c['label']) ? (string) $c['label'] : '';
+						if (!$hex) continue;
+						if ($hex[0] !== '#') {
+							$hex = '#' . $hex;
+						}
+						$hex = strtoupper($hex);
+					?>
+						<div class="qd-color-chip">
+							<span class="qd-color-chip__swatch" style="background: <?php echo esc_attr($hex); ?>;" aria-hidden="true"></span>
+							<span class="qd-color-chip__code"><?php echo esc_html($hex); ?></span>
+							<?php if ($label) : ?>
+								<span class="qd-color-chip__label"><?php echo esc_html($label); ?></span>
+							<?php endif; ?>
 						</div>
-					<?php endif; ?>
-					<?php if (!empty($features) || !empty($customFeatures)) : ?>
-						<div class="qd-feature-group">
-							<span class="qd-feature-group__label"><?php echo esc_html__('Tính năng chuẩn', 'laca'); ?></span>
-							<div class="qd-tags">
-								<?php foreach ((array)$features as $f) : ?>
-									<span class="qd-tag"><?php echo esc_html($featureLabels[$f] ?? $f); ?></span>
-								<?php endforeach; ?>
-								<?php foreach ((array)$customFeatures as $cf) : ?>
-									<span class="qd-tag qd-tag--custom"><?php echo esc_html($cf['name'] ?? ''); ?></span>
-								<?php endforeach; ?>
-							</div>
-						</div>
-					<?php endif; ?>
-
-					<?php if (!empty($brandColors) && is_array($brandColors)) : ?>
-						<div class="qd-feature-group">
-							<span class="qd-feature-group__label"><?php echo esc_html__('Màu chủ đạo', 'laca'); ?></span>
-							<div class="qd-color-palette" aria-label="<?php echo esc_attr__('Bảng màu', 'laca'); ?>">
-								<?php foreach ($brandColors as $c) :
-									$hex = isset($c['hex']) ? (string) $c['hex'] : '';
-									$label = isset($c['label']) ? (string) $c['label'] : '';
-									if (!$hex) continue;
-									if ($hex[0] !== '#') {
-										$hex = '#' . $hex;
-									}
-									$hex = strtoupper($hex);
-								?>
-									<div class="qd-color-chip">
-										<span class="qd-color-chip__swatch" style="background: <?php echo esc_attr($hex); ?>;" aria-hidden="true"></span>
-										<span class="qd-color-chip__code"><?php echo esc_html($hex); ?></span>
-										<?php if ($label) : ?>
-											<span class="qd-color-chip__label"><?php echo esc_html($label); ?></span>
-										<?php endif; ?>
-									</div>
-								<?php endforeach; ?>
-							</div>
-						</div>
-					<?php endif; ?>
+					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>
 
@@ -631,62 +553,7 @@
 	<!-- ============================================================
 	     SECTION V — QUY TRÌNH LÀM VIỆC
 	     ============================================================ -->
-	<?php if ($workflowSteps) : ?>
-		<section class="qd-section">
-			<h2 class="qd-section__heading"><span class="qd-section__num">V</span> <?php echo esc_html__('Quy trình làm việc', 'laca'); ?></h2>
-			<div class="qd-prose">
-				<?php echo wp_kses_post(apply_filters('the_content', $workflowSteps)); ?>
-			</div>
-		</section>
-	<?php endif; ?>
 
-	<!-- ============================================================
-	     SECTION VI — CHÍNH SÁCH BẢO TRÌ / BẢO HÀNH
-	     ============================================================ -->
-	<?php if ($maintenanceType && $maintenanceType !== 'none') : ?>
-		<section class="qd-section">
-			<h2 class="qd-section__heading"><span class="qd-section__num">VI</span> <?php echo esc_html__('Chính sách bảo trì & bảo hành', 'laca'); ?></h2>
-			<div class="qd-maintenance-header">
-				<span class="badge <?php echo $maintenanceType === 'free' ? 'badge--success' : 'badge--info'; ?>">
-					<?php echo esc_html($maintenanceType === 'free' ? __('Bảo hành miễn phí', 'laca') : __('Bảo trì có phí', 'laca')); ?>
-				</span>
-				<?php if ($maintenanceStart && $maintenanceEnd) : ?>
-					<span class="qd-maintenance-period">
-						<?php echo date('d/m/Y', strtotime($maintenanceStart)); ?> — <?php echo date('d/m/Y', strtotime($maintenanceEnd)); ?>
-					</span>
-				<?php endif; ?>
-			</div>
-			<?php if ($maintenanceScope) : ?>
-				<div class="qd-prose">
-					<?php echo wp_kses_post(apply_filters('the_content', $maintenanceScope)); ?>
-				</div>
-			<?php endif; ?>
-		</section>
-	<?php endif; ?>
-
-	<!-- ============================================================
-	     SECTION VII — YÊU CẦU TỪ PHÍA KHÁCH HÀNG
-	     ============================================================ -->
-	<?php if ($clientReqs) : ?>
-		<section class="qd-section">
-			<h2 class="qd-section__heading"><span class="qd-section__num">VII</span> <?php echo esc_html__('Yêu cầu từ phía Bên B', 'laca'); ?></h2>
-			<div class="qd-prose">
-				<?php echo wp_kses_post(apply_filters('the_content', $clientReqs)); ?>
-			</div>
-		</section>
-	<?php endif; ?>
-
-	<!-- ============================================================
-	     SECTION VIII — PHƯƠNG THỨC THANH TOÁN
-	     ============================================================ -->
-	<?php if ($paymentTerms) : ?>
-		<section class="qd-section">
-			<h2 class="qd-section__heading"><span class="qd-section__num">VIII</span> <?php echo esc_html__('Phương thức thanh toán', 'laca'); ?></h2>
-			<div class="qd-prose">
-				<?php echo wp_kses_post(apply_filters('the_content', $paymentTerms)); ?>
-			</div>
-		</section>
-	<?php endif; ?>
 
 	<section class="qd-section qd-section--cta">
 		<h2 class="qd-section__heading"><span class="qd-section__num">IX</span> <?php echo esc_html__('Liên hệ & xác nhận', 'laca'); ?></h2>
