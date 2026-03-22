@@ -98,6 +98,12 @@ class AITranslationManager
             return;
         }
 
+        // Force-enqueue the legacy Gutenberg bundle.
+        // All modern blocks have their own build folders, so this script is never
+        // enqueued automatically. wp_localize_script only outputs inline data
+        // when the script handle is actually enqueued.
+        wp_enqueue_script('lacadev-gutenberg-blocks');
+
         wp_localize_script('lacadev-gutenberg-blocks', 'lacaAITranslate', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce'   => wp_create_nonce('lacadev_ai_translate_block_nonce'),

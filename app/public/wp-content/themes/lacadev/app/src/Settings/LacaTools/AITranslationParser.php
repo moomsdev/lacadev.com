@@ -85,6 +85,7 @@ class AITranslationParser
             'lacadev/process-block'        => ['title', 'description', 'steps'],
             'lacadev/marquee-block'        => ['brands'],
             'lacadev/tech-list-block'      => ['technologies'],
+            'lacadev/workflow-block'       => ['subTitle', 'title', 'steps'],
             
             // WordPress core blocks that store text directly in attributes
             'core/paragraph'               => ['content'],

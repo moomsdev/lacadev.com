@@ -98,6 +98,12 @@ class AITranslationManager
             return;
         }
 
+        // Ensure the handle is registered/enqueued before localizing
+        if (!wp_script_is('lacadev-gutenberg-blocks', 'registered') &&
+            !wp_script_is('lacadev-gutenberg-blocks', 'enqueued')) {
+            wp_enqueue_script('lacadev-gutenberg-blocks');
+        }
+
         wp_localize_script('lacadev-gutenberg-blocks', 'lacaAITranslate', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce'   => wp_create_nonce('lacadev_ai_translate_block_nonce'),

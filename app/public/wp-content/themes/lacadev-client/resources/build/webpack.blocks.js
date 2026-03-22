@@ -8,7 +8,7 @@ const blocks = fs.readdirSync(blocksDir).filter(dir => {
 });
 
 // Create a separate configuration object for each block
-module.exports = blocks.map(block => {
+const blockConfigs = blocks.map(block => {
   return {
     ...defaultConfig,
     entry: {
@@ -21,3 +21,19 @@ module.exports = blocks.map(block => {
     }
   };
 });
+
+// Legacy/global Gutenberg bundle: block-gutenberg/index.js → dist/gutenberg/
+// Required for: ai-translate-plugin and any blocks not using individual build folders.
+const gutenbergLegacyConfig = {
+  ...defaultConfig,
+  entry: {
+    index: path.join(blocksDir, 'index.js'),
+  },
+  output: {
+    ...defaultConfig.output,
+    path: path.resolve(__dirname, '../../dist/gutenberg'),
+    filename: '[name].js',
+  },
+};
+
+module.exports = [...blockConfigs, gutenbergLegacyConfig];

@@ -174,7 +174,7 @@ class AITranslationHandler
         $url = 'https://api.groq.com/openai/v1/chat/completions';
         
         $body = [
-            'model' => 'llama3-8b-8192',  // model stable, không dùng llama-3.1-8b-instant (deprecated)
+            'model' => 'llama-3.3-70b-versatile',  // stable 2025+, thay llama3-8b-8192 đã bị decommission
             'messages' => [
                 ['role' => 'system', 'content' => $system_prompt],
                 ['role' => 'user', 'content' => $text]

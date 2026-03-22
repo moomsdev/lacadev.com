@@ -1,19 +1,12 @@
 /**
- * Gutenberg Blocks Entry Point
+ * Gutenberg Blocks Entry Point — lacadev-client
+ *
+ * Trên client theme, các block được receive từ lacadev qua Block Sync Manager.
+ * Mỗi block synced có build/ folder riêng với editor_script riêng.
+ * Bundle này chỉ cần load AI Translation Plugin một lần cho toàn bộ editor.
  */
 
-// Import blocks
-import './slogan-block';
-import './about-laca-block';
-import './service-block';
-import './blog-block';
-import './staggered-blog-block';
-import './statement-block';
-import './process-block';
-import './marquee-block';
-import './tech-list-block';
-import './button-block';
-import './project-block';
-
-// AI Translation Plugin — adds a "Dịch AI" button to every block's toolbar
+// AI Translation Plugin — dùng addFilter('editor.BlockEdit') để thêm
+// panel "✨ Dịch bằng AI" vào sidebar của tất cả blocks.
 import './ai-translate-plugin';
+
