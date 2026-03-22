@@ -52,7 +52,7 @@ body.wp-admin {
   }
 
   .logo-admin-bar {
-    max-height: 1.2rem;
+    max-height: 0.75rem;
   }
 
   #wp-admin-bar-user-info {
@@ -645,8 +645,8 @@ div.error {
 }
 
 .thumbnail-preview {
-  max-width: 8rem;
-  max-height: 8rem;
+  max-width: 5rem;
+  max-height: 5rem;
   display: block;
 }
 
@@ -655,7 +655,7 @@ div.error {
 .dashicons.column-dashicon {
   width: unset !important;
   height: unset !important;
-  font-size: 3rem;
+  font-size: 1.875rem;
 }
 
 form#posts-filter {
@@ -664,12 +664,12 @@ form#posts-filter {
 
 .column-featured_image.featured_image,
 .column-is_feature {
-  width: 8rem !important;
+  width: 5rem !important;
 }
 
 .column-is_feature {
   a {
-    padding: 0.2rem;
+    padding: 0.125rem;
 
     &.dashicons-yes {
       color: #3a878f;

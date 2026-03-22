@@ -7,14 +7,14 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 5rem;
+    gap: 3.125rem;
 
     @include maxWidth($md) {
-      gap: 3rem;
+      gap: 1.875rem;
     }
 
     @include maxWidth($sm) {
-      gap: 2rem;
+      gap: 1.25rem;
     }
   }
 
@@ -25,14 +25,14 @@
     justify-content: center;
     text-align: center;
     transition: all 0.3s ease;
-    padding: 2rem 3rem;
-    border-radius: 1.5rem;
+    padding: 1.25rem 1.875rem;
+    border-radius: 0.9375rem;
     border: 1px solid transparent;
 
     &:hover {
-      transform: translateY(-0.5rem);
+      transform: translateY(-0.3125rem);
       background: #fff;
-      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
+      box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.05);
 
       .tech-icon-wrapper img {
         filter: grayscale(0%) opacity(1);
@@ -41,8 +41,8 @@
   }
 
   .tech-icon-wrapper {
-    margin-bottom: 1.5rem;
-    height: 4.5rem;
+    margin-bottom: 0.9375rem;
+    height: 2.8125rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,15 +56,15 @@
     }
 
     .tech-placeholder {
-      font-size: 4rem;
-      width: 4rem;
-      height: 4rem;
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
       color: rgba(0,0,0,0.3);
     }
   }
 
   .tech-name {
-    font-size: 1.6rem;
+    font-size: 1rem;
     font-weight: $semiBold;
     color: $primaryColor;
   }

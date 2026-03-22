@@ -8,13 +8,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem 3.5rem;
+    padding: 0.9375rem 2.1875rem;
     font-family: $primaryFont;
-    border-radius: 5rem;
+    border-radius: 3.125rem;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     cursor: pointer;
     border: 1px solid transparent;
-    gap: 1rem;
+    gap: 0.625rem;
     letter-spacing: 0.02em;
 
     &-primary {
@@ -25,7 +25,7 @@
         background-color: transparent;
         border-color: $primaryColor;
         color: $primaryColor;
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -48,13 +48,13 @@
       font-weight: $medium;
       display: inline-flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.625rem;
       transition: all 0.4s ease;
 
       .btn-icon {
         position: relative;
-        width: 1rem;
-        height: 1rem;
+        width: 0.625rem;
+        height: 0.625rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -64,8 +64,8 @@
         &::before {
           content: "";
           position: absolute;
-          width: 0.8rem;
-          height: 0.8rem;
+          width: 0.5rem;
+          height: 0.5rem;
           border: 1px solid currentColor;
           border-radius: 50%;
           transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -76,8 +76,8 @@
         &::after {
           content: "";
           position: absolute;
-          width: 2.5rem;
-          height: 2.5rem;
+          width: 1.5625rem;
+          height: 1.5625rem;
           background-color: $primaryColor;
           border-radius: 50%;
           transform: scale(0);
@@ -87,8 +87,8 @@
 
         svg {
           position: relative;
-          width: 1.6rem;
-          height: 1.6rem;
+          width: 1rem;
+          height: 1rem;
           transform: translate(-5px, 5px);
           opacity: 0;
           transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -99,7 +99,7 @@
 
       .btn-text {
         position: relative;
-        padding-bottom: 0.2rem;
+        padding-bottom: 0.125rem;
         transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         
         &::after {
@@ -134,7 +134,7 @@
         }
 
         .btn-text {
-          transform: translateX(1.5rem);
+          transform: translateX(0.9375rem);
           &::after {
             transform: scaleX(0);
           }
@@ -174,7 +174,7 @@
 }
 
   h2.block-title {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     text-transform: uppercase;
     font-weight: $medium;
     color: $primaryColor;
@@ -185,7 +185,7 @@
       text-align: left;
     }
 
-    @include resFont(1.8, 2.8);
+    @include resFont(1.125, 1.75);
   }
 
   .block-title-scroll {
@@ -193,12 +193,12 @@
     font-style: italic;
     text-transform: uppercase;
 
-    @include resFont(2, 8, true);
+    @include resFont(1.25, 5, true);
   }
 
   .block-desc {
     margin: 0 auto;
-    max-width: 92rem;
+    max-width: 57.5rem;
     text-align: center;
 
     &.desc-left {
@@ -207,26 +207,26 @@
   }
 
   .block-header {
-    margin-bottom: 3rem;
+    margin-bottom: 1.875rem;
     position: relative;
-    padding: 2rem;
+    padding: 1.25rem;
     text-align: center;
   }
   
   .block-footer {
-    margin-top: 3rem;
+    margin-top: 1.875rem;
     text-align: center;
   }
 
   section {
-    margin-bottom: 7rem;
-    padding: 3rem 0;
+    margin-bottom: 4.375rem;
+    padding: 1.875rem 0;
     position: relative;
     overflow: hidden;
 
     @include maxWidth($md) {
-      margin-bottom: 5rem;
-      padding: 4rem 0;
+      margin-bottom: 3.125rem;
+      padding: 2.5rem 0;
     }
   }
 }

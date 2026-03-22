@@ -3,8 +3,8 @@
 
 .block-marquee {
   background-color: $primaryColor;
-  margin: 3rem 0;
-  padding: 1rem 0;
+  margin: 1.875rem 0;
+  padding: 0.625rem 0;
   overflow: hidden;
   white-space: nowrap;
   position: relative;
@@ -30,11 +30,11 @@
     transition: opacity 0.3s ease;
 
     .marquee-sep {
-      margin: 0 4rem;
+      margin: 0 2.5rem;
       opacity: 0.3;
     }
 
-    @include resFont(2, 2.6);
+    @include resFont(1.25, 1.625);
   }
 
   &:hover .marquee-inner {

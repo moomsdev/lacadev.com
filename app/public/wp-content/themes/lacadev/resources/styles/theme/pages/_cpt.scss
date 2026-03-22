@@ -4,7 +4,7 @@
 .list-post {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 0.625rem;
 }
 
 /* Service Page Styles */
@@ -13,8 +13,8 @@
 }
 
 .rating-box {
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: 1.25rem auto;
+  padding: 1.25rem;
   background: rgba($primaryColor, 0.02);
   border: 1px solid rgba($primaryColor, 0.08);
   border-radius: 32px;
@@ -58,7 +58,7 @@
   }
 
   .rating-cta {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 25px !important;
     color: var(--text-main);
@@ -80,7 +80,7 @@
 
       .kksr-legend {
         margin-top: 15px !important;
-        font-size: 1.4rem !important;
+        font-size: 0.875rem !important;
         color: var(--text-muted) !important;
         font-weight: 500 !important;
         text-transform: uppercase;
@@ -111,7 +111,7 @@
   }
 
   .post-title {
-    font-size: clamp(3.5rem, 6vw, 6rem);
+    font-size: clamp(2.1875rem, 6vw, 3.75rem);
     font-weight: 800;
     letter-spacing: -2px;
     margin-bottom: 20px;
@@ -122,7 +122,7 @@
     display: flex;
     justify-content: center;
     gap: 30px;
-    font-size: 1.5rem;
+    font-size: 0.9375rem;
     color: var(--text-muted);
     opacity: 0.7;
 
@@ -151,7 +151,7 @@
   }
 
   .post-body {
-    font-size: 1.8rem;
+    font-size: 1.125rem;
     line-height: 1.8;
 
     h2,
@@ -217,7 +217,7 @@ html[data-theme="light"] {
   }
 
   &__site-name {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: $primaryColor;
@@ -232,7 +232,7 @@ html[data-theme="light"] {
   }
 
   &__label {
-    font-size: 1rem;
+    font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -240,14 +240,14 @@ html[data-theme="light"] {
   }
 
   &__id {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1;
   }
 
   &__date {
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     opacity: 0.45;
   }
 }
@@ -266,7 +266,7 @@ html[data-theme="dark"] .quotation-header {
   flex-wrap: wrap;
 
   &__sup {
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -275,7 +275,7 @@ html[data-theme="dark"] .quotation-header {
   }
 
   &__title {
-    font-size: clamp(2.8rem, 4vw, 4.5rem);
+    font-size: clamp(1.75rem, 4vw, 2.8125rem);
     font-weight: 800;
     letter-spacing: -1.5px;
     line-height: 1.1;
@@ -286,7 +286,7 @@ html[data-theme="dark"] .quotation-header {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: $primaryColor;
     text-decoration: none;
@@ -310,14 +310,14 @@ html[data-theme="dark"] .quotation-header {
 
   &__value {
     display: block;
-    font-size: 3rem;
+    font-size: 1.875rem;
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1;
   }
 
   &__label {
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     opacity: 0.4;
   }
 }
@@ -327,7 +327,7 @@ html[data-theme="dark"] .quotation-header {
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
   opacity: 0.6;
 
   strong { opacity: 1; font-weight: 700; }
@@ -361,7 +361,7 @@ html[data-theme="dark"] .quotation-header {
   margin-bottom: 44px;
 
   &__title {
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -378,7 +378,7 @@ html[data-theme="dark"] .quotation-section__title {
 
 // --- Content ---
 .quotation-content {
-  font-size: 1.6rem;
+  font-size: 1rem;
   line-height: 1.85;
   opacity: 0.82;
 
@@ -401,7 +401,7 @@ html[data-theme="dark"] .quotation-section__title {
   margin-bottom: 16px;
 
   &__label {
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     opacity: 0.4;
     white-space: nowrap;
@@ -420,7 +420,7 @@ html[data-theme="dark"] .quotation-section__title {
   display: inline-block;
   padding: 4px 14px;
   border-radius: 100px;
-  font-size: 1.1rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   background: rgba(0,0,0,0.05);
   border: 1px solid rgba(0,0,0,0.08);
@@ -448,12 +448,12 @@ html[data-theme="dark"] .quotation-section__title {
   }
 
   &__period {
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     opacity: 0.5;
   }
 
   &__scope {
-    font-size: 1.5rem;
+    font-size: 0.9375rem;
     line-height: 1.8;
     opacity: 0.8;
     padding: 20px;
@@ -484,7 +484,7 @@ html[data-theme="dark"] .quotation-section__title {
     align-items: center;
     gap: 10px;
     padding: 15px 20px;
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -501,7 +501,7 @@ html[data-theme="dark"] .quotation-section__title {
   &__body { padding: 20px; }
 
   &__subsection-title {
-    font-size: 1.1rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     opacity: 0.38;
     text-transform: uppercase;
@@ -518,7 +518,7 @@ html[data-theme="dark"] .quotation-section__title {
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid rgba(0,0,0,0.05);
-  font-size: 1.4rem;
+  font-size: 0.875rem;
 
   html[data-theme="dark"] & { border-bottom-color: rgba(255,255,255,0.05); }
 
@@ -526,7 +526,7 @@ html[data-theme="dark"] .quotation-section__title {
 
   &__label {
     opacity: 0.4;
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     white-space: nowrap;
   }
 
@@ -550,20 +550,20 @@ html[data-theme="dark"] .quotation-section__title {
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid rgba(0,0,0,0.05);
-  font-size: 1.4rem;
+  font-size: 0.875rem;
 
   html[data-theme="dark"] & { border-bottom-color: rgba(255,255,255,0.05); }
 
   &:last-child { border-bottom: none; }
 
   &--main .quotation-price-row__value {
-    font-size: 1.9rem;
+    font-size: 1.1875rem;
     font-weight: 800;
     letter-spacing: -0.5px;
   }
 
   &--sm {
-    font-size: 1.25rem;
+    font-size: 0.7812rem;
     padding: 7px 0;
   }
 
@@ -571,11 +571,11 @@ html[data-theme="dark"] .quotation-section__title {
 
   &__label {
     opacity: 0.45;
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     flex: 1;
   }
 
-  &__note { font-size: 1rem; opacity: 0.45; }
+  &__note { font-size: 0.625rem; opacity: 0.45; }
 
   &__value {
     font-weight: 600;
@@ -598,10 +598,10 @@ html[data-theme="dark"] {
   align-items: center;
   padding: 4px 12px;
   border-radius: 100px;
-  font-size: 1.1rem;
+  font-size: 0.6875rem;
   font-weight: 700;
 
-  &--xs { padding: 2px 8px; font-size: 0.95rem; }
+  &--xs { padding: 2px 8px; font-size: 0.5938rem; }
 
   &--success { background: #dcfce7; color: #166534; }
   &--info    { background: #dbeafe; color: #1e40af; }
@@ -627,7 +627,7 @@ html[data-theme="dark"] .badge {
   padding-top: 10px;
 
   &__thanks {
-    font-size: 1.4rem;
+    font-size: 0.875rem;
     opacity: 0.4;
   }
 
@@ -644,7 +644,7 @@ html[data-theme="dark"] .badge {
   gap: 8px;
   padding: 12px 24px;
   border-radius: 100px;
-  font-size: 1.3rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.22s ease;
@@ -705,19 +705,19 @@ html[data-theme="dark"] .badge {
 
 .quotation-doc {
   max-width: 860px;
-  margin: 3rem auto 5rem;
-  padding: 0 1.5rem;
+  margin: 1.875rem auto 3.125rem;
+  padding: 0 0.9375rem;
   font-family: $primaryFont;
   color: #1a1a1a;
-  font-size: 1.5rem;
+  font-size: 0.9375rem;
   line-height: 1.7;
 
   // ── VALUE-CENTRIC METRICS (Hero grid) ────────────────────────────────
   .qd-metrics {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 1rem;
-    margin: 2rem 0 2.6rem;
+    gap: 0.625rem;
+    margin: 1.25rem 0 1.625rem;
   }
 
   .qd-metric {
@@ -725,7 +725,7 @@ html[data-theme="dark"] .badge {
     background: #fff;
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px;
-    padding: 1.1rem 1.2rem;
+    padding: 0.6875rem 0.75rem;
 
     @media (max-width: 760px) {
       grid-column: span 6;
@@ -736,16 +736,16 @@ html[data-theme="dark"] .badge {
     }
 
     &__label {
-      font-size: 1.1rem;
+      font-size: 0.6875rem;
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: rgba(0,0,0,0.55);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.25rem;
       font-weight: $semiBold;
     }
 
     &__value {
-      font-size: 1.8rem;
+      font-size: 1.125rem;
       font-weight: $extraBold;
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
@@ -758,51 +758,51 @@ html[data-theme="dark"] .badge {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 2rem;
-    padding-bottom: 2rem;
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid rgba(0,0,0,0.85);
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5625rem;
 
     &__brand {
       flex: 1;
     }
 
     &__logo {
-      max-height: 15rem;
+      max-height: 9.375rem;
       width: auto;
     }
 
     &__site-name {
-      font-size: 2rem;
+      font-size: 1.25rem;
       font-weight: $bold;
       color: inherit;
       text-decoration: none;
     }
 
     &__title {
-      font-size: 2rem;
+      font-size: 1.25rem;
       font-weight: $extraBold;
       letter-spacing: 0.12em;
       text-align: right;
-      margin: 0 0 1rem;
+      margin: 0 0 0.625rem;
       color: #1a1a1a;
     }
 
     &__meta-table {
-      font-size: 1.3rem;
+      font-size: 0.8125rem;
       border: none;
       margin: 0;
       width: auto;
 
       td {
-        padding: 0.2rem 0.6rem 0.2rem 0;
+        padding: 0.125rem 0.375rem 0.125rem 0;
         border: none;
         background: none;
         white-space: nowrap;
 
         &:first-child {
           color: #666;
-          padding-right: 1.2rem;
+          padding-right: 0.75rem;
         }
       }
 
@@ -816,14 +816,14 @@ html[data-theme="dark"] .badge {
   .qd-parties {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2.5rem;
-    margin-bottom: 2.5rem;
+    gap: 1.5625rem;
+    margin-bottom: 1.5625rem;
   }
 
   .qd-party {
     background: #fff;
     border-radius: 10px;
-    padding: 1.5rem 1.8rem;
+    padding: 0.9375rem 1.125rem;
     border: 1px solid rgba(0,0,0,0.08);
     border-left: 3px solid rgba(0,0,0,0.35);
 
@@ -834,22 +834,22 @@ html[data-theme="dark"] .badge {
     }
 
     &__role {
-      font-size: 1.1rem;
+      font-size: 0.6875rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: #888;
-      margin: 0 0 0.4rem;
+      margin: 0 0 0.25rem;
     }
 
     &__name {
-      font-size: 1.6rem;
+      font-size: 1rem;
       font-weight: $bold;
-      margin: 0 0 0.8rem;
+      margin: 0 0 0.5rem;
     }
 
     &__detail {
-      font-size: 1.35rem;
-      margin: 0.2rem 0;
+      font-size: 0.8438rem;
+      margin: 0.125rem 0;
       color: #444;
 
       a {
@@ -867,25 +867,25 @@ html[data-theme="dark"] .badge {
   .qd-rule {
     border: none;
     border-top: 1px solid rgba(0,0,0,0.12);
-    margin: 0 0 3rem;
+    margin: 0 0 1.875rem;
   }
 
   // ── SECTION ─────────────────────────────────────────────────────────
   .qd-section {
-    margin-bottom: 3.5rem;
+    margin-bottom: 2.1875rem;
 
     &__heading {
       display: grid;
-      grid-template-columns: 2.8rem 1fr;
+      grid-template-columns: 1.75rem 1fr;
       align-items: center;
-      column-gap: 1rem;
-      font-size: 1.55rem;
+      column-gap: 0.625rem;
+      font-size: 0.9688rem;
       font-weight: $bold;
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: #1a1a1a;
-      padding-bottom: 0.6rem;
-      margin: 0 0 1.8rem;
+      padding-bottom: 0.375rem;
+      margin: 0 0 1.125rem;
       position: relative;
 
       &::after {
@@ -900,7 +900,7 @@ html[data-theme="dark"] .badge {
     }
 
     &--sign {
-      margin-top: 4rem;
+      margin-top: 2.5rem;
     }
   }
 
@@ -908,43 +908,43 @@ html[data-theme="dark"] .badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.6rem;
-    height: 2.6rem;
+    width: 1.625rem;
+    height: 1.625rem;
     border-radius: 50%;
     background: $primaryColor;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     font-weight: $bold;
     flex-shrink: 0;
   }
 
   // ── SUBSECTION h3 ───────────────────────────────────────────────────
   .qd-subsection {
-    font-size: 1.4rem;
+    font-size: 0.875rem;
     font-weight: $semiBold;
     color: #444;
-    margin: 3rem 0 1rem;
-    padding-left: 0.8rem;
+    margin: 1.875rem 0 0.625rem;
+    padding-left: 0.5rem;
     border-left: 3px solid $primaryColor;
   }
 
   // ── PROSE & RICH TEXT ───────────────────────────────────────────────
   .qd-prose {
-    font-size: 1.45rem;
+    font-size: 0.9062rem;
     line-height: 1.75;
     color: #2a2a2a;
 
     ul, ol {
-      padding-left: 1.8rem;
-      margin: 0.5rem 0;
+      padding-left: 1.125rem;
+      margin: 0.3125rem 0;
     }
 
-    p { margin: 0 0 0.8rem; }
+    p { margin: 0 0 0.5rem; }
 
     &--sm {
-      font-size: 1.35rem;
+      font-size: 0.8438rem;
 
-      p { margin: 0.2rem 0; }
+      p { margin: 0.125rem 0; }
     }
   }
 
@@ -953,24 +953,24 @@ html[data-theme="dark"] .badge {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 1.4rem;
-    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.9375rem;
 
     th {
       background: rgba(0,0,0,0.03);
       font-weight: $semiBold;
       text-align: left;
-      padding: 0.7rem 1rem;
+      padding: 0.4375rem 0.625rem;
       border: none;
       border-bottom: 1px solid rgba(0,0,0,0.12);
       color: #444;
-      font-size: 1.25rem;
+      font-size: 0.7812rem;
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
 
     td {
-      padding: 0.7rem 1rem;
+      padding: 0.4375rem 0.625rem;
       border: none;
       border-bottom: 1px solid rgba(0,0,0,0.08);
       vertical-align: top;
@@ -982,23 +982,23 @@ html[data-theme="dark"] .badge {
     }
 
     &__col-num {
-      width: 4rem;
+      width: 2.5rem;
       text-align: center;
     }
 
     &__col-price {
-      width: 14rem;
+      width: 8.75rem;
       text-align: right;
       white-space: nowrap;
     }
 
     &__col-qty {
-      width: 4rem;
+      width: 2.5rem;
       text-align: center;
     }
 
     &__col-days {
-      width: 10rem;
+      width: 6.25rem;
       text-align: center;
     }
 
@@ -1014,7 +1014,7 @@ html[data-theme="dark"] .badge {
     &__note-row td {
       background: rgba(0,0,0,0.015);
       color: #666;
-      font-size: 1.3rem;
+      font-size: 0.8125rem;
       font-style: italic;
     }
 
@@ -1026,7 +1026,7 @@ html[data-theme="dark"] .badge {
     // Timeline table tweaks
     &--timeline .qd-phase-name {
       font-weight: $semiBold;
-      font-size: 1.3rem;
+      font-size: 0.8125rem;
       color: #333;
       white-space: nowrap;
     }
@@ -1042,15 +1042,15 @@ html[data-theme="dark"] .badge {
 
         tbody {
           display: grid;
-          gap: 0.9rem;
+          gap: 0.5625rem;
         }
 
         tbody tr {
           display: grid;
           grid-template-columns: 1fr 180px;
           grid-auto-rows: minmax(0, auto);
-          gap: 0.55rem 1.2rem;
-          padding: 1.05rem 1.1rem;
+          gap: 0.3438rem 0.75rem;
+          padding: 0.6562rem 0.6875rem;
           background: #fff;
           border: 1px solid rgba(0,0,0,0.08);
           border-radius: 14px;
@@ -1066,12 +1066,12 @@ html[data-theme="dark"] .badge {
         tbody td::before {
           content: attr(data-label);
           display: block;
-          font-size: 1.05rem;
+          font-size: 0.6562rem;
           letter-spacing: 0.14em;
           text-transform: uppercase;
           color: rgba(0,0,0,0.52);
           font-weight: $extraBold;
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.1562rem;
         }
 
         tbody td.qd-table__col-num {
@@ -1082,7 +1082,7 @@ html[data-theme="dark"] .badge {
         tbody td:nth-child(2) {
           grid-column: 1 / 2;
           font-weight: $extraBold;
-          font-size: 1.45rem;
+          font-size: 0.9062rem;
         }
 
         tbody td.qd-table__col-price,
@@ -1111,17 +1111,17 @@ html[data-theme="dark"] .badge {
   .qd-flow {
     list-style: none;
     padding: 0;
-    margin: 1.2rem 0 0;
+    margin: 0.75rem 0 0;
     position: relative;
   }
 
   .qd-flow__item {
     display: grid;
     grid-template-columns: 18px 1fr;
-    column-gap: 1.2rem;
+    column-gap: 0.75rem;
     align-items: start;
     position: relative;
-    padding-bottom: 1.4rem;
+    padding-bottom: 0.875rem;
 
     &:last-child {
       padding-bottom: 0;
@@ -1156,23 +1156,23 @@ html[data-theme="dark"] .badge {
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px;
     background: #fff;
-    padding: 1.1rem 1.2rem 1rem;
+    padding: 0.6875rem 0.75rem 0.625rem;
   }
 
   .qd-flow__head {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.625rem;
     align-items: baseline;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.375rem;
   }
 
   .qd-flow__title {
     display: flex;
     align-items: baseline;
-    gap: 0.7rem;
+    gap: 0.4375rem;
     font-weight: $semiBold;
-    font-size: 1.35rem;
+    font-size: 0.8438rem;
     color: #1a1a1a;
   }
 
@@ -1180,8 +1180,8 @@ html[data-theme="dark"] .badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 1.375rem;
+    height: 1.375rem;
     border-radius: 8px;
     background: rgba($primaryColor, 0.08);
     border: 1px solid rgba($primaryColor, 0.18);
@@ -1191,7 +1191,7 @@ html[data-theme="dark"] .badge {
   }
 
   .qd-flow__meta {
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     color: rgba(0,0,0,0.55);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -1209,7 +1209,7 @@ html[data-theme="dark"] .badge {
     &--total {
       font-weight: $bold;
       color: $primaryColor;
-      font-size: 1.5rem;
+      font-size: 0.9375rem;
     }
 
     &--paid { color: #27ae60; }
@@ -1220,21 +1220,21 @@ html[data-theme="dark"] .badge {
   .qd-link {
     color: $primaryColor;
     text-decoration: underline;
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     word-break: break-all;
   }
 
   .qd-demo-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3125rem;
     color: $primaryColor;
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     text-decoration: none;
     border: 1px solid rgba($primaryColor, 0.35);
-    padding: 0.4rem 1rem;
+    padding: 0.25rem 0.625rem;
     border-radius: 4px;
-    margin-top: 0.8rem;
+    margin-top: 0.5rem;
     transition: background 0.2s;
 
     &:hover { background: rgba($primaryColor, 0.06); }
@@ -1244,14 +1244,14 @@ html[data-theme="dark"] .badge {
   .qd-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    gap: 0.3438rem;
   }
 
   .qd-tag {
     display: inline-block;
-    padding: 0.38rem 0.95rem;
+    padding: 0.2375rem 0.5938rem;
     border-radius: 100px;
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     font-weight: $semiBold;
     letter-spacing: 0.01em;
     background: rgba(0,0,0,0.03);
@@ -1287,19 +1287,19 @@ html[data-theme="dark"] .badge {
   .qd-feature-grid {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 0.6875rem;
   }
 
   .qd-feature-group {
     display: flex;
     align-items: flex-start;
-    gap: 1.1rem;
-    padding: 0.25rem 0;
+    gap: 0.6875rem;
+    padding: 0.1562rem 0;
 
     &__label {
-      min-width: 10rem;
+      min-width: 6.25rem;
       font-weight: 600;
-      font-size: 1.35rem;
+      font-size: 0.8438rem;
       color: $primaryColor;
     }
   }
@@ -1308,15 +1308,15 @@ html[data-theme="dark"] .badge {
   .qd-color-palette {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
-    padding-top: 0.25rem;
+    gap: 0.375rem;
+    padding-top: 0.1562rem;
   }
 
   .qd-color-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.45rem 0.8rem;
+    gap: 0.3438rem;
+    padding: 0.2812rem 0.5rem;
     border-radius: 999px;
     border: 1px solid rgba(0,0,0,0.12);
     background: rgba(255,255,255,0.75);
@@ -1337,12 +1337,12 @@ html[data-theme="dark"] .badge {
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-size: 1.15rem;
+    font-size: 0.7188rem;
     color: rgba(0,0,0,0.78);
   }
 
   .qd-color-chip__label {
-    font-size: 1.15rem;
+    font-size: 0.7188rem;
     color: rgba(0,0,0,0.55);
     font-weight: $semiBold;
   }
@@ -1351,18 +1351,18 @@ html[data-theme="dark"] .badge {
   .qd-timeline-summary {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+    margin-bottom: 0.9375rem;
   }
 
   .qd-timeline-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 1.2rem;
+    gap: 0.3125rem;
+    padding: 0.2812rem 0.75rem;
     border-radius: 100px;
     background: #f4f4f4;
-    font-size: 1.35rem;
+    font-size: 0.8438rem;
     border: 1px solid #e4e4e4;
   }
 
@@ -1371,34 +1371,34 @@ html[data-theme="dark"] .badge {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.4rem;
+    padding: 0.625rem 0.875rem;
     background: #f8f8f8;
     border-radius: 6px;
     border: 1px solid #e8e8e8;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.375rem;
 
-    &__label { font-size: 1.4rem; color: #444; }
-    &__value  { font-size: 1.5rem; font-weight: $bold; }
+    &__label { font-size: 0.875rem; color: #444; }
+    &__value  { font-size: 0.9375rem; font-weight: $bold; }
 
-    &--muted .qd-price-summary__value { color: #777; font-weight: $regular; font-size: 1.35rem; }
+    &--muted .qd-price-summary__value { color: #777; font-weight: $regular; font-size: 0.8438rem; }
   }
 
   // ── PAYMENT STATUS ───────────────────────────────────────────────────
   .qd-payment-status {
-    margin-top: 1rem;
-    font-size: 1.35rem;
+    margin-top: 0.625rem;
+    font-size: 0.8438rem;
     color: #555;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.375rem;
   }
 
   // ── CTA (Document end) ───────────────────────────────────────────────
   .qd-cta {
     display: flex;
     justify-content: space-between;
-    gap: 2rem;
-    padding: 1.4rem 1.6rem;
+    gap: 1.25rem;
+    padding: 0.875rem 1rem;
     border-radius: 14px;
     border: 1px solid rgba(0,0,0,0.08);
     background: rgba(0,0,0,0.015);
@@ -1410,24 +1410,24 @@ html[data-theme="dark"] .badge {
   }
 
   .qd-cta__title {
-    font-size: 1.55rem;
+    font-size: 0.9688rem;
     font-weight: $extraBold;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.25rem;
     letter-spacing: -0.01em;
   }
 
   .qd-cta__desc {
     margin: 0;
     color: rgba(0,0,0,0.62);
-    font-size: 1.35rem;
+    font-size: 0.8438rem;
     line-height: 1.65;
   }
 
   .qd-cta__meta {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem 1.2rem;
-    margin-top: 1rem;
+    gap: 0.5625rem 0.75rem;
+    margin-top: 0.625rem;
 
     @media (max-width: 640px) {
       grid-template-columns: 1fr;
@@ -1437,11 +1437,11 @@ html[data-theme="dark"] .badge {
   .qd-cta__meta-item {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.1562rem;
   }
 
   .qd-cta__meta-label {
-    font-size: 1.05rem;
+    font-size: 0.6562rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(0,0,0,0.52);
@@ -1449,7 +1449,7 @@ html[data-theme="dark"] .badge {
   }
 
   .qd-cta__meta-value {
-    font-size: 1.35rem;
+    font-size: 0.8438rem;
     color: $primaryColor;
     text-decoration: none;
 
@@ -1459,7 +1459,7 @@ html[data-theme="dark"] .badge {
   .qd-cta__actions {
     display: flex;
     align-items: flex-start;
-    gap: 0.9rem;
+    gap: 0.5625rem;
     flex-shrink: 0;
 
     @media (max-width: 640px) {
@@ -1472,14 +1472,14 @@ html[data-theme="dark"] .badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.85rem 1.2rem;
+    gap: 0.3125rem;
+    padding: 0.5312rem 0.75rem;
     border-radius: 999px;
     border: 1px solid rgba(0,0,0,0.16);
     background: #fff;
     color: #1a1a1a;
     font-weight: $extraBold;
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     cursor: pointer;
@@ -1509,12 +1509,12 @@ html[data-theme="dark"] .badge {
   .qd-maintenance-header {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-    margin-bottom: 1.2rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 
   .qd-maintenance-period {
-    font-size: 1.3rem;
+    font-size: 0.8125rem;
     color: #666;
   }
 
@@ -1523,9 +1523,9 @@ html[data-theme="dark"] .badge {
   @media (max-width: 640px) {
     .qd-header { flex-direction: column; }
     .qd-parties { grid-template-columns: 1fr; }
-    .qd-table { font-size: 1.25rem; }
-    .qd-table th, .qd-table td { padding: 0.5rem 0.7rem; }
-    .qd-feature-group { flex-direction: column; gap: 0.5rem; }
+    .qd-table { font-size: 0.7812rem; }
+    .qd-table th, .qd-table td { padding: 0.3125rem 0.4375rem; }
+    .qd-feature-group { flex-direction: column; gap: 0.3125rem; }
   }
 }
 

@@ -26,7 +26,7 @@
     }
 
     .page-title {
-        font-size: clamp(3.5rem, 6vw, 6rem);
+        font-size: clamp(2.1875rem, 6vw, 3.75rem);
         font-weight: 800;
         letter-spacing: -2px;
         margin-bottom: 20px;
@@ -44,7 +44,7 @@
         color: var(--text-muted);
         max-width: 700px;
         margin: 0 auto;
-        font-size: clamp(1.6rem, 2vw, 1.8rem);
+        font-size: clamp(1rem, 2vw, 1.125rem);
         line-height: 1.6;
         opacity: 0.8;
 
@@ -69,15 +69,15 @@
 // ─── View Count Meta Item (extracted from page-hero.php, post-hero.php) ─────
 
 .meta-item--viewcount {
-    margin-top: 1rem;
-    font-size: 1.4rem;
+    margin-top: 0.625rem;
+    font-size: 0.875rem;
     color: var(--laca-text-muted, var(--text-muted));
 
     .dashicons {
-        font-size: 1.4rem;
-        width: 1.4rem;
-        height: 1.4rem;
-        margin-right: 0.4rem;
+        font-size: 0.875rem;
+        width: 0.875rem;
+        height: 0.875rem;
+        margin-right: 0.25rem;
         vertical-align: middle;
     }
 }

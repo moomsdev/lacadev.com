@@ -7,7 +7,7 @@
 @use "admin-help";
 
 html :where(.wp-block) {
-  max-width: 144rem !important;
+  max-width: 90rem !important;
   position: relative;
   overflow: hidden;
 }
@@ -87,7 +87,7 @@ input[name="carbon_fields_compact_input[_smtp_password]"] {
 }
 
 button[data-toggle="password-toggle"] {
-  padding: 2px 2rem;
+  padding: 2px 1.25rem;
   min-width: 12%;
   display: inline-block;
   font-weight: 600;
@@ -120,11 +120,11 @@ button[data-toggle="password-toggle"] {
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 2.4rem !important;
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.4) !important;
-  padding: 3rem !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 1.25rem 3.125rem rgba(0, 0, 0, 0.4) !important;
+  padding: 1.875rem !important;
   width: auto !important;
-  max-width: 40rem !important;
+  max-width: 25rem !important;
   overflow: hidden;
 
   .swal2-html-container {
@@ -140,24 +140,24 @@ button[data-toggle="password-toggle"] {
     text-align: center;
 
     .alp-swal-icon {
-      font-size: 5rem;
-      margin-bottom: 2rem;
+      font-size: 3.125rem;
+      margin-bottom: 1.25rem;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
       animation: alpEmojiBounce 2s ease-in-out infinite;
     }
 
     .alp-swal-title {
       font-family: "Quicksand", sans-serif !important;
-      font-size: 2.4rem !important;
+      font-size: 1.5rem !important;
       font-weight: 800 !important;
       color: #fff !important;
-      margin-bottom: 1rem !important;
+      margin-bottom: 0.625rem !important;
       letter-spacing: -0.02em;
     }
 
     .alp-swal-msg {
       font-family: "Quicksand", sans-serif !important;
-      font-size: 1.6rem !important;
+      font-size: 1rem !important;
       color: rgba(255, 255, 255, 0.7) !important;
       margin: 0 !important;
       line-height: 1.6;
@@ -166,7 +166,7 @@ button[data-toggle="password-toggle"] {
 
   .swal2-timer-progress-bar {
     background: rgba(255, 255, 255, 0.2) !important;
-    height: 0.4rem !important;
+    height: 0.25rem !important;
   }
 }
 
