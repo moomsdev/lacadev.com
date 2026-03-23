@@ -39,6 +39,16 @@
       ]
     }
   },
+  "example": {
+    "attributes": {
+      "brands": [
+        { "name": "LA CA DEV", "url": "" },
+        { "name": "CREATIVE AGENCY", "url": "" },
+        { "name": "UI/UX DESIGN", "url": "" },
+        { "name": "WEB DEVELOPMENT", "url": "" }
+      ]
+    }
+  },
   "supports": {
     "html": false,
     "align": [

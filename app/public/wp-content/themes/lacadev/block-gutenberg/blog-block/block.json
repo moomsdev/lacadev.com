@@ -66,6 +66,15 @@
       "default": "/blog/"
     }
   },
+  "example": {
+    "attributes": {
+      "title": "Popular Blogs",
+      "description": "Những bài viết hay nhất từ La Cà Dev",
+      "count": 3,
+      "buttonText": "Xem tất cả bài viết",
+      "buttonUrl": "/blog/"
+    }
+  },
   "supports": {
     "html": false,
     "align": [

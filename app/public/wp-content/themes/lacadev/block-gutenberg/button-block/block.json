@@ -55,6 +55,14 @@
       "default": ""
     }
   },
+  "example": {
+    "attributes": {
+      "text": "Tìm hiểu ngay",
+      "url": "#",
+      "style": "primary",
+      "alignment": "center"
+    }
+  },
   "supports": {
     "html": false,
     "align": [

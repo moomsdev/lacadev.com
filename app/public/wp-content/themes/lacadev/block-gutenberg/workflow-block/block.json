@@ -46,6 +46,18 @@
       ]
     }
   },
+  "example": {
+    "attributes": {
+      "subTitle": "The Process",
+      "title": "Cách tôi làm việc",
+      "steps": [
+        { "title": "Gathering", "desc": "Understanding your vision and setting the base camp for the project journey." },
+        { "title": "Curating", "desc": "Design and architecture. Selecting the right tools and visual language for the task." },
+        { "title": "Crafting", "desc": "Building with precision. Agile development cycles from a focused digital atelier." },
+        { "title": "Exploring", "desc": "Final launch and continuous support as your digital presence begins its ascent." }
+      ]
+    }
+  },
   "supports": {
     "html": false,
     "align": ["wide", "full"]

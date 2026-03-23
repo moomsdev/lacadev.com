@@ -43,6 +43,16 @@
       ]
     }
   },
+  "example": {
+    "attributes": {
+      "technologies": [
+        { "name": "Next.js", "iconUrl": "", "iconId": 0 },
+        { "name": "Vercel", "iconUrl": "", "iconId": 0 },
+        { "name": "TypeScript", "iconUrl": "", "iconId": 0 },
+        { "name": "Tailwind", "iconUrl": "", "iconId": 0 }
+      ]
+    }
+  },
   "supports": {
     "html": false,
     "align": [

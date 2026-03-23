@@ -67,6 +67,15 @@
       "default": "/blog/"
     }
   },
+  "example": {
+    "attributes": {
+      "title": "Bài viết nổi bật",
+      "description": "Khám phá những bài viết hay nhất",
+      "count": 3,
+      "buttonText": "Khám phá tất cả bài viết",
+      "buttonUrl": "/blog/"
+    }
+  },
   "supports": {
     "html": false,
     "align": [

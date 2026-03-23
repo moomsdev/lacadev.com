@@ -62,6 +62,14 @@
       "default": ""
     }
   },
+  "example": {
+    "attributes": {
+      "title": "Selected Works",
+      "description": "A curated showcase by La Cà Dev. Rugged, minimalist, and bold.",
+      "countDesktop": 6,
+      "countMobile": 4
+    }
+  },
   "supports": {
     "html": false,
     "align": [
