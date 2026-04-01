@@ -35,12 +35,19 @@ function app_action_theme_enqueue_assets()
     }
 
     /**
-     * Vendors bundle
+     * Vendor chunks — load theo thứ tự phụ thuộc, tất cả defer
      */
+    $vendor_chunks = [
+        'theme-vendors-js'      => 'vendors.js',
+        'theme-vendor-gsap-js'  => 'vendor-gsap.js',
+        'theme-vendor-swiper-js'=> 'vendor-swiper.js',
+    ];
     $vendors_deps = [];
-    if (file_exists($dist_path . 'vendors.js')) {
-        wp_enqueue_script('theme-vendors-js', $dist_url . 'vendors.js', [], $version, true);
-        $vendors_deps = ['theme-vendors-js'];
+    foreach ($vendor_chunks as $handle => $file) {
+        if (file_exists($dist_path . $file)) {
+            wp_enqueue_script($handle, $dist_url . $file, [], $version, true);
+            $vendors_deps[] = $handle;
+        }
     }
 
     /**
@@ -116,21 +123,25 @@ function app_action_admin_enqueue_assets()
     );
 
     /**
-     * Enqueue vendors.js if exists (same fix as frontend)
-     * CRITICAL: Load in head (false) to ensure it's available before admin.js
+     * Admin vendor chunks — load in <head> (false) để đảm bảo Swal/Chart available trước admin.js
      */
     $admin_deps = [];
     $theme_root = dirname(get_template_directory());
-    $vendors_path = $theme_root . '/dist/vendors.js';
-    
-    if (file_exists($vendors_path)) {
-        $base_uri = get_template_directory_uri();
-        $theme_uri = dirname($base_uri);
-        $vendors_url = $theme_uri . '/dist/vendors.js';
-        
-        // Load in <head> without defer to ensure Swal is available
-        wp_enqueue_script('theme-vendors-js', $vendors_url, [], wp_get_theme()->get('Version'), false);
-        $admin_deps = ['theme-vendors-js'];
+    $base_uri   = dirname(get_template_directory_uri());
+    $admin_theme_dist_path = $theme_root . '/dist/';
+    $admin_theme_dist_url  = $base_uri . '/dist/';
+    $admin_version = wp_get_theme()->get('Version');
+
+    $admin_vendor_chunks = [
+        'theme-vendors-js'       => 'vendors.js',
+        'theme-vendor-swal-js'   => 'vendor-swal.js',
+        'theme-vendor-chart-js'  => 'vendor-chart.js',
+    ];
+    foreach ($admin_vendor_chunks as $handle => $file) {
+        if (file_exists($admin_theme_dist_path . $file)) {
+            wp_enqueue_script($handle, $admin_theme_dist_url . $file, [], $admin_version, false);
+            $admin_deps[] = $handle;
+        }
     }
 
     /**
@@ -389,15 +400,18 @@ function app_action_add_favicon()
  * Advanced script optimization with defer/async/preload
  */
 add_filter('script_loader_tag', function ($tag, $handle, $src) {
-    // Scripts to defer (non-critical)
-    // NOTE: theme-vendors-js is NOT deferred - it must load blocking to ensure Swal/dependencies are available
+    // Scripts to defer (non-critical, loaded in footer)
+    // NOTE: admin vendor chunks (swal, chart) are NOT deferred — loaded in <head> blocking
     $defer_scripts = [
+        'theme-vendors-js',
+        'theme-vendor-gsap-js',
+        'theme-vendor-swiper-js',
         'theme-js-bundle',
         'theme-admin-js-bundle',
         'theme-login-js-bundle',
         'theme-editor-js-bundle',
         'theme-archive-js',
-        'theme-comments-js'
+        'theme-comments-js',
     ];
 
     // Scripts to async (tracking, analytics)

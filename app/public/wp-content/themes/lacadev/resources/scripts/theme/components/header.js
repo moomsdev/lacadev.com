@@ -7,6 +7,7 @@ export function initHeaderScroll() {
 	const header = document.getElementById( 'header' );
 	if ( ! header ) return;
 
+	const controller = new AbortController();
 	let lastScrollTop = 0;
 	const THRESHOLD = 100;
 
@@ -22,5 +23,7 @@ export function initHeaderScroll() {
 		}
 
 		lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-	}, { passive: true } );
+	}, { passive: true, signal: controller.signal } );
+
+	return () => controller.abort();
 }

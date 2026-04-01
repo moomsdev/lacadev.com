@@ -7,7 +7,6 @@
   "rules": {
     "no-empty-source": null,
     "no-descending-specificity": null,
-    "indentation": 2,
     "order/order": [
       "custom-properties",
       "dollar-variables",
@@ -28,7 +27,9 @@
       true,
       {
         "ignorePseudoClasses": [
-          "where"
+          "where",
+          "global",
+          "local"
         ]
       }
     ],
@@ -41,6 +42,8 @@
           "view-transition-image-pair"
         ]
       }
-    ]
+    ],
+    "scss/at-rule-no-unknown": true,
+    "scss/no-duplicate-dollar-variables": true
   }
 }

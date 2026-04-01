@@ -662,9 +662,66 @@ form#posts-filter {
   position: relative;
 }
 
+// ─── Image Column Width ──────────────────────────────────────
+// Fix cột IMAGE quá rộng trong admin list tables (Posts, Pages, Service, Project...)
+// th: header cell; td: data cell - đều cần width cố định
+
+.column-featured_image,
+.column-thumbnail {
+  width: 10rem !important;
+  max-width: 10rem;
+
+  a:not(.remove-thumbnail) {
+    display: block !important;
+    background-color: #fff;
+  }
+
+  a.remove-thumbnail {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 13px;
+    height: 13px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f15d4f;
+    color: #fff;
+    border-radius: 50%;
+    border: 1px solid #f15d4f;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #fff;
+      color: #f15d4f;
+    }
+
+    svg {
+      width: 50%;
+      height: 50%;
+    }
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .no-image-text {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    border: 1px dashed;
+    aspect-ratio: 16 / 10;
+  }
+}
+
 .column-featured_image.featured_image,
 .column-is_feature {
-  width: 5rem !important;
+  width: 10rem !important;
+  max-width: 10rem;
 }
 
 .column-is_feature {

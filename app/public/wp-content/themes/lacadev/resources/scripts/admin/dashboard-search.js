@@ -44,12 +44,28 @@
                         return;
                     }
 
-                    results.innerHTML = res.data.items.map(function (item) {
-                        return '<a href="' + item.edit_url + '" class="laca-quick-search-item">' +
-                            '<span class="item-title">' + escHtml(item.title) + escHtml(item.status) + '</span>' +
-                            '<span class="item-meta">' + escHtml(item.post_type) + ' · ' + escHtml(item.date) + '</span>' +
-                        '</a>';
-                    }).join('');
+                    const fragment = document.createDocumentFragment();
+                    res.data.items.forEach(function (item) {
+                        const a = document.createElement('a');
+                        // Chỉ cho phép URL bắt đầu bằng http/https để tránh javascript: injection
+                        const url = String(item.edit_url || '');
+                        a.href = /^https?:\/\//.test(url) ? url : '#';
+                        a.className = 'laca-quick-search-item';
+
+                        const title = document.createElement('span');
+                        title.className = 'item-title';
+                        title.textContent = String(item.title || '') + String(item.status || '');
+
+                        const meta = document.createElement('span');
+                        meta.className = 'item-meta';
+                        meta.textContent = String(item.post_type || '') + ' · ' + String(item.date || '');
+
+                        a.appendChild(title);
+                        a.appendChild(meta);
+                        fragment.appendChild(a);
+                    });
+                    results.innerHTML = '';
+                    results.appendChild(fragment);
                 })
                 .catch(function () {
                     results.innerHTML = '<div class="laca-quick-search-empty">Lỗi kết nối.</div>';

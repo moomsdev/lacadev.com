@@ -1,0 +1,175 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "useRootPaddingAwareAlignments": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "link": true,
+      "custom": true,
+      "customDuotone": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false,
+      "palette": [
+        {
+          "slug": "primary",
+          "color": "var(--primary-color, #0ea5e9)",
+          "name": "Primary"
+        },
+        {
+          "slug": "primary-dark",
+          "color": "var(--primary-color-dark, #0284c7)",
+          "name": "Primary Dark"
+        },
+        {
+          "slug": "secondary",
+          "color": "var(--secondary-color, #f59e0b)",
+          "name": "Secondary"
+        },
+        {
+          "slug": "secondary-dark",
+          "color": "var(--secondary-color-dark, #d97706)",
+          "name": "Secondary Dark"
+        },
+        {
+          "slug": "background",
+          "color": "var(--bg-color, #ffffff)",
+          "name": "Background"
+        },
+        {
+          "slug": "background-dark",
+          "color": "var(--bg-color-dark, #0f172a)",
+          "name": "Background Dark"
+        },
+        {
+          "slug": "white",
+          "color": "#ffffff",
+          "name": "White"
+        },
+        {
+          "slug": "black",
+          "color": "#000000",
+          "name": "Black"
+        }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "customFontSize": true,
+      "defaultFontSizes": false,
+      "fontFamilies": [
+        {
+          "slug": "primary",
+          "name": "Be Vietnam Pro",
+          "fontFamily": "\"Be Vietnam Pro\", sans-serif"
+        },
+        {
+          "slug": "secondary",
+          "name": "Quicksand",
+          "fontFamily": "Quicksand, sans-serif"
+        },
+        {
+          "slug": "sans",
+          "name": "System Sans",
+          "fontFamily": "Quicksand, \"Be Vietnam Pro\", sans-serif"
+        }
+      ],
+      "fontSizes": [
+        { "slug": "xs",   "size": "0.75rem",  "name": "Extra Small" },
+        { "slug": "sm",   "size": "0.875rem", "name": "Small" },
+        { "slug": "base", "size": "1rem",     "name": "Base" },
+        { "slug": "lg",   "size": "1.125rem", "name": "Large" },
+        { "slug": "xl",   "size": "1.25rem",  "name": "Extra Large" },
+        { "slug": "2xl",  "size": "1.5rem",   "name": "2XL" },
+        { "slug": "3xl",  "size": "1.875rem", "name": "3XL" },
+        { "slug": "4xl",  "size": "2.25rem",  "name": "4XL" },
+        { "slug": "5xl",  "size": "3rem",     "name": "5XL" },
+        { "slug": "6xl",  "size": "3.75rem",  "name": "6XL" }
+      ],
+      "fontWeights": [
+        { "slug": "thin",       "fontWeight": "100", "name": "Thin" },
+        { "slug": "extralight", "fontWeight": "200", "name": "Extra Light" },
+        { "slug": "light",      "fontWeight": "300", "name": "Light" },
+        { "slug": "normal",     "fontWeight": "400", "name": "Normal" },
+        { "slug": "medium",     "fontWeight": "500", "name": "Medium" },
+        { "slug": "semibold",   "fontWeight": "600", "name": "Semi Bold" },
+        { "slug": "bold",       "fontWeight": "700", "name": "Bold" },
+        { "slug": "extrabold",  "fontWeight": "800", "name": "Extra Bold" },
+        { "slug": "black",      "fontWeight": "900", "name": "Black" }
+      ]
+    },
+    "spacing": {
+      "defaultSpacingSizes": false,
+      "spacingSizes": [
+        { "slug": "1",  "size": "0.25rem",  "name": "1" },
+        { "slug": "2",  "size": "0.5rem",   "name": "2" },
+        { "slug": "3",  "size": "0.75rem",  "name": "3" },
+        { "slug": "4",  "size": "1rem",     "name": "4" },
+        { "slug": "5",  "size": "1.25rem",  "name": "5" },
+        { "slug": "6",  "size": "1.5rem",   "name": "6" },
+        { "slug": "8",  "size": "2rem",     "name": "8" },
+        { "slug": "10", "size": "2.5rem",   "name": "10" },
+        { "slug": "12", "size": "3rem",     "name": "12" },
+        { "slug": "16", "size": "4rem",     "name": "16" },
+        { "slug": "20", "size": "5rem",     "name": "20" },
+        { "slug": "24", "size": "6rem",     "name": "24" }
+      ]
+    },
+    "layout": {
+      "contentSize": "75rem",
+      "wideSize": "90rem"
+    },
+    "blocks": {
+      "core/paragraph": {
+        "typography": {
+          "fontFamily": true,
+          "fontSize": true,
+          "fontWeight": true,
+          "lineHeight": true
+        }
+      },
+      "core/heading": {
+        "typography": {
+          "fontFamily": true,
+          "fontSize": true,
+          "fontWeight": true
+        }
+      }
+    }
+  },
+  "styles": {
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--primary)",
+      "fontSize": "var(--wp--preset--font-size--base)",
+      "fontWeight": "400",
+      "lineHeight": "1.6"
+    },
+    "color": {
+      "text": "var(--wp--preset--color--black)",
+      "background": "var(--wp--preset--color--white)"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--primary)",
+          "fontWeight": "700"
+        }
+      },
+      "link": {
+        "color": {
+          "text": "var(--wp--preset--color--primary)"
+        },
+        ":hover": {
+          "color": {
+            "text": "var(--wp--preset--color--primary-dark)"
+          }
+        }
+      }
+    }
+  },
+  "templateParts": [],
+  "customTemplates": []
+}

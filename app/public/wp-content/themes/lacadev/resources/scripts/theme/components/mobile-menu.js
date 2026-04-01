@@ -8,6 +8,9 @@ export function initMobileMenu() {
 	const overlay = document.querySelector( '.header__overlay' );
 	if ( ! burgerBtn || ! overlay ) return;
 
+	const controller = new AbortController();
+	const { signal } = controller;
+
 	const closeMenu = () => {
 		burgerBtn.classList.remove( 'active' );
 		overlay.classList.remove( 'active' );
@@ -23,7 +26,7 @@ export function initMobileMenu() {
 			overlay.classList.add( 'active' );
 			document.body.classList.add( 'menu-open' );
 		}
-	} );
+	}, { signal } );
 
 	overlay.querySelectorAll( 'a' ).forEach( ( link ) => {
 		link.addEventListener( 'click', ( e ) => {
@@ -41,6 +44,8 @@ export function initMobileMenu() {
 			}
 
 			closeMenu();
-		} );
+		}, { signal } );
 	} );
+
+	return () => controller.abort();
 }
