@@ -170,9 +170,7 @@ window.registerFunction = {
 					).then( () => {
 						// Use Swup to load new page if available, or fallback to window.location
 						if ( window.swup ) {
-							window.swup.loadPage( {
-								url: response.data.redirect_to,
-							} );
+							window.swup.navigate( response.data.redirect_to );
 						} else {
 							window.location.href = response.data.redirect_to;
 						}

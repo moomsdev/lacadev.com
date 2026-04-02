@@ -8,6 +8,14 @@ module.exports = {
     './resources/**/*.{js,jsx,php,twig,html}',
   ],
   theme: {
+    // Sync breakpoints với SCSS _variables.scss
+    screens: {
+      xs: '576px',
+      sm: '768px',
+      md: '992px',
+      lg: '1200px',
+      xl: '1440px',
+    },
     extend: {
       colors: {
         // Material Design 3 surface tokens — fallback to CSS vars, default to neutral tones
@@ -24,6 +32,28 @@ module.exports = {
         'outline':                 'var(--color-outline, #79747E)',
         'primary':                 'var(--color-primary, #6750A4)',
         'on-primary':              'var(--color-on-primary, #FFFFFF)',
+      },
+      // Sync fonts với SCSS $primaryFont, $secondaryFont
+      fontFamily: {
+        primary:   ['"Be Vietnam Pro"', 'sans-serif'],
+        secondary: ['Quicksand', 'sans-serif'],
+        sans:      ['Quicksand', '"Be Vietnam Pro"', 'sans-serif'],
+      },
+      // Container max-width sync với $container-mw: 90rem
+      maxWidth: {
+        container: '90rem',
+      },
+      // Font weights sync với SCSS variables
+      fontWeight: {
+        thin:        '100',
+        extralight:  '200',
+        light:       '300',
+        normal:      '400',
+        medium:      '500',
+        semibold:    '600',
+        bold:        '700',
+        extrabold:   '800',
+        black:       '900',
       },
     },
   },

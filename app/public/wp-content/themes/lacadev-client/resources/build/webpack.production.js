@@ -5,7 +5,6 @@ const { ProvidePlugin, WatchIgnorePlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -56,18 +55,6 @@ const plugins = [
         // jQuery: 'jquery'
     }),
     miniCss,
-    // TEMPORARILY DISABLED: imagemin-webpack-plugin has compatibility issues with Webpack 5
-    // Will use compress-images-webpack-plugin or sharp later
-    // new ImageminPlugin({
-    //     optipng: { optimizationLevel: 7 },
-    //     gifsicle: { optimizationLevel: 3 },
-    //     svgo: { plugins: [] },
-    //     plugins: [
-    //         require('imagemin-mozjpeg')({
-    //             quality: 100
-    //         })
-    //     ]
-    // }),
     new WebpackManifestPlugin(),
     new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -106,7 +93,7 @@ module.exports = {
                 exclude: /\.min\.js$/, // Don't minify already minified files
                 terserOptions: {
                     compress: {
-                        drop_console: false, // Keep console.log for debugging
+                        drop_console: true,
                         drop_debugger: true,
                         pure_funcs: [],
                     },
@@ -133,38 +120,74 @@ module.exports = {
             }),
             new ImageMinimizerPlugin({
                 minimizer: {
-                    implementation: ImageMinimizerPlugin.imageminMinify,
+                    implementation: ImageMinimizerPlugin.sharpMinify,
                     options: {
-                        plugins: [
-                            ['mozjpeg', { quality: 85, progressive: true }],
-                            ['pngquant', { quality: [0.7, 0.9], speed: 4 }],
-                            ['gifsicle', { optimizationLevel: 3 }],
-                            ['svgo', {
-                                plugins: [
-                                    {
-                                        name: 'preset-default',
-                                        params: {
-                                            overrides: {
-                                                removeViewBox: false,
-                                                cleanupIDs: false,
-                                            },
-                                        },
-                                    },
-                                ],
-                            }],
-                        ],
+                        encodeOptions: {
+                            jpeg: { quality: 85, progressive: true },
+                            png: { quality: 85, compressionLevel: 8 },
+                            gif: {},
+                            avif: { quality: 80 },
+                        },
                     },
                 },
+                generator: [
+                    // Tự động tạo thêm phiên bản WebP cho mọi ảnh JPEG/PNG
+                    {
+                        type: 'asset',
+                        preset: 'webp',
+                        implementation: ImageMinimizerPlugin.sharpGenerate,
+                        options: {
+                            encodeOptions: {
+                                webp: { quality: 85 },
+                            },
+                        },
+                    },
+                ],
             })
         ],
         splitChunks: {
             chunks: 'all',
+            minSize: 20000,
             cacheGroups: {
+                // GSAP — animation library (~200KB) — tách riêng để cache lâu dài
+                gsap: {
+                    test: /[\\/]node_modules[\\/]gsap[\\/]/,
+                    name: 'vendor-gsap',
+                    chunks: 'all',
+                    priority: 30,
+                    enforce: true,
+                },
+                // Swiper — slider library — tách riêng
+                swiper: {
+                    test: /[\\/]node_modules[\\/]swiper[\\/]/,
+                    name: 'vendor-swiper',
+                    chunks: 'all',
+                    priority: 25,
+                    enforce: true,
+                },
+                // SweetAlert2 — chỉ dùng trong admin
+                sweetalert2: {
+                    test: /[\\/]node_modules[\\/]sweetalert2[\\/]/,
+                    name: 'vendor-swal',
+                    chunks: 'all',
+                    priority: 25,
+                    enforce: true,
+                },
+                // Chart.js — chỉ dùng trong admin
+                chartjs: {
+                    test: /[\\/]node_modules[\\/]chart\.js[\\/]/,
+                    name: 'vendor-chart',
+                    chunks: 'all',
+                    priority: 25,
+                    enforce: true,
+                },
+                // Các vendor còn lại vào 1 chunk chung
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendors',
                     chunks: 'all',
                     priority: 10,
+                    minChunks: 2,
                 },
             },
         }

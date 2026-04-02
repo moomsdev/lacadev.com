@@ -142,20 +142,4 @@ function initRippleEffect() {
 	} );
 }
 
-// --------------------------------------------------------------------------
-// Init khi DOM ready
-// --------------------------------------------------------------------------
-if ( document.readyState === 'loading' ) {
-	document.addEventListener( 'DOMContentLoaded', () => {
-		initScrollReveal();
-		initCounters();
-		initRippleEffect();
-	} );
-} else {
-	initScrollReveal();
-	initCounters();
-	initRippleEffect();
-}
-
-// Export để có thể import riêng lẻ
 export { initScrollReveal, initCounters, initRippleEffect };

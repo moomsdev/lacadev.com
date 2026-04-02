@@ -7,11 +7,15 @@
 export function initToggleDarkMode() {
 	const toggleInput = document.querySelector( '.header__darkmode-input' );
 	const rootElement = document.documentElement;
-	const prefersDark = window.matchMedia( '(prefers-color-scheme: dark)' ).matches;
+	const mediaQuery = window.matchMedia( '(prefers-color-scheme: dark)' );
+	const prefersDark = mediaQuery.matches;
 
 	const savedTheme = localStorage.getItem( 'theme' );
 	const initialTheme = savedTheme || ( prefersDark ? 'dark' : 'light' );
 	rootElement.setAttribute( 'data-theme', initialTheme );
+
+	const controller = new AbortController();
+	const { signal } = controller;
 
 	if ( toggleInput ) {
 		toggleInput.checked = initialTheme === 'dark';
@@ -31,14 +35,16 @@ export function initToggleDarkMode() {
 				rootElement.setAttribute( 'data-theme', newTheme );
 				localStorage.setItem( 'theme', newTheme );
 			}
-		} );
+		}, { signal } );
 	}
 
-	window.matchMedia( '(prefers-color-scheme: dark)' ).addEventListener( 'change', ( e ) => {
+	mediaQuery.addEventListener( 'change', ( e ) => {
 		if ( ! localStorage.getItem( 'theme' ) ) {
 			const newTheme = e.matches ? 'dark' : 'light';
 			rootElement.setAttribute( 'data-theme', newTheme );
 			if ( toggleInput ) toggleInput.checked = e.matches;
 		}
-	} );
+	}, { signal } );
+
+	return () => controller.abort();
 }

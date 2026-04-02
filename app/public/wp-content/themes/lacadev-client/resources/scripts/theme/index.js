@@ -4,12 +4,10 @@ import '@styles/tailwind.css'; // Tailwind v3: PostCSS only, no sass-loader
 import '@styles/theme';
 import './pages/*.js';
 import './ajax-search.js';
-import './micro-interactions.js';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Swup from 'swup';
-import Swiper from 'swiper';
 
 import { initAnimations, animateText, setupGsap404 } from './components/animations.js';
 import { initToggleDarkMode }                          from './components/dark-mode.js';
@@ -19,6 +17,7 @@ import { initPageLoader, shouldShowLoader }            from './components/loader
 import { initAboutLacaHero }                           from './pages/about-laca.js';
 import { initContactPage }                             from './pages/contact.js';
 import { initCommentForm }                             from './pages/comments.js';
+import { initScrollReveal, initCounters, initRippleEffect } from './micro-interactions.js';
 
 gsap.registerPlugin( ScrollTrigger );
 
@@ -30,18 +29,32 @@ if ( ! isMobile && shouldShowLoader() ) {
 	document.documentElement.classList.add( 'loading' );
 }
 
-// ─── Init tất cả features của một page ───────────────────────────────────────
+// ─── GSAP context — reverted on each navigation ───────────────────────────────
+let gsapCtx;
+
+// ─── Per-page features: re-run on every Swup navigation ─────────────────────
+// Binds to content inside the Swup container. Previous GSAP context is reverted
+// before each re-init to prevent stale ScrollTriggers and infinite tweens
+// (e.g. 404 spaceman) from leaking across page navigations.
 function initPageFeatures() {
-	if ( ! isMobile ) {
-		setupGsap404();
-		initAnimations();
-		animateText();
+	// Revert previous GSAP context: kills all tweens + ScrollTriggers from last page
+	if ( gsapCtx ) {
+		gsapCtx.revert();
 	}
 
-	initHeaderScroll();
-	initMobileMenu();
-	initToggleDarkMode();
-	initAboutLacaHero();
+	gsapCtx = gsap.context( () => {
+		if ( ! isMobile ) {
+			setupGsap404();
+			initAnimations();
+			animateText();
+		}
+		initAboutLacaHero();
+	} );
+
+	// Scroll-reveal and counters must re-observe new DOM nodes on each navigation
+	initScrollReveal();
+	initCounters();
+
 	initContactPage();
 	initCommentForm();
 
@@ -50,11 +63,20 @@ function initPageFeatures() {
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 document.addEventListener( 'DOMContentLoaded', () => {
+	// Persistent features: bind to header/nav elements that survive Swup navigations.
+	// Called ONCE — each returns an AbortController-based cleanup (unused here since
+	// these elements are never torn down, but safe to call again if needed).
+	initHeaderScroll();
+	initMobileMenu();
+	initToggleDarkMode();
+	initRippleEffect(); // document-level delegation — must only run once
+
 	const swup = new Swup();
+	window.swup = swup; // Expose for register.js → swup.navigate()
 
 	initPageFeatures();
 	initPageLoader( isMobile );
 
-	// Swup: re-init sau mỗi lần navigate (không show loader)
+	// Re-init page-specific features after each Swup navigation
 	swup.hooks.on( 'content:replace', initPageFeatures );
 } );

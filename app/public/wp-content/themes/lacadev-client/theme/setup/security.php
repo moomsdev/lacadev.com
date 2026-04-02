@@ -31,27 +31,24 @@ add_action('send_headers', function() {
     // XSS Protection (legacy browsers)
     header('X-XSS-Protection: 1; mode=block');
     
-    // if ( ! is_admin() ) {
-    //     // Content Security Policy
-    //     // Đang ở chế độ Report-Only: violations sẽ hiển thị trong Console nhưng không block resource
-    //     // Sau khi xác nhận không có violation hợp lệ, đổi thành 'Content-Security-Policy'
-    //     $csp  = "default-src 'self'; ";
-    //     $csp .= "script-src 'self' 'nonce-{$nonce}' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://images.dmca.com https://apis.google.com blob:; ";
-    //     $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; ";
-    //     $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
-    //     $csp .= "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.google-analytics.com https://stats.g.doubleclick.net https://apis.google.com ws: wss:; ";
-    //     $csp .= "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://docs.google.com https://www.google.com https://www.gstatic.com; ";
-    //     $csp .= "media-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com; ";
-    //     $csp .= "img-src 'self' data: https: http:; ";
-    //     $csp .= "worker-src 'self' blob:; ";
-    //     $csp .= "frame-ancestors 'self';";
+    if ( ! is_admin() ) {
+        // Content Security Policy
+        $csp  = "default-src 'self'; ";
+        $csp .= "script-src 'self' 'nonce-{$nonce}' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://images.dmca.com https://apis.google.com blob:; ";
+        $csp .= "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; ";
+        $csp .= "font-src 'self' https://fonts.gstatic.com data:; ";
+        $csp .= "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.google-analytics.com https://stats.g.doubleclick.net https://apis.google.com ws: wss:; ";
+        $csp .= "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://docs.google.com https://www.google.com https://www.gstatic.com; ";
+        $csp .= "media-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com; ";
+        $csp .= "img-src 'self' data: https: http:; ";
+        $csp .= "worker-src 'self' blob:; ";
+        $csp .= "frame-ancestors 'self';";
 
-    //     // TODO: Khi đã kiểm tra kỹ violation, đổi header bên dưới thành 'Content-Security-Policy'
-    //     header( "Content-Security-Policy-Report-Only: {$csp}" );
+        header( "Content-Security-Policy: {$csp}" );
 
-    //     // Permissions Policy
-    //     header( 'Permissions-Policy: geolocation=(), microphone=(), camera=()' );
-    // }
+        // Permissions Policy
+        header( 'Permissions-Policy: geolocation=(), microphone=(), camera=()' );
+    }
 });
 
 /**
