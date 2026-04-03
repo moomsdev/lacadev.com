@@ -7,16 +7,39 @@
 ## 1. TỔNG QUAN KIẾN TRÚC & VỊ TRÍ FILE (WPEmerge MVC)
 Kiến trúc dự án bám sát chuẩn OOP, Module hóa và phân tách Frontend/Backend. KHÔNG code quy trình (procedural) hoặc ném mọi thứ vào `functions.php`.
 
-- **`app/routes/`**: Nơi định nghĩa các đường dẫn (Routing) trỏ tới Controller.
-- **`app/src/Controllers/`**: Nơi xử lý logic MVC.
-- **`app/src/PostTypes/`**: Nơi đăng ký Custom Post Type (sử dụng thư viện `Extended CPTs`).
-- **`app/src/Features/` & `app/src/Settings/`**: Nơi xử lý Meta Fields (Carbon Fields) và các tính năng Admin.
-- **`app/helpers/`**: Nơi chứa các hàm tiện ích gọi mọi nơi (Ví dụ: `getOption()`, `theResponsivePostThumbnail()`).
-- **`app/hooks.php` & `app/config.php`**: Nơi khai báo các Action/Filter hooks nhỏ bé hoặc cấu hình chung.
-- **`theme/`**: Các file template chuẩn WP (`single.php`, `header.php`, `footer.php`, `archive.php`).
-- **`theme/setup/`**: Nơi cấu hình WP core (Menu Walker, Theme Supports, reCAPTCHA, Security, SEO).
-- **`resources/scripts/` & `resources/styles/`**: Nơi chứa mã nguồn JS thuần (Vanilla) và SCSS (Tailwind). Compile qua Webpack vào folder `dist/`.
-- **`block-gutenberg/`**: Mã nguồn gốc của Custom Gutenberg Blocks.
+> ⚠️ **KHÔNG có thư mục `Controllers/`**. Logic nhỏ đặt vào `app/hooks.php`, logic lớn tạo Class tại `app/src/` theo mục đích tương ứng bên dưới.
+
+### `app/` — Core Backend
+- **`app/routes/`**: Định nghĩa Routing trỏ tới các xử lý trong `app/src/`.
+- **`app/hooks.php`**: Khai báo Action/Filter hooks ngắn. **KHÔNG đặt logic phức tạp ở đây.**
+- **`app/config.php`**: Cấu hình chung của ứng dụng.
+- **`app/helpers.php`**: Bootstrap load toàn bộ files trong `app/helpers/`.
+- **`app/views.php`**: Đăng ký View templates với WPEmerge.
+- **`app/helpers/`** *(13 files)*: Các hàm tiện ích gọi mọi nơi. Quan trọng nhất:
+  - `theResponsivePostThumbnail('mobile|tablet|full', $attr)` — render ảnh bài viết tối ưu WebP/srcset.
+  - `theResponsiveImage($id, 'size')` — render ảnh từ Media ID.
+  - `theAsset('images/name.png')` — link tĩnh đến resources.
+  - `getOption('option_name')` — lấy Theme Option (tự map theo ngôn ngữ WPML).
+
+### `app/src/` — OOP Classes (PSR-4, namespace `App\`)
+- **`Abstracts/`**: Base Classes để kế thừa (extend). Không tạo code trực tiếp ở đây.
+- **`PostTypes/`**: Đăng ký Custom Post Type dùng thư viện `Extended CPTs`.
+- **`Settings/`**: Carbon Fields Meta Boxes và các tính năng Admin panel.
+- **`Models/`**: Query/Data-access layer truy vấn dữ liệu CPT.
+- **`Validators/`**: Validate input từ form hoặc AJAX request.
+- **`Widgets/`**: WordPress Sidebar Widgets tùy chỉnh.
+- **`View/`**: View helpers/partials theo kiến trúc MVC.
+- **`Routing/`**: Routing logic bổ sung nâng cao.
+- **`Helpers/`**: Helper Classes dạng OOP (khác với `app/helpers/` dạng functions).
+- **`Features/`** ⚠️ **CHỈ CÓ Ở PARENT THEME (`lacadev`)**: Portal Client, Project Management, AI Tracking. Các tính năng này bị **EXCLUDE** khi sync/build sang Child theme.
+- **`Databases/`** ⚠️ **CHỈ CÓ Ở PARENT THEME**: Tạo và quản lý Custom DB Tables (ví dụ: `ProjectLogTable`, `ProjectAlertTable`).
+
+### Theme Templates & Frontend
+- **`theme/`**: File template chuẩn WP (`single.php`, `header.php`, `footer.php`, `archive.php`, ...).
+- **`theme/setup/`**: Cấu hình WP core — Menu Walker, Theme Supports, reCAPTCHA, Security, SEO, Sidebars.
+- **`theme/template-parts/`**: Các partial layout tái sử dụng (breadcrumb, page-hero, post-hero, loop-post, loop-service, share_box, ...).
+- **`resources/scripts/` & `resources/styles/`**: Mã nguồn JS Vanilla và SCSS/Tailwind. Compile qua Webpack → `dist/`.
+- **`block-gutenberg/`**: Mã nguồn Custom Gutenberg Blocks (mỗi block = 1 thư mục con).
 
 ---
 
