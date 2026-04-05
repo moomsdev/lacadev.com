@@ -10,13 +10,12 @@
 }
 
 html {
-  // font-size: 62.5%;
   color-scheme: light;
   border: none !important;
 }
 
 body {
-  font-family: $secondaryFont !important;
+  font-family: $themeFont !important;
   font-weight: $regular !important;
   line-height: 1.5em !important;
   color: $primaryColor !important;
@@ -193,4 +192,12 @@ a:focus-visible {
 #wpadminbar .logo-admin-bar {
   max-height: 0.75rem !important;
   width: auto !important;
+}
+
+p a,
+.wp-block-list.has-marker a {
+  color: $primaryColor;
+  text-decoration: underline !important;
+  text-underline-position: under;
+  text-decoration-color: #0064d1 !important;
 }

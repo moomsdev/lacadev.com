@@ -14,4 +14,11 @@
 
 /* === CHILD THEME OVERRIDES === */
 
-/* Thêm CSS của bạn bên dưới */
+// Tự động load biến ($themeFont, $primaryColor...) từ parent nhờ Webpack alias @parent
+@import "@parent/styles/theme/abstracts/variables";
+@import "@parent/styles/theme/abstracts/mixins";
+
+// Ví dụ dùng ngay lập tức:
+// body.custom-child {
+//   font-family: $themeFont !important;
+// }

@@ -246,6 +246,12 @@ module.exports = {
                         options: {
                             sourceMap: false,
                             api: 'modern-compiler',
+                            sassOptions: {
+                                includePaths: [
+                                    require('path').resolve(__dirname, '../../../../lacadev-client/resources'),
+                                    require('path').resolve(__dirname, '../../../../lacadev-client/resources/styles')
+                                ]
+                            }
                         }
                     }
                 ]

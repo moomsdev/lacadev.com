@@ -1,12 +1,8 @@
 @use "../theme/abstracts/_variables.scss" as *;
 @use "../theme/base/_fonts.scss" as *;
 
-html {
-  font-size: 62.5%;
-}
-
 body.login {
-  font: normal normal 400 1rem $secondaryFont;
+  font: normal normal 400 1rem $themeFont;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -198,7 +194,7 @@ body.login {
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-family: $secondaryFont;
+          font-family: $themeFont;
           font-weight: 600;
           color: #1e293b;
           font-size: 0.875rem;
@@ -215,7 +211,7 @@ body.login {
         height: 3.5rem !important;
         padding: 0 1.25rem !important;
         font-size: 1rem !important;
-        font-family: $secondaryFont !important;
+        font-family: $themeFont !important;
         color: #1e293b !important;
         background-color: #f1f5f9 !important;
         border: 2px solid #e2e8f0 !important;

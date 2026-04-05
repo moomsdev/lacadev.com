@@ -6,6 +6,10 @@ module.exports = {
     // Theme templates (Twig / PHP)
     './app/**/*.php',
     './resources/**/*.{js,jsx,php,twig,html}',
+    // Nhận tự động từ Parent Theme
+    '../lacadev-client/block-gutenberg/**/*.{js,jsx,php,scss}',
+    '../lacadev-client/app/**/*.php',
+    '../lacadev-client/resources/**/*.{js,jsx,php,twig,html}'
   ],
   theme: {
     // Sync breakpoints với SCSS _variables.scss

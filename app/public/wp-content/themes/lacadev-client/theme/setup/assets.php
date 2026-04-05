@@ -14,8 +14,8 @@ use WPEmergeTheme\Facades\Assets;
 function app_action_theme_enqueue_assets()
 {
     $version = wp_get_theme()->get('Version');
-    $theme_root_dir = dirname(get_template_directory());
-    $theme_root_uri = dirname(get_template_directory_uri());
+    $theme_root_dir = dirname(get_stylesheet_directory());
+    $theme_root_uri = dirname(get_stylesheet_directory_uri());
     
     $dist_path = $theme_root_dir . '/dist/';
     $dist_url  = $theme_root_uri . '/dist/';
@@ -101,9 +101,8 @@ function app_action_theme_enqueue_assets()
  */
 function app_action_admin_enqueue_assets()
 {
-    // Theme::uri() trả về .../lacadev-client/theme/ (nơi đặt style.css)
     // dist/ nằm ở .../lacadev-client/dist/ nên cần dirname() để lên 1 level
-    $template_dir = dirname(get_template_directory_uri());
+    $template_dir = dirname(get_stylesheet_directory_uri());
 
     /**
      * Enqueue styles.
@@ -122,11 +121,11 @@ function app_action_admin_enqueue_assets()
      * CRITICAL: Load in head (false) to ensure it's available before admin.js
      */
     $admin_deps = [];
-    $theme_root = dirname(get_template_directory());
+    $theme_root = dirname(get_stylesheet_directory());
     $vendors_path = $theme_root . '/dist/vendors.js';
     
     if (file_exists($vendors_path)) {
-        $base_uri = get_template_directory_uri();
+        $base_uri = get_stylesheet_directory_uri();
         $theme_uri = dirname($base_uri);
         $vendors_url = $theme_uri . '/dist/vendors.js';
         
@@ -269,7 +268,7 @@ function app_action_admin_enqueue_assets()
  * Preload critical assets in admin_head
  */
 add_action('admin_head', function() {
-    $theme_root_uri = dirname(get_template_directory_uri());
+    $theme_root_uri = dirname(get_stylesheet_directory_uri());
     $dist_url = $theme_root_uri . '/dist/';
     
     // Preload important fonts
@@ -291,7 +290,7 @@ add_action('admin_head', function() {
  */
 function app_action_login_enqueue_assets()
 {
-    $template_dir = dirname(get_template_directory_uri());
+    $template_dir = dirname(get_stylesheet_directory_uri());
 
     /**
      * Enqueue scripts.
@@ -330,7 +329,7 @@ function app_action_login_enqueue_assets()
  */
 function app_action_editor_enqueue_assets()
 {
-    $template_dir = dirname(get_template_directory_uri());
+    $template_dir = dirname(get_stylesheet_directory_uri());
 
     /**
      * Enqueue scripts.
@@ -432,7 +431,7 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
     ];
 
     // If critical CSS file exists (inlined in header), load main bundle asynchronously
-    if (file_exists(get_template_directory() . '/dist/styles/critical.css')) {
+    if (file_exists(dirname(get_stylesheet_directory()) . '/dist/styles/critical.css')) {
         $non_critical_styles[] = 'theme-css-bundle';
     }
 
@@ -449,8 +448,8 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
  * FIXED: Preload critical assets in wp_head (Agent Skills: Performance)
  */
 add_action('wp_head', function() {
-    $theme_root_dir = dirname(get_template_directory());
-    $theme_root_uri = dirname(get_template_directory_uri());
+    $theme_root_dir = dirname(get_stylesheet_directory());
+    $theme_root_uri = dirname(get_stylesheet_directory_uri());
     
     $dist_path = $theme_root_dir . '/dist/';
     $dist_url  = $theme_root_uri . '/dist/';

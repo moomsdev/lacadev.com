@@ -9,7 +9,7 @@
 
 body.wp-admin {
   background: var(--bg-color-ad, #f0f0f1);
-  font-family: $secondaryFont !important;
+  font-family: $themeFont !important;
 }
 
 // ─── Admin Bar ───────────────────────────────────────────────
@@ -547,7 +547,7 @@ div.error {
     border-radius: 10px;
     padding: 8px 12px;
     font-size: 13px;
-    font-family: $secondaryFont;
+    font-family: $themeFont;
     resize: none;
     outline: none;
     min-height: 40px;

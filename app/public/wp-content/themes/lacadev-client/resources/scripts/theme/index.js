@@ -14,7 +14,6 @@ import { initToggleDarkMode }                          from './components/dark-m
 import { initHeaderScroll, resetHeaderState }           from './components/header.js';
 import { initMobileMenu, closeMobileMenu }             from './components/mobile-menu.js';
 import { initPageLoader, shouldShowLoader }            from './components/loader.js';
-import { initAboutLacaHero }                           from './pages/about-laca.js';
 import { initContactPage }                             from './pages/contact.js';
 import { initCommentForm }                             from './pages/comments.js';
 import { initScrollReveal, initCounters, initRippleEffect } from './micro-interactions.js';

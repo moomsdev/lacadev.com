@@ -18,7 +18,7 @@
 // Editor wrapper - ensures styles apply in Gutenberg context
 .editor-styles-wrapper,
 .block-editor-writing-flow {
-  font-family: $secondaryFont !important;
+  font-family: $themeFont !important;
 
   h1, h2, h3, h4, h5, h6 {
     font-family: $primaryFont !important;
