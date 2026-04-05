@@ -174,7 +174,37 @@ class ProjectFields
                         ->set_attribute('placeholder', 'Đơn giá')
                         ->set_classes('laca-pay-amount'),
                 ])
-                ->set_header_template('<% if (item_name) { %><%-item_name%><% } %>'),
+                ->set_header_template('<% if (item_name) { %><%-item_name%><% } %>')
+                ->set_default_value([
+                    [
+                        'item_name'       => 'Thiết kế giao diện website (responsive)',
+                        'item_desc'       => 'UI/UX chuẩn mobile-first, tương thích mọi thiết bị',
+                        'item_unit_price' => '4500000',
+                    ],
+                    [
+                        'item_name'       => 'Lập trình website',
+                        'item_desc'       => 'WordPress + Gutenberg blocks, tích hợp Carbon Fields',
+                        'item_unit_price' => '3500000',
+                    ],
+                    [
+                        'item_name'       => 'SEO On-page cơ bản',
+                        'item_desc'       => 'Schema markup, sitemap, tối ưu tốc độ tải trang',
+                        'item_unit_price' => '',
+                        'item_note'       => 'Bao gồm trong gói',
+                    ],
+                    [
+                        'item_name'       => 'SSL Certificate',
+                        'item_desc'       => 'Chứng chỉ bảo mật HTTPS, tự động gia hạn.',
+                        'item_unit_price' => '',
+                        'item_note'       => 'Miễn phí năm đầu',
+                    ],
+                    [
+                        'item_name'       => 'Email doanh nghiệp',
+                        'item_desc'       => '5 hộp thư @tên-miền, dung lượng 5GB/hộp.',
+                        'item_unit_price' => '',
+                        'item_note'       => 'Miễn phí năm đầu',
+                    ],
+                ]),
         ]);
 
         // Quy trình thực hiện
@@ -201,42 +231,80 @@ class ProjectFields
 
         // Tab: Tính năng kỹ thuật
         $container->add_tab(__('Tính năng kỹ thuật', 'laca'), [
-            Field::make('rich_text', 'backend_features', __('', 'laca'))
-                ->set_default_value('
-                                        <h3>Tính năng kỹ thuật &amp; Nền tảng</h3>
-                                        <p>Chúng tôi sử dụng những công nghệ hiện đại nhất để đảm bảo website vận hành ổn định, bảo mật và thân thiện với các công cụ tìm kiếm.</p>
-                                        <p><strong>WordPress | Code thuần | Gutenberg</strong></p>
+            Field::make('textarea', 'tech_description', __('Mô tả ngắn', 'laca'))
+                ->set_rows(2)
+                ->set_attribute('placeholder', 'Chúng tôi sử dụng những công nghệ hiện đại nhất...')
+                ->set_default_value('Chúng tôi sử dụng những công nghệ hiện đại nhất để đảm bảo website vận hành ổn định, bảo mật và thân thiện với các công cụ tìm kiếm.'),
 
-                                        <h4>Module Cập nhật nội dung</h4>
-                                        <ul>
-                                        <li>Quản lý thêm, sửa, xóa bài viết</li>
-                                        <li>Sắp xếp thứ tự các blocks nội dung</li>
-                                        <li>Tối ưu hóa hình ảnh tự động</li>
-                                        </ul>
+            Field::make('complex', 'tech_tags', __('Tech Tags (nền tảng)', 'laca'))
+                ->set_layout('tabbed-horizontal')
+                ->setup_labels(['plural_name' => 'Tags', 'singular_name' => 'Tag'])
+                ->add_fields([
+                    Field::make('text', 'tag_name', __('', 'laca'))
+                        ->set_attribute('placeholder', 'WordPress'),
+                ])
+                ->set_header_template('<% if (tag_name) { %><%-tag_name%><% } %>')
+                ->set_default_value([
+                    ['tag_name' => 'WordPress'],
+                    ['tag_name' => 'Code thuần'],
+                    ['tag_name' => 'Gutenberg'],
+                ]),
 
-                                        <h4>Module Tính năng &amp; Live Chat</h4>
-                                        <ul>
-                                        <li>Tích hợp Live Chat (Facebook/Zalo)</li>
-                                        <li>Nút gọi điện nhanh trên di động</li>
-                                        <li>Tích hợp bản đồ &amp; chỉ đường</li>
-                                        </ul>
+            Field::make('complex', 'tech_modules', __('Modules tính năng', 'laca'))
+                ->set_layout('tabbed-vertical')
+                ->setup_labels(['plural_name' => 'Module', 'singular_name' => 'Module'])
+                ->add_fields([
+                    Field::make('text', 'module_icon', __('', 'laca'))
+                        ->set_width(25)
+                        ->set_attribute('placeholder', 'edit_note')
+                        ->set_help_text('Material Symbol name: edit_note, chat_bubble, search, mail, shield, speed... — <a href="https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Outlined" target="_blank" rel="noopener">Xem tất cả icon ↗</a>'),
 
-                                        <h4>Tối ưu hóa SEO</h4>
-                                        <ul>
-                                        <li>Cấu trúc URL thân thiện (Breadcrumbs)</li>
-                                        <li>Tối ưu tốc độ tải trang (LCP, FID)</li>
-                                        <li>Khai báo Schema Markup tiêu chuẩn</li>
-                                        </ul>
+                    Field::make('select', 'module_color', __('', 'laca'))
+                        ->set_width(25)
+                        ->add_options([
+                            'secondary' => 'Secondary (xanh lá)',
+                            'tertiary'  => 'Tertiary (vàng)',
+                            'primary'   => 'Primary (xám)',
+                            'neutral'   => 'Neutral (stone)',
+                        ])
+                        ->set_default_value('secondary'),
 
-                                        <h4>Module Liên hệ</h4>
-                                        <ul>
-                                        <li>Form gửi yêu cầu tư vấn</li>
-                                        <li>Thông báo email tự động về admin</li>
-                                        <li>Chống spam qua Google reCAPTCHA</li>
-                                        </ul>
-                                        '),
-            ]);
+                    Field::make('text', 'module_title', __('', 'laca'))
+                        ->set_width(50)
+                        ->set_attribute('placeholder', 'Module Cập nhật nội dung'),
 
+                    Field::make('textarea', 'module_items', __('', 'laca'))
+                        ->set_rows(4)
+                        ->set_attribute('placeholder', "Mỗi dòng = 1 bullet point\nQuản lý thêm, sửa, xóa bài viết\nSắp xếp thứ tự các blocks nội dung"),
+                ])
+                ->set_header_template('<% if (module_title) { %><%-module_title%><% } %>')
+                ->set_default_value([
+                    [
+                        'module_icon'  => 'edit_note',
+                        'module_color' => 'secondary',
+                        'module_title' => 'Module Cập nhật nội dung',
+                        'module_items' => "Quản lý thêm, sửa, xóa bài viết\nSắp xếp thứ tự các blocks nội dung\nTối ưu hóa hình ảnh tự động",
+                    ],
+                    [
+                        'module_icon'  => 'chat_bubble',
+                        'module_color' => 'tertiary',
+                        'module_title' => 'Module Tính năng & Live Chat',
+                        'module_items' => "Tích hợp Live Chat (Facebook/Zalo)\nNút gọi điện nhanh trên di động\nTích hợp bản đồ & chỉ đường",
+                    ],
+                    [
+                        'module_icon'  => 'search',
+                        'module_color' => 'primary',
+                        'module_title' => 'Tối ưu hóa SEO',
+                        'module_items' => "Cấu trúc URL thân thiện (Breadcrumbs)\nTối ưu tốc độ tải trang (LCP, FID)\nKhai báo Schema Markup tiêu chuẩn",
+                    ],
+                    [
+                        'module_icon'  => 'mail',
+                        'module_color' => 'neutral',
+                        'module_title' => 'Module Liên hệ',
+                        'module_items' => "Form gửi yêu cầu tư vấn\nThông báo email tự động về admin\nChống spam qua Google reCAPTCHA",
+                    ],
+                ]),
+        ]);
 
         // Tab: Bảo trì & Bảo hành
         $container->add_tab(__('Bảo trì & Bảo hành', 'laca'), [
@@ -253,7 +321,7 @@ class ProjectFields
             Field::make('rich_text', 'warranty_policy', __('', 'laca'))
                 ->set_width(70)
                 ->set_default_value('
-                    <h3>Chính sách Bảo trì &amp; Bảo hành</h3>
+                 <h2 class="text-2xl md:text-3xl font-bold mb-6 tracking-tight">Chính sách Bảo trì &amp; Bảo hành</h2>
                     <ul>
                     <li><strong>Bảo hành trọn đời:</strong> Áp dụng cho các lỗi kỹ thuật phát sinh từ phía hệ thống code do lacadev triển khai khi khách hàng sử dụng dịch vụ Hosting tại lacadev.</li>
                     <li><strong>Hỗ trợ vận hành:</strong> Miễn phí hướng dẫn sử dụng và hỗ trợ kỹ thuật qua Hotline/Zalo trong suốt quá trình vận hành website.</li>

@@ -198,6 +198,56 @@ function custom_ajax_search_script()
 }
 add_action('wp_enqueue_scripts', 'custom_ajax_search_script');
 
+// =============================================================================
+// SINGLE PROJECT: Enqueue Fonts + Material Symbols (dùng build Tailwind thay CDN)
+// =============================================================================
+add_action('wp_enqueue_scripts', function () {
+    if (!is_singular('project')) {
+        return;
+    }
+    // Material Symbols
+    wp_enqueue_style(
+        'laca-material-symbols',
+        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap',
+        [],
+        null
+    );
+});
+
+
+// // Project page inline styles (CSS custom properties + helpers)
+// add_action('wp_head', function () {
+//     if (!is_singular('project')) {
+//         return;
+//     }
+//     echo '<style id="laca-project-styles">
+//         .material-symbols-outlined {
+//             font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+//             vertical-align: middle;
+//         }
+//         .signature-font { font-family: cursive; }
+//         :root {
+//             --color-secondary: #566259;
+//             --color-primary: #5f5e5e;
+//             --color-primary-dim: #535252;
+//             --color-outline: #757c7d;
+//             --color-on-surface: #2d3435;
+//             --color-on-surface-variant: #5a6061;
+//             --color-surface-container: #ebeeef;
+//             --color-surface-container-low: #f2f4f4;
+//             --color-surface-container-lowest: #ffffff;
+//             --color-secondary-container: #d9e6da;
+//             --color-on-secondary-container: #49554c;
+//             --color-tertiary-container: #fbf3e4;
+//             --color-on-tertiary-container: #605b50;
+//             --color-primary-container: #e5e2e1;
+//             --color-on-primary-container: #525151;
+//             --color-surface-dim: #d4dbdd;
+//         }
+//     </style>';
+// });
+
+
 /**
  * Register custom query vars for search pagination
  */
