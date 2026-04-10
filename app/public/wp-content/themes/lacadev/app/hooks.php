@@ -175,6 +175,10 @@ add_action('init', function() {
         (new \App\Settings\LacaTools\ClientPortalEndpoint())->init();
     }
 
+    if (class_exists('\App\Features\ProjectManagement\Api\ClientWebhook')) {
+        (new \App\Features\ProjectManagement\Api\ClientWebhook())->init();
+    }
+
     if (class_exists('\App\Settings\LacaTools\ProjectTrackerGenerator')) {
         (new \App\Settings\LacaTools\ProjectTrackerGenerator())->init();
     }
