@@ -46,6 +46,8 @@ class ProjectGlobalAlertsPage
         $filterProject = absint($_GET['filter_project'] ?? 0);
         $filterLevel   = sanitize_key($_GET['filter_level'] ?? '');
         $filterType    = sanitize_key($_GET['filter_type'] ?? '');
+        $perPage       = absint($_GET['per_page'] ?? 30);
+        $perPage       = max(1, min(500, $perPage ?: 30));
         $page          = max(1, absint($_GET['alerts_page'] ?? 1));
 
         $filters = [];
@@ -53,10 +55,10 @@ class ProjectGlobalAlertsPage
         if ($filterLevel)   $filters['alert_level'] = $filterLevel;
         if ($filterType)    $filters['alert_type']  = $filterType;
 
-        $result   = ProjectAlert::getAllActiveFiltered($filters, 30, $page);
+        $result   = ProjectAlert::getAllActiveFiltered($filters, $perPage, $page);
         $alerts   = $result['items'];
         $total    = $result['total'];
-        $maxPages = max(1, (int) ceil($total / 30));
+        $maxPages = max(1, (int) ceil($total / $perPage));
 
         // Lấy danh sách projects để filter
         $projects = get_posts([
@@ -108,6 +110,19 @@ class ProjectGlobalAlertsPage
                     <option value="bug"            <?php selected($filterType, 'bug'); ?>>Lỗi</option>
                     <option value="other"          <?php selected($filterType, 'other'); ?>>Khác</option>
                 </select>
+
+                <input type="number" name="per_page" value="<?php echo esc_attr($perPage); ?>"
+                    min="1" max="500" style="width:80px" list="laca-per-page-options"
+                    placeholder="/ trang">
+                <datalist id="laca-per-page-options">
+                    <option value="10">
+                    <option value="20">
+                    <option value="30">
+                    <option value="50">
+                    <option value="100">
+                    <option value="200">
+                    <option value="500">
+                </datalist>
 
                 <?php submit_button('Lọc', 'secondary', 'submit', false); ?>
 
@@ -164,6 +179,7 @@ class ProjectGlobalAlertsPage
                                 'post_type'      => 'project',
                                 'page'           => 'laca-global-alerts',
                                 'alerts_page'    => $i,
+                                'per_page'       => $perPage,
                                 'filter_project' => $filterProject ?: '',
                                 'filter_level'   => $filterLevel,
                                 'filter_type'    => $filterType,
@@ -180,63 +196,7 @@ class ProjectGlobalAlertsPage
             <?php endif; ?>
         </div>
 
-        <script>
-        (function() {
-            // Chọn tất cả
-            ['laca-check-all', 'laca-check-all-head'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.addEventListener('change', function() {
-                    document.querySelectorAll('.laca-alert-check').forEach(function(cb) {
-                        cb.checked = el.checked;
-                    });
-                });
-            });
-
-            // Bulk resolve
-            var btn = document.getElementById('laca-bulk-resolve');
-            if (btn) btn.addEventListener('click', function() {
-                var checked = Array.from(document.querySelectorAll('.laca-alert-check:checked'))
-                    .map(function(cb) { return cb.value; });
-
-                if (!checked.length) {
-                    document.getElementById('laca-bulk-msg').textContent = 'Chưa chọn alert nào.';
-                    return;
-                }
-
-                var fd = new FormData();
-                fd.append('action', 'laca_global_alerts_bulk_resolve');
-                fd.append('nonce', btn.dataset.nonce);
-                checked.forEach(function(id) { fd.append('alert_ids[]', id); });
-
-                fetch(ajaxurl, { method: 'POST', body: fd })
-                    .then(function(r) { return r.json(); })
-                    .then(function(res) {
-                        if (res.success) {
-                            checked.forEach(function(id) {
-                                var row = document.querySelector('[data-alert-id="' + id + '"]');
-                                if (row) row.remove();
-                            });
-                            document.getElementById('laca-bulk-msg').textContent = res.data.message;
-                        }
-                    });
-            });
-
-            // Auto-refresh đếm badge mỗi 60s
-            setInterval(function() {
-                var fd = new FormData();
-                fd.append('action', 'laca_global_alerts_count');
-                fd.append('nonce', '<?php echo esc_js($nonce); ?>');
-                fetch(ajaxurl, { method: 'POST', body: fd })
-                    .then(function(r) { return r.json(); })
-                    .then(function(res) {
-                        if (res.success) {
-                            var badge = document.querySelector('.laca-total-badge');
-                            if (badge) badge.textContent = res.data.count + ' chưa xử lý';
-                        }
-                    });
-            }, 60000);
-        })();
-        </script>
+        <div data-alerts-nonce="<?php echo esc_attr($nonce); ?>"></div>
         <?php
     }
 
@@ -291,27 +251,6 @@ class ProjectGlobalAlertsPage
         .laca-alert--info     { background: #eef3fe; color: #2c5282; }
         .laca-pagination { margin-top: 16px; display: flex; gap: 4px; }
         </style>';
-
-        // Resolve đơn lẻ
-        echo '<script>
-        document.addEventListener("click", function(e) {
-            if (!e.target.classList.contains("laca-resolve-btn")) return;
-            var btn = e.target;
-            var id  = btn.dataset.id;
-            var fd  = new FormData();
-            fd.append("action", "laca_global_alerts_bulk_resolve");
-            fd.append("nonce", btn.dataset.nonce);
-            fd.append("alert_ids[]", id);
-            fetch(ajaxurl, { method: "POST", body: fd })
-                .then(function(r) { return r.json(); })
-                .then(function(res) {
-                    if (res.success) {
-                        var row = document.querySelector("[data-alert-id=\'" + id + "\']");
-                        if (row) row.style.opacity = "0.4";
-                    }
-                });
-        });
-        </script>';
     }
 
     // ── AJAX handlers ────────────────────────────────────────────────────────
@@ -348,7 +287,9 @@ class ProjectGlobalAlertsPage
         $filters = array_filter($filters);
 
         $page   = max(1, absint($_POST['alerts_page'] ?? 1));
-        $result = ProjectAlert::getAllActiveFiltered($filters, 30, $page);
+        $perPage = absint($_POST['per_page'] ?? 30);
+        $perPage = max(1, min(500, $perPage ?: 30));
+        $result = ProjectAlert::getAllActiveFiltered($filters, $perPage, $page);
 
         wp_send_json_success($result);
     }

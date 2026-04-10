@@ -4,6 +4,7 @@ import './project.js';
 import './ai-chat.js';
 import './project-charts.js';
 import './contact-form.js';
+import './global-alerts.js';
 
 import Swal from 'sweetalert2';
 window.Swal = Swal;

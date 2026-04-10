@@ -34,13 +34,12 @@ function app_action_theme_enqueue_assets()
         wp_enqueue_script('theme-critical-js', $dist_url . 'critical.js', [], $version, false);
     }
 
-    /**
-     * Vendor chunks — load theo thứ tự phụ thuộc, tất cả defer
-     */
     $vendor_chunks = [
         'theme-vendors-js'      => 'vendors.js',
         'theme-vendor-gsap-js'  => 'vendor-gsap.js',
         'theme-vendor-swiper-js'=> 'vendor-swiper.js',
+        'theme-vendor-swal-js'  => 'vendor-swal.js',
+        'theme-vendor-836-js'   => '836.js',
     ];
     $vendors_deps = [];
     foreach ($vendor_chunks as $handle => $file) {
@@ -406,6 +405,8 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
         'theme-vendors-js',
         'theme-vendor-gsap-js',
         'theme-vendor-swiper-js',
+        'theme-vendor-swal-js',
+        'theme-vendor-836-js',
         'theme-js-bundle',
         'theme-admin-js-bundle',
         'theme-login-js-bundle',

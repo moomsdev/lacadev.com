@@ -154,10 +154,19 @@ button[data-toggle="password-toggle"] {
 }
 
 // Custom Screeshot theme
-.theme-browser .theme .theme-name {
-  padding: 20px 10px;
-  display: flex;
-  align-items: center;
+.theme-browser .theme {
+  .theme-name {
+    padding: 10px;
+    height: auto;
+    display: flex;
+    align-items: center;
+  }
+  .theme-actions {
+    position: relative;
+    top: unset;
+    transform: unset;
+    text-align: end;
+  }
 }
 
 .theme-browser .theme .theme-actions,
@@ -165,6 +174,10 @@ button[data-toggle="password-toggle"] {
   background: transparent;
   opacity: 1;
   border: none;
+  position: relative;
+  top: unset;
+  transform: unset;
+  text-align: end;
 }
 
 .theme-browser .theme .theme-screenshot:after {

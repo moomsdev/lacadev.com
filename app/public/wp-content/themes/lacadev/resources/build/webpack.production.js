@@ -187,7 +187,7 @@ module.exports = {
                     name: 'vendors',
                     chunks: 'all',
                     priority: 10,
-                    minChunks: 2,
+                    minChunks: 1,
                 },
             },
         }
