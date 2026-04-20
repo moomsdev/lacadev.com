@@ -236,9 +236,9 @@ html {
     }
 
     &-social-link {
-      font-size: 0.875rem;
+      font-size: $fsSm;
       font-weight: $medium;
-      color: $primaryColor;
+      color: $cText;
       text-decoration: none;
     }
   }
@@ -303,7 +303,7 @@ html {
       position: absolute;
       width: 3.125rem;
       height: 3.125rem;
-      border: 1px solid $primaryColor;
+      border: 1px solid $cText;
 
       &--1 {
         border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
@@ -853,7 +853,7 @@ $close-trans-time: 150ms;
     transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);
 
   html[data-theme="dark"] & {
-    background-color: rgba(17, 17, 17, 0.95);
+    background-color: rgba($cSurface, 0.95);
   }
 
   @include maxWidth($md) {

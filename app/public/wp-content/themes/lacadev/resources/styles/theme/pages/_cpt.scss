@@ -193,7 +193,7 @@ html[data-theme="light"] {
 .quotation-page {
   min-height: 100vh;
   padding: 60px 20px 100px;
-  background: var(--bg-color);
+  background: $backgroundColor;
 }
 
 .quotation-wrap {
@@ -208,7 +208,7 @@ html[data-theme="light"] {
   justify-content: space-between;
   padding-bottom: 40px;
   margin-bottom: 40px;
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  border-bottom: 1px solid rgba($cText, 0.07);
 
   &__logo {
     height: 36px;
@@ -217,7 +217,7 @@ html[data-theme="light"] {
   }
 
   &__site-name {
-    font-size: 1.25rem;
+    font-size: $fsXl;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: $primaryColor;
@@ -240,7 +240,7 @@ html[data-theme="light"] {
   }
 
   &__id {
-    font-size: 1.25rem;
+    font-size: $fsXl;
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1;
@@ -336,7 +336,7 @@ html[data-theme="dark"] .quotation-header {
 // --- Divider ---
 .quotation-divider {
   height: 1px;
-  background: rgba(0,0,0,0.07);
+  background: rgba($cText, 0.07);
   margin: 40px 0;
 
   &--sm { margin: 16px 0; }
@@ -368,7 +368,7 @@ html[data-theme="dark"] .quotation-header {
     opacity: 0.35;
     margin-bottom: 20px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba($cText, 0.06);
   }
 }
 
@@ -419,7 +419,7 @@ html[data-theme="dark"] .quotation-section__title {
 .quotation-tag {
   display: inline-block;
   padding: 4px 14px;
-  border-radius: 100px;
+  border-radius: $rPill;
   font-size: 0.6875rem;
   font-weight: 600;
   background: rgba(0,0,0,0.05);
@@ -458,7 +458,7 @@ html[data-theme="dark"] .quotation-section__title {
     opacity: 0.8;
     padding: 20px;
     background: rgba(0,0,0,0.03);
-    border-radius: 16px;
+    border-radius: $rLg;
     border: 1px solid rgba(0,0,0,0.06);
 
     html[data-theme="dark"] & {
@@ -470,8 +470,8 @@ html[data-theme="dark"] .quotation-section__title {
 
 // --- Cards ---
 .quotation-card {
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 20px;
+  border: 1px solid rgba($cText, 0.08);
+  border-radius: $rXl;
   overflow: hidden;
   margin-bottom: 24px;
 
@@ -489,7 +489,7 @@ html[data-theme="dark"] .quotation-section__title {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     opacity: 0.45;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba($cText, 0.06);
     background: rgba(0,0,0,0.025);
 
     html[data-theme="dark"] & {
@@ -517,8 +517,8 @@ html[data-theme="dark"] .quotation-section__title {
   align-items: baseline;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  font-size: 0.875rem;
+  border-bottom: 1px solid rgba($cText, 0.05);
+  font-size: $fsSm;
 
   html[data-theme="dark"] & { border-bottom-color: rgba(255,255,255,0.05); }
 
@@ -549,8 +549,8 @@ html[data-theme="dark"] .quotation-section__title {
   align-items: baseline;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  font-size: 0.875rem;
+  border-bottom: 1px solid rgba($cText, 0.05);
+  font-size: $fsSm;
 
   html[data-theme="dark"] & { border-bottom-color: rgba(255,255,255,0.05); }
 
@@ -627,7 +627,7 @@ html[data-theme="dark"] .badge {
   padding-top: 10px;
 
   &__thanks {
-    font-size: 0.875rem;
+    font-size: $fsSm;
     opacity: 0.4;
   }
 
@@ -643,7 +643,7 @@ html[data-theme="dark"] .badge {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  border-radius: 100px;
+  border-radius: $rPill;
   font-size: 0.8125rem;
   font-weight: 700;
   cursor: pointer;
@@ -668,7 +668,7 @@ html[data-theme="dark"] .badge {
 
   &--primary {
     background: $primaryColor;
-    color: #fff;
+    color: $cSurface;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 
     &:hover {

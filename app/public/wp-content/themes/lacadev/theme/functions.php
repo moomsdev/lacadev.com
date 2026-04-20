@@ -139,11 +139,10 @@ add_action('after_setup_theme', function () {
     require_once APP_APP_SETUP_DIR . 'theme-support.php';
     require_once APP_APP_SETUP_DIR . 'menus.php';
 
-    // Load security & SEO (Phase 1 improvements)
+    // Load security modules
     require_once APP_APP_SETUP_DIR . 'security.php';
     require_once APP_APP_SETUP_DIR . 'recaptcha.php';
     // contact-recaptcha.php removed - recaptcha.php handles all forms including contact
-    // require_once APP_APP_SETUP_DIR . 'seo.php';
 
     // Load image optimization (Phase 2 improvements)
     require_once APP_APP_SETUP_DIR . 'image-optimization.php';

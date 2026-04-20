@@ -71,7 +71,7 @@
 .meta-item--viewcount {
     margin-top: 0.625rem;
     font-size: 0.875rem;
-    color: var(--laca-text-muted, var(--text-muted));
+    color: $cMuted;
 
     .dashicons {
         font-size: 0.875rem;

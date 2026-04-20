@@ -10,7 +10,7 @@
   height: 100vh;
   display: flex;
   place-items: center;
-  background-color: #fff;
+  background-color: $cSurface;
   z-index: 10000;
 
   .inner {
@@ -30,7 +30,7 @@
     font-weight: bold;
     text-transform: uppercase;
     -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: 2px var(--primary-color);
+    -webkit-text-stroke: 2px $primaryColor;
 
     @include resFont(5, 8.125);
 
@@ -59,8 +59,8 @@
     padding: 8px 3.125rem;
     position: relative;
     border-radius: 1.875rem;
-    border: 4px solid #000;
-    font-size: clamp(1rem, 3.6vw, 1.125rem);
+    border: 4px solid $cText;
+    font-size: clamp($fsBase, 3.6vw, $fsLg);
     font-weight: bold;
     text-transform: uppercase;
     background: transparent;
@@ -76,15 +76,15 @@
       height: 100%;
       left: 0;
       top: 0;
-      background: #000;
+      background: $cText;
       transition: 0.5s ease;
       z-index: -1;
     }
 
     &:hover {
-      color: #fff;
+      color: $cSurface;
       transition: 0.5s ease;
-      border: 4px solid #000;
+      border: 4px solid $cText;
 
       &:before {
         width: 100%;
@@ -104,9 +104,9 @@
 
 // Maintenance Mode Page Styles (Black & White Theme)
 .maintenance-body {
-  font-family: 'Nunito', sans-serif;
-  background: #fff;
-  color: #333;
+  font-family: $primaryFont;
+  background: $cSurface;
+  color: $cText;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -128,7 +128,7 @@
 
     .star {
       position: absolute;
-      background: #333;
+      background: $cText;
       border-radius: 50%;
       opacity: 0.8;
       animation: twinkle 4s infinite ease-in-out;
@@ -258,14 +258,14 @@
     margin-bottom: 0.9375rem;
     font-weight: 800;
     letter-spacing: 1px;
-    color: #333;
+    color: $cText;
   }
 
   p {
     font-size: 0.9375rem;
     line-height: 1.6;
     margin-bottom: 1.875rem;
-    color: #666;
+    color: $cMuted;
   }
 
   /* Socials */
@@ -276,7 +276,7 @@
     flex-wrap: wrap;
 
     a {
-      color: #333;
+      color: $cText;
       font-size: 0.875rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -313,7 +313,7 @@
       display: block;
       width: 80px;
       height: 40px;
-      border: 2px solid #333;
+      border: 2px solid $cText;
       border-radius: 40px;
       position: relative;
       cursor: pointer;
@@ -330,7 +330,7 @@
         left: 2px;
         width: 32px;
         height: 32px;
-        background: #333;
+        background: $cText;
         border-radius: 50%;
         display: flex;
         align-items: center;

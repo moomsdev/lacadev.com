@@ -146,12 +146,13 @@ class Laca_Recaptcha {
      * Validate Login
      */
     public function verify_login($user, $username, $password) {
-        if (isset($_POST['laca_recaptcha_response'])) {
-            $verify = $this->verify_token($_POST['laca_recaptcha_response']);
-            if (is_wp_error($verify)) {
-                return $verify;
-            }
+        // Enforce reCAPTCHA for login if enabled
+        $token = isset($_POST['laca_recaptcha_response']) ? $_POST['laca_recaptcha_response'] : '';
+        $verify = $this->verify_token($token);
+        if (is_wp_error($verify)) {
+            return $verify;
         }
+
         return $user;
     }
 
@@ -159,12 +160,12 @@ class Laca_Recaptcha {
      * Validate Registration
      */
     public function verify_registration($errors, $sanitized_user_login, $user_email) {
-        if (isset($_POST['laca_recaptcha_response'])) {
-            $verify = $this->verify_token($_POST['laca_recaptcha_response']);
-            if (is_wp_error($verify)) {
-                $errors->add('recaptcha_error', $verify->get_error_message());
-            }
+        $token = isset($_POST['laca_recaptcha_response']) ? $_POST['laca_recaptcha_response'] : '';
+        $verify = $this->verify_token($token);
+        if (is_wp_error($verify)) {
+            $errors->add('recaptcha_error', $verify->get_error_message());
         }
+
         return $errors;
     }
 
@@ -172,8 +173,9 @@ class Laca_Recaptcha {
      * Validate Comment
      */
     public function verify_comment($commentdata) {
-        if (!is_user_logged_in() && isset($_POST['laca_recaptcha_response'])) {
-            $verify = $this->verify_token($_POST['laca_recaptcha_response']);
+        if (!is_user_logged_in()) {
+            $token = isset($_POST['laca_recaptcha_response']) ? $_POST['laca_recaptcha_response'] : '';
+            $verify = $this->verify_token($token);
             if (is_wp_error($verify)) {
                 wp_die($verify->get_error_message());
             }

@@ -16,10 +16,10 @@
     text-align: left;
 
     .cta-label {
-      font-size: 0.875rem;
+      font-size: $fsSm;
       font-weight: $semiBold;
       letter-spacing: 0.2em;
-      color: #999;
+      color: $cMuted;
       margin-bottom: 1.25rem;
       text-transform: uppercase;
     }
@@ -92,7 +92,7 @@
   }
 
   .footer-title {
-    font-size: 0.875rem;
+    font-size: $fsSm;
     font-weight: $bold;
     letter-spacing: 0.1em;
     color: $primaryColor;
@@ -107,8 +107,8 @@
 
     p, a {
       margin-bottom: 0;
-      font-size: 1rem;
-      color: #666;
+      font-size: $fsBase;
+      color: $cMuted;
       text-decoration: none;
       transition: color 0.3s ease;
     }
@@ -131,8 +131,8 @@
     align-items: center;
 
     .footer-copyright {
-      font-size: 0.875rem;
-      color: #999;
+      font-size: $fsSm;
+      color: $cMuted;
     }
 
     .footer-legal {
@@ -140,8 +140,8 @@
       gap: 1.875rem;
 
       a {
-        font-size: 0.875rem;
-        color: #999;
+        font-size: $fsSm;
+        color: $cMuted;
         text-decoration: none;
 
         &:hover {
@@ -161,7 +161,7 @@
 // Dark mode support
 [data-theme="dark"], .dark {
   .site-footer {
-    background-color: var(--bg-color-dark);
+    background-color: $backgroundColor;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 
     &::before {
@@ -170,20 +170,20 @@
     }
 
     .cta-label, .footer-copyright, .footer-legal a {
-      color: #555;
+      color: $cMuted;
     }
 
     .footer-title, .cta-email {
-      color: #fff;
-      border-color: #fff;
+      color: $cText;
+      border-color: $cText;
     }
 
     .footer-content p, .footer-links a, .footer-socials a {
-      color: #888;
+      color: $cMuted;
     }
 
     .footer-links a:hover, .footer-socials a:hover, .footer-legal a:hover {
-      color: #fff;
+      color: $cText;
     }
 
     .footer-bottom {

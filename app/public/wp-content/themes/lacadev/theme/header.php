@@ -220,10 +220,34 @@ if (!defined('ABSPATH')) {
                     ?>
                     
                     <div class="header__overlay-footer">
-                        <div class="header__overlay-socials">
-                            <a href="#" target="_blank" class="header__overlay-social-link">Facebook</a>
-                            <a href="#" target="_blank" class="header__overlay-social-link">Instagram</a>
-                        </div>
+                        <?php
+                        $overlay_socials = [
+                            'facebook' => 'Facebook',
+                            'instagram' => 'Instagram',
+                            'linkedin' => 'LinkedIn',
+                            'youtube' => 'YouTube',
+                        ];
+                        $overlay_social_links = [];
+                        foreach ($overlay_socials as $social_key => $social_label) {
+                            $social_url = getOption($social_key);
+                            if (!$social_url) {
+                                continue;
+                            }
+                            $overlay_social_links[] = [
+                                'url' => $social_url,
+                                'label' => $social_label,
+                            ];
+                        }
+                        ?>
+                        <?php if (!empty($overlay_social_links)) : ?>
+                            <div class="header__overlay-socials">
+                                <?php foreach ($overlay_social_links as $social_item) : ?>
+                                    <a href="<?php echo esc_url($social_item['url']); ?>" target="_blank" rel="nofollow noopener" class="header__overlay-social-link">
+                                        <?php echo esc_html($social_item['label']); ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

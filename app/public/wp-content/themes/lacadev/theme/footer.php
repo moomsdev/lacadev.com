@@ -98,8 +98,29 @@
                 &copy; <?php echo date('Y'); ?> La Cà Dev. All rights reserved.
             </div>
             <div class="footer-legal">
-                <a href="#"><?php _e('Chính sách bảo mật', 'laca'); ?></a>
-                <a href="#"><?php _e('Điều khoản sử dụng', 'laca'); ?></a>
+                <?php
+                $privacy_policy_url = getOption('privacy_policy_url');
+                if (!$privacy_policy_url) {
+                    $privacy_policy_url = get_privacy_policy_url();
+                }
+
+                $terms_of_use_url = getOption('terms_of_use_url');
+                if (!$terms_of_use_url) {
+                    $terms_page = get_page_by_path('terms-of-use');
+                    if (!$terms_page) {
+                        $terms_page = get_page_by_path('dieu-khoan-su-dung');
+                    }
+                    if ($terms_page instanceof WP_Post) {
+                        $terms_of_use_url = get_permalink($terms_page->ID);
+                    }
+                }
+                ?>
+                <?php if ($privacy_policy_url) : ?>
+                    <a href="<?php echo esc_url($privacy_policy_url); ?>"><?php _e('Chính sách bảo mật', 'laca'); ?></a>
+                <?php endif; ?>
+                <?php if ($terms_of_use_url) : ?>
+                    <a href="<?php echo esc_url($terms_of_use_url); ?>"><?php _e('Điều khoản sử dụng', 'laca'); ?></a>
+                <?php endif; ?>
             </div>
         </div>
     </div>

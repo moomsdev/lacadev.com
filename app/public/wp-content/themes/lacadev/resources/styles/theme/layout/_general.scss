@@ -36,8 +36,8 @@ html {
 body {
   font-family: $secondaryFont !important;
   font-weight: $regular !important;
-  line-height: 1.5em !important;
-  color: $primaryColor !important;
+  line-height: $lhBase !important;
+  color: $cText !important;
   background-color: $backgroundColor;
   transition: background-color 0.3s ease, color 0.3s ease;
 
@@ -113,9 +113,10 @@ img {
 
 a {
   text-decoration: none !important;
+  color: $primaryColor;
 
   &:hover {
-    color: $primaryColor;
+    color: $secondaryColor;
   }
 }
 

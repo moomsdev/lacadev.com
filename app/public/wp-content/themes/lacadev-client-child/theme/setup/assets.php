@@ -56,8 +56,20 @@ function child_enqueue_frontend_assets()
             'child-theme-js',
             $child_dir_uri . '/dist/child.js',
             ['theme-js-bundle'], // load sau parent JS
-            $child_version,
+            filemtime($child_dist_js), // cache-bust khi file thay đổi
             true // in footer
+        );
+    }
+
+    // Stats Counter Block animation script — enqueue trực tiếp
+    $sc_js = get_stylesheet_directory() . '/block-gutenberg/stats-counter-block/stats-counter.js';
+    if (file_exists($sc_js)) {
+        wp_enqueue_script(
+            'block-stats-counter-js',
+            get_stylesheet_directory_uri() . '/block-gutenberg/stats-counter-block/stats-counter.js',
+            [],
+            filemtime($sc_js),
+            true
         );
     }
 }

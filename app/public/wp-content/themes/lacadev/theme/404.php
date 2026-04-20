@@ -48,9 +48,26 @@
 			<h1><?php _e('404', 'laca'); ?></h1>
 			<h2><?php _e('La cà hơi xa rồi bạn ơi!', 'laca'); ?></h2>
 			<p>
-				<?php _e('Chỗ này hoang vu lắm, chưa có nội dung gì đâu.'); ?>
+				<?php esc_html_e('Chỗ này hoang vu lắm, chưa có nội dung gì đâu.', 'laca'); ?>
 				<br>
-				<?php _e('Quay về "<a href=" ' . esc_url(home_url()) . '"><b>đường lớn</b></a>" kẻo lạc.'); ?>
+				<?php
+				$home_link = sprintf(
+					'<a href="%s"><b>%s</b></a>',
+					esc_url(home_url('/')),
+					esc_html__('đường lớn', 'laca')
+				);
+				/* translators: %s is the homepage link text. */
+				printf(
+					wp_kses(
+						__('Quay về %s kẻo lạc.', 'laca'),
+						[
+							'a' => ['href' => []],
+							'b' => [],
+						]
+					),
+					$home_link
+				);
+				?>
 			</p>
 		</div>
 	</div>
