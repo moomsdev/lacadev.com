@@ -7,6 +7,7 @@
 
 use WPEmergeTheme\Facades\Theme;
 use WPEmergeTheme\Facades\Assets;
+use App\Contracts\AssetHandles;
 
 /**
  * Enhanced asset loading with performance optimizations
@@ -31,11 +32,11 @@ function app_action_theme_enqueue_assets()
      * Critical JS (inline or very small) - load in head for critical functionality
      */
     if (file_exists($dist_path . 'critical.js')) {
-        wp_enqueue_script('theme-critical-js', $dist_url . 'critical.js', [], $version, false);
+        wp_enqueue_script(AssetHandles::CRITICAL_JS, $dist_url . 'critical.js', [], $version, false);
     }
 
     $vendor_chunks = [
-        'theme-vendors-js'      => 'vendors.js',
+        AssetHandles::VENDORS_JS      => 'vendors.js',
         'theme-vendor-gsap-js'  => 'vendor-gsap.js',
         'theme-vendor-swiper-js'=> 'vendor-swiper.js',
         'theme-vendor-swal-js'  => 'vendor-swal.js',
@@ -52,46 +53,46 @@ function app_action_theme_enqueue_assets()
     /**
      * Main JavaScript bundle (deferred)
      */
-    Assets::enqueueScript('theme-js-bundle', $dist_url . 'theme.js', $vendors_deps, true);
+    Assets::enqueueScript(AssetHandles::THEME_JS, $dist_url . 'theme.js', $vendors_deps, true);
 
     /**
      * Conditional assets based on page type
      */
     if (is_home() || is_archive() || is_search()) {
         if (file_exists($dist_path . 'archive.js')) {
-            wp_enqueue_script('theme-archive-js', $dist_url . 'archive.js', ['theme-js-bundle'], $version, true);
+            wp_enqueue_script(AssetHandles::ARCHIVE_JS, $dist_url . 'archive.js', [AssetHandles::THEME_JS], $version, true);
         }
     }
 
     if (is_single() && comments_open()) {
         if (file_exists($dist_path . 'comments.js')) {
-            wp_enqueue_script('theme-comments-js', $dist_url . 'comments.js', ['theme-js-bundle'], $version, true);
+            wp_enqueue_script(AssetHandles::COMMENTS_JS, $dist_url . 'comments.js', [AssetHandles::THEME_JS], $version, true);
         }
     }
 
     /**
      * Enqueue styles with preload optimization
      */
-    Assets::enqueueStyle('theme-css-bundle', $dist_url . 'styles/theme.css');
+    Assets::enqueueStyle(AssetHandles::THEME_CSS, $dist_url . 'styles/theme.css');
 
     /**
      * Conditional CSS based on page type
      */
     if (is_single()) {
         if (file_exists($dist_path . 'styles/single.css')) {
-            wp_enqueue_style('theme-single-css', $dist_url . 'styles/single.css', ['theme-css-bundle'], $version);
+            wp_enqueue_style(AssetHandles::SINGLE_CSS, $dist_url . 'styles/single.css', [AssetHandles::THEME_CSS], $version);
         }
     }
 
     /**
      * Enqueue theme's style.css file to allow overrides for the bundled styles.
      */
-    Assets::enqueueStyle('theme-styles', get_template_directory_uri() . '/style.css');
+    Assets::enqueueStyle(AssetHandles::THEME_STYLES, get_template_directory_uri() . '/style.css');
 
     /**
      * Localize script with minimal data
      */
-    wp_localize_script('theme-js-bundle', 'themeData', [
+    wp_localize_script(AssetHandles::THEME_JS, 'themeData', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('theme_nonce'),
         'isHome' => is_home(),
@@ -113,11 +114,11 @@ function app_action_admin_enqueue_assets()
      * Enqueue styles.
      */
     Assets::enqueueStyle(
-        'theme-admin-css-bundle',
+        AssetHandles::ADMIN_CSS,
         $template_dir . '/dist/styles/admin.css'
     );
     Assets::enqueueStyle(
-        'theme-editor-css-bundle',
+        AssetHandles::EDITOR_CSS,
         $template_dir . '/dist/styles/editor.css'
     );
 
@@ -132,7 +133,7 @@ function app_action_admin_enqueue_assets()
     $admin_version = wp_get_theme()->get('Version');
 
     $admin_vendor_chunks = [
-        'theme-vendors-js'       => 'vendors.js',
+        AssetHandles::VENDORS_JS       => 'vendors.js',
         'theme-vendor-swal-js'   => 'vendor-swal.js',
         'theme-vendor-chart-js'  => 'vendor-chart.js',
     ];
@@ -147,7 +148,7 @@ function app_action_admin_enqueue_assets()
      * Enqueue scripts.
      */
     Assets::enqueueScript(
-        'theme-admin-js-bundle',
+        AssetHandles::ADMIN_JS,
         $template_dir . '/dist/admin.js',
         $admin_deps,
         true
@@ -156,7 +157,7 @@ function app_action_admin_enqueue_assets()
     /**
      * Localize admin script data with nonce for AJAX requests and i18n strings
      */
-    wp_localize_script('theme-admin-js-bundle', 'ajaxurl_params', [
+    wp_localize_script(AssetHandles::ADMIN_JS, 'ajaxurl_params', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('update_post_thumbnail'),  // Must match backend check_ajax_referer
     ]);
@@ -164,7 +165,7 @@ function app_action_admin_enqueue_assets()
     /**
      * Localize i18n strings for admin JavaScript
      */
-    wp_localize_script('theme-admin-js-bundle', 'adminI18n', [
+    wp_localize_script(AssetHandles::ADMIN_JS, 'adminI18n', [
         // Thumbnail removal
         'removeThumbnailTitle' => __('Remove Thumbnail?', 'lacadev'),
         'removeThumbnailText' => __('Are you sure you want to remove this featured image?', 'lacadev'),
@@ -246,7 +247,7 @@ function app_action_admin_enqueue_assets()
             ];
         }
 
-        wp_localize_script('theme-admin-js-bundle', 'lacaProjectCharts', [
+        wp_localize_script(AssetHandles::ADMIN_JS, 'lacaProjectCharts', [
             'primary'  => carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc',
             'byStatus' => $by_status,
             'byMonth'  => $by_month,
@@ -254,7 +255,7 @@ function app_action_admin_enqueue_assets()
     }
 
     // Enqueue front-end styles in admin area
-    //  Assets::enqueueStyle('theme-css-bundle', $template_dir . '/dist/styles/theme.css');
+    //  Assets::enqueueStyle(AssetHandles::THEME_CSS, $template_dir . '/dist/styles/theme.css');
 
     // Inject dynamic admin colors as CSS variables
     $primary_color_ad = carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc';
@@ -270,7 +271,7 @@ function app_action_admin_enqueue_assets()
             --text-color-ad: {$text_color_ad};
         }
     ";
-    wp_add_inline_style('theme-admin-css-bundle', $custom_css);
+    wp_add_inline_style(AssetHandles::ADMIN_CSS, $custom_css);
 }
 
 /**
@@ -381,13 +382,13 @@ function app_action_login_enqueue_assets()
      * Enqueue scripts.
      */
     Assets::enqueueScript(
-        'theme-login-js-bundle',
+        AssetHandles::LOGIN_JS,
         $template_dir . '/dist/login.js',
         [],
         true
     );
 
-    wp_localize_script('theme-login-js-bundle', 'loginI18n', [
+    wp_localize_script(AssetHandles::LOGIN_JS, 'loginI18n', [
         'logoUrl' => $login_logo_url,
         'locales' => [
             'vi' => $loginVi,
@@ -405,13 +406,13 @@ function app_action_login_enqueue_assets()
     ]);
 
     // Ensure placeholders can be overridden from Carbon Fields without requiring JS rebuild.
-    wp_add_inline_script('theme-login-js-bundle', "(function(){document.addEventListener('DOMContentLoaded',function(){var cfg=window.loginI18n||{};var locales=cfg.locales||{};var lang=(document.documentElement.lang||'').indexOf('en')!==-1?'en':'vi';var data=locales[lang]||locales.vi||{};var userPlaceholder=data.userPlaceholder||cfg.userPlaceholder||'';var passPlaceholder=data.passPlaceholder||cfg.passPlaceholder||'';var user=document.getElementById('user_login');var pass=document.getElementById('user_pass');if(user&&userPlaceholder){user.setAttribute('placeholder',userPlaceholder);}if(pass&&passPlaceholder){pass.setAttribute('placeholder',passPlaceholder);}});}());", 'after');
+    wp_add_inline_script(AssetHandles::LOGIN_JS, "(function(){document.addEventListener('DOMContentLoaded',function(){var cfg=window.loginI18n||{};var locales=cfg.locales||{};var lang=(document.documentElement.lang||'').indexOf('en')!==-1?'en':'vi';var data=locales[lang]||locales.vi||{};var userPlaceholder=data.userPlaceholder||cfg.userPlaceholder||'';var passPlaceholder=data.passPlaceholder||cfg.passPlaceholder||'';var user=document.getElementById('user_login');var pass=document.getElementById('user_pass');if(user&&userPlaceholder){user.setAttribute('placeholder',userPlaceholder);}if(pass&&passPlaceholder){pass.setAttribute('placeholder',passPlaceholder);}});}());", 'after');
 
     /**
      * Enqueue styles.
      */
     Assets::enqueueStyle(
-        'theme-login-css-bundle',
+        AssetHandles::LOGIN_CSS,
         $template_dir . '/dist/styles/login.css'
     );
 
@@ -419,7 +420,7 @@ function app_action_login_enqueue_assets()
     if (!empty($login_logo_url)) {
         $safe_logo_url = esc_url_raw($login_logo_url);
         $login_logo_css = "#login h1 a{background-image:url('{$safe_logo_url}') !important;}";
-        wp_add_inline_style('theme-login-css-bundle', $login_logo_css);
+        wp_add_inline_style(AssetHandles::LOGIN_CSS, $login_logo_css);
     }
 }
 
@@ -436,7 +437,7 @@ function app_action_editor_enqueue_assets()
      * Enqueue scripts.
      */
     Assets::enqueueScript(
-        'theme-editor-js-bundle',
+        AssetHandles::EDITOR_JS,
         $template_dir . '/dist/editor.js',
         [],
         true
@@ -446,7 +447,7 @@ function app_action_editor_enqueue_assets()
     * Enqueue styles.
     */
     Assets::enqueueStyle(
-        'theme-editor-css-bundle',
+        AssetHandles::EDITOR_CSS,
         $template_dir . '/dist/styles/editor.css'
     );
 
@@ -473,7 +474,7 @@ function app_action_editor_enqueue_assets()
             font-family: 'Quicksand', sans-serif !important;
         }
     ";
-    wp_add_inline_style('theme-editor-css-bundle', $custom_css);
+    wp_add_inline_style(AssetHandles::EDITOR_CSS, $custom_css);
 }
 
 /**
@@ -494,17 +495,17 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
     // Scripts to defer (non-critical, loaded in footer)
     // NOTE: admin vendor chunks (swal, chart) are NOT deferred — loaded in <head> blocking
     $defer_scripts = [
-        'theme-vendors-js',
+        AssetHandles::VENDORS_JS,
         'theme-vendor-gsap-js',
         'theme-vendor-swiper-js',
         'theme-vendor-swal-js',
         'theme-vendor-836-js',
-        'theme-js-bundle',
-        'theme-admin-js-bundle',
-        'theme-login-js-bundle',
-        'theme-editor-js-bundle',
-        'theme-archive-js',
-        'theme-comments-js',
+        AssetHandles::THEME_JS,
+        AssetHandles::ADMIN_JS,
+        AssetHandles::LOGIN_JS,
+        AssetHandles::EDITOR_JS,
+        AssetHandles::ARCHIVE_JS,
+        AssetHandles::COMMENTS_JS,
     ];
 
     // Scripts to async (tracking, analytics)
@@ -531,14 +532,14 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
 add_filter('style_loader_tag', function ($tag, $handle, $href) {
     // Non-critical styles to load asynchronously
     $non_critical_styles = [
-        'theme-single-css',
+        AssetHandles::SINGLE_CSS,
         'fontawesome',
         'google-fonts'
     ];
 
     // If critical CSS file exists (inlined in header), load main bundle asynchronously
     if (file_exists(get_template_directory() . '/dist/styles/critical.css')) {
-        $non_critical_styles[] = 'theme-css-bundle';
+        $non_critical_styles[] = AssetHandles::THEME_CSS;
     }
 
     if (in_array($handle, $non_critical_styles)) {

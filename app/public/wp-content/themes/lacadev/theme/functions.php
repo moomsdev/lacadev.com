@@ -1,6 +1,7 @@
 <?php
 use WPEmerge\Facades\WPEmerge;
 use WPEmergeTheme\Facades\Theme;
+use App\Contracts\AssetHandles;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -190,7 +191,7 @@ foreach ($folders as $folder) {
  */
 function custom_ajax_search_script()
 {
-    wp_localize_script('theme-js-bundle', 'themeSearch', [
+    wp_localize_script(AssetHandles::THEME_JS, 'themeSearch', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('theme_search_nonce'),
     ]);

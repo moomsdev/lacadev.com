@@ -2,6 +2,8 @@
 
 namespace App\PostTypes\Concerns;
 
+use App\Contracts\AssetHandles;
+
 /**
  * Trait BlockSyncSender
  *
@@ -32,23 +34,12 @@ trait BlockSyncSender
             return;
         }
 
-        // SweetAlert2
-        wp_enqueue_script(
-            'sweetalert2',
-            'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
-            [],
-            '11',
-            true
-        );
-        wp_enqueue_style(
-            'sweetalert2',
-            'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
-            [],
-            '11'
-        );
+        // SweetAlert2 is bundled in admin JS (window.Swal set in admin/index.js).
+        // Do NOT load from CDN — use the locally-bundled version instead.
+        wp_enqueue_script(AssetHandles::ADMIN_JS);
 
-        // Inline script cho Block Sync UI
-        wp_add_inline_script('sweetalert2', $this->getBlockSyncInlineScript(), 'after');
+        // Inline script cho Block Sync UI — runs after admin bundle which exposes window.Swal
+        wp_add_inline_script(AssetHandles::ADMIN_JS, $this->getBlockSyncInlineScript(), 'after');
     }
 
     // =========================================================================
@@ -263,8 +254,8 @@ trait BlockSyncSender
                 'X-Laca-Key' => $apiKey,
                 'Accept'     => 'application/json',
             ],
-            'timeout' => 15,
-            'sslverify' => false, // Cho phép self-signed cert môi trường staging
+            'timeout'   => 15,
+            'sslverify' => !defined('WP_DEBUG') || !WP_DEBUG,
         ]);
 
         if (is_wp_error($response)) {
@@ -336,25 +327,51 @@ trait BlockSyncSender
             ];
         }
 
-        // POST đến client endpoint
-        $response = wp_remote_post($endpointUrl, [
-            'headers' => [
-                'X-Laca-Key'   => $apiKey,
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json',
-            ],
-            'body'    => json_encode([
-                'block_name' => $blockName,
-                'version'    => $version,
-                'files'      => $files,
-            ]),
-            'timeout' => 30,
+        // POST đến client endpoint — retry với exponential backoff (max 3 lần)
+        $payload = json_encode([
+            'block_name' => $blockName,
+            'version'    => $version,
+            'files'      => $files,
         ]);
 
-        if (is_wp_error($response)) {
+        $response    = null;
+        $lastError   = '';
+        $maxAttempts = 3;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            if ($attempt > 1) {
+                // Exponential backoff: 1s, 2s (blocking — admin context, short delays ok)
+                sleep(min(2 ** ($attempt - 2), 4));
+            }
+
+            $response = wp_remote_post($endpointUrl, [
+                'headers' => [
+                    'X-Laca-Key'   => $apiKey,
+                    'Content-Type' => 'application/json',
+                    'Accept'       => 'application/json',
+                ],
+                'body'    => $payload,
+                'timeout' => 30,
+                'sslverify' => !WP_DEBUG,
+            ]);
+
+            if (!is_wp_error($response)) {
+                $code = wp_remote_retrieve_response_code($response);
+                // Retry on server errors (5xx) but not client errors (4xx)
+                if ($code < 500) {
+                    break;
+                }
+                $lastError = "HTTP {$code} (attempt {$attempt})";
+            } else {
+                $lastError = $response->get_error_message() . " (attempt {$attempt})";
+                $response  = null;
+            }
+        }
+
+        if ($response === null || is_wp_error($response)) {
             return [
                 'success' => false,
-                'message' => 'Lỗi kết nối: ' . $response->get_error_message(),
+                'message' => 'Lỗi kết nối sau ' . $maxAttempts . ' lần thử: ' . $lastError,
                 'version' => null,
             ];
         }

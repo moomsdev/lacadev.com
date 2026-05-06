@@ -120,19 +120,27 @@ add_action('manage_post_posts_custom_column', 'app_render_featured_image_column'
  */
 
 /**
- * Tạo custom DB tables khi activate theme lần đầu
- * Cũng chạy trên `init` để upgrade version nếu cần
+ * Tạo custom DB tables — chỉ chạy dbDelta() khi schema version thay đổi.
+ * Tăng SCHEMA_VERSION khi thêm/sửa cấu trúc bảng.
  */
-add_action('after_switch_theme', 'laca_install_project_manager_tables');
-add_action('init', 'laca_install_project_manager_tables', 5);
+define('LACADEV_HUB_SCHEMA_VERSION', '1.0.0');
 
 function laca_install_project_manager_tables(): void
 {
-    \App\Databases\ProjectLogTable::install();
-    \App\Databases\ProjectAlertTable::install();
-    \App\Databases\ContactFormTable::install();
-    \App\Settings\EmailLog\EmailLogTable::install();
+    \App\Databases\DbVersionManager::maybeInstall(
+        LACADEV_HUB_SCHEMA_VERSION,
+        'lacadev_hub_db_version',
+        [
+            fn() => \App\Databases\ProjectLogTable::install(),
+            fn() => \App\Databases\ProjectAlertTable::install(),
+            fn() => \App\Databases\ContactFormTable::install(),
+            fn() => \App\Settings\EmailLog\EmailLogTable::install(),
+        ]
+    );
 }
+
+add_action('after_switch_theme', 'laca_install_project_manager_tables');
+add_action('after_setup_theme', 'laca_install_project_manager_tables', 1);
 
 /**
  * ============================================================================

@@ -13,9 +13,27 @@ class DynamicCptManager
 {
     const OPTION_KEY = 'laca_dynamic_cpts';
 
+    /**
+     * Thư mục chứa meta files — luôn trỏ về child theme (hoặc parent nếu không có child).
+     * Dùng method thay vì const để hỗ trợ get_stylesheet_directory() runtime.
+     */
+    public static function getMetaDir(): string
+    {
+        $dir = get_stylesheet_directory();
+        // WPEmerge child themes có style.css trong /theme subfolder.
+        if (basename($dir) === 'theme') {
+            $dir = dirname($dir);
+        }
+        return $dir . '/app/src/PostTypes/DynamicMeta';
+    }
+
     public function __construct()
     {
         add_action('init', [$this, 'registerAll'], 5);
+
+        // Carbon Fields fires carbon_fields_register_fields trên init priority 0.
+        // Meta files phải được require_once TRƯỚC priority 0, tức là trên after_setup_theme.
+        add_action('after_setup_theme', [$this, 'loadAllMetaFiles'], 9999);
     }
 
     /**
@@ -112,7 +130,7 @@ class DynamicCptManager
             );
 
             // Thêm cột thumbnail vào danh sách admin (giống AbstractPostType::showThumbnailOnList)
-            if (in_array('thumbnail', $supports, true)) {
+            if (\in_array('thumbnail', $supports, true)) {
                 $this->registerThumbnailColumn($slug);
             }
 
@@ -126,7 +144,7 @@ class DynamicCptManager
                 register_taxonomy_for_object_type('post_tag', $slug);
             }
 
-            foreach (($taxonomies['custom'] ?? []) as $tax) {
+            foreach ((array)($taxonomies['custom'] ?? []) as $tax) {
                 $tax_slug = sanitize_key($tax['slug'] ?? '');
                 if (!$tax_slug) {
                     continue;
@@ -148,6 +166,23 @@ class DynamicCptManager
                     ]
                 );
             }
+        }
+    }
+
+    /**
+     * Load TẤT CẢ file *-meta.php trong thư mục DynamicMeta.
+     * Áp dụng cho cả static CPT (project, service...) lẫn dynamic CPT.
+     * Các file này tự hook vào carbon_fields_register_fields nên chỉ cần require_once.
+     */
+    public function loadAllMetaFiles(): void
+    {
+        $dir = self::getMetaDir();
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        foreach (glob($dir . '/*-meta.php') ?: [] as $file) {
+            require_once $file;
         }
     }
 }

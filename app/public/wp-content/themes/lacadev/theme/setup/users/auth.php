@@ -1,6 +1,7 @@
 <?php
 
 use Overtrue\Socialite\SocialiteManager;
+use App\Contracts\AssetHandles;
 
 add_action('wp_ajax_nopriv_user_login', 'mm_user_login');
 add_action('wp_ajax_user_login', 'mm_user_login');
@@ -321,6 +322,6 @@ function mm_inject_login_alert_script() {
                 icon: '" . esc_js($icon) . "'
             }));
         ";
-        wp_add_inline_script('theme-admin-js-bundle', $script, 'before');
+        wp_add_inline_script(AssetHandles::ADMIN_JS, $script, 'before');
     }
 }

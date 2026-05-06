@@ -7,9 +7,6 @@
  */
 
 ( function () {
-	// Debug log
-	console.log( 'AJAX Search script loaded!' );
-
 	// Wait for DOM to be ready
 	if ( document.readyState === 'loading' ) {
 		document.addEventListener( 'DOMContentLoaded', init );
@@ -18,8 +15,6 @@
 	}
 
 	function init() {
-		console.log( 'AJAX Search: Initializing...' );
-
 		// Find search elements
 		const searchInput = document.querySelector(
 			'.header__bottom-search input[type="text"]'
@@ -28,16 +23,7 @@
 			'.header__bottom-search .search-box'
 		);
 
-		if ( ! searchInput ) {
-			console.error( 'AJAX Search: No search input found!' );
-			return;
-		}
-
-		console.log( 'Search input found:', searchInput );
-		console.log(
-			'themeSearch data:',
-			typeof themeSearch !== 'undefined' ? themeSearch : 'NOT AVAILABLE'
-		);
+		if ( ! searchInput ) return;
 
 		// Create search results container if it doesn't exist
 		let searchResults = searchForm.querySelector( '.search-results' );
@@ -46,8 +32,6 @@
 			searchResults.className = 'search-results';
 			searchForm.appendChild( searchResults );
 		}
-
-		console.log( 'Search results container ready' );
 
 		// Debounce timer
 		let searchTimeout = null;
@@ -103,15 +87,10 @@
 	 * @param resultsContainer
 	 */
 	function performSearch( query, resultsContainer ) {
-		console.log( 'Performing search for:', query );
-
 		// Check if themeSearch is available
 		if ( typeof themeSearch === 'undefined' ) {
-			console.error( 'themeSearch data not available!' );
 			return;
 		}
-
-		console.log( 'AJAX URL:', themeSearch.ajaxurl );
 
 		// Show loading indicator
 		resultsContainer.innerHTML =
@@ -139,7 +118,6 @@
 				return response.text();
 			} )
 			.then( ( html ) => {
-				console.log( 'AJAX: Success! Response received' );
 				if ( html && html.trim() !== '' ) {
 					resultsContainer.innerHTML = html;
 					resultsContainer.classList.add( 'active' );
@@ -149,8 +127,7 @@
 					resultsContainer.classList.add( 'active' );
 				}
 			} )
-			.catch( ( error ) => {
-				console.error( 'AJAX: Error!', error );
+			.catch( () => {
 				resultsContainer.innerHTML =
 					'<div class="search-results__error">Có lỗi xảy ra. Vui lòng thử lại.</div>';
 				resultsContainer.classList.add( 'active' );
