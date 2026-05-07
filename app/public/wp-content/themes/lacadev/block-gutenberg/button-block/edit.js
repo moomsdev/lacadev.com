@@ -16,15 +16,6 @@ import {
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
-		return (
-			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
-			</div>
-		);
-	}
-
-
 	const {
 		text,
 		url,
@@ -46,6 +37,25 @@ export default function Edit( { attributes, setAttributes } ) {
 		},
 	} );
 
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
+		return (
+			<div style={ { width: '100%', lineHeight: 0 } }>
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<InspectorControls>
@@ -53,16 +63,22 @@ export default function Edit( { attributes, setAttributes } ) {
 					<TextControl
 						label={ __( 'Nội dung nút', 'laca' ) }
 						value={ text }
-						onChange={ ( value ) => setAttributes( { text: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { text: value } )
+						}
 					/>
-					
+
 					<div style={ { marginBottom: '15px' } }>
-						<div style={ { display: 'block', marginBottom: '5px' } }>
+						<div
+							style={ { display: 'block', marginBottom: '5px' } }
+						>
 							{ __( 'Liên kết (URL):', 'laca' ) }
 						</div>
 						<URLInput
 							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { url: value } )
+							}
 						/>
 					</div>
 
@@ -70,13 +86,30 @@ export default function Edit( { attributes, setAttributes } ) {
 						label={ __( 'Kiểu dáng', 'laca' ) }
 						value={ style }
 						options={ [
-							{ label: __( 'Tiêu chuẩn (Primary)', 'laca' ), value: 'primary' },
-							{ label: __( 'Đường nét (Outline)', 'laca' ), value: 'outline' },
-							{ label: __( 'Tối giản (Minimal)', 'laca' ), value: 'minimal' },
-							{ label: __( 'Gương thần (Glass)', 'laca' ), value: 'glass' },
-							{ label: __( 'Gạch chân (Text only)', 'laca' ), value: 'text-only' },
+							{
+								label: __( 'Tiêu chuẩn (Primary)', 'laca' ),
+								value: 'primary',
+							},
+							{
+								label: __( 'Đường nét (Outline)', 'laca' ),
+								value: 'outline',
+							},
+							{
+								label: __( 'Tối giản (Minimal)', 'laca' ),
+								value: 'minimal',
+							},
+							{
+								label: __( 'Gương thần (Glass)', 'laca' ),
+								value: 'glass',
+							},
+							{
+								label: __( 'Gạch chân (Text only)', 'laca' ),
+								value: 'text-only',
+							},
 						] }
-						onChange={ ( value ) => setAttributes( { style: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { style: value } )
+						}
 					/>
 
 					<SelectControl
@@ -87,29 +120,43 @@ export default function Edit( { attributes, setAttributes } ) {
 							{ label: __( 'Giữa', 'laca' ), value: 'center' },
 							{ label: __( 'Phải', 'laca' ), value: 'right' },
 						] }
-						onChange={ ( value ) => setAttributes( { alignment: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { alignment: value } )
+						}
 					/>
 
 					<SelectControl
 						label={ __( 'Mở trong', 'laca' ) }
 						value={ target }
 						options={ [
-							{ label: __( 'Trang hiện tại (_self)', 'laca' ), value: '_self' },
-							{ label: __( 'Trang mới (_blank)', 'laca' ), value: '_blank' },
+							{
+								label: __( 'Trang hiện tại (_self)', 'laca' ),
+								value: '_self',
+							},
+							{
+								label: __( 'Trang mới (_blank)', 'laca' ),
+								value: '_blank',
+							},
 						] }
-						onChange={ ( value ) => setAttributes( { target: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { target: value } )
+						}
 					/>
 
 					<ToggleControl
 						label={ __( 'Độ rộng tối đa (Full width)', 'laca' ) }
 						checked={ fullWidth }
-						onChange={ ( value ) => setAttributes( { fullWidth: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { fullWidth: value } )
+						}
 					/>
 
 					<RangeControl
 						label={ __( 'Khoảng cách trên (px)', 'laca' ) }
 						value={ marginTop }
-						onChange={ ( value ) => setAttributes( { marginTop: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { marginTop: value } )
+						}
 						min={ 0 }
 						max={ 200 }
 					/>
@@ -117,7 +164,9 @@ export default function Edit( { attributes, setAttributes } ) {
 					<RangeControl
 						label={ __( 'Khoảng cách dưới (px)', 'laca' ) }
 						value={ marginBottom }
-						onChange={ ( value ) => setAttributes( { marginBottom: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { marginBottom: value } )
+						}
 						min={ 0 }
 						max={ 200 }
 					/>
@@ -125,9 +174,17 @@ export default function Edit( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
-				<div className={ `btn btn-${ style } ${ fullWidth ? 'is-full-width' : '' }` }>
-					{ style === 'minimal' && <span className="btn-icon"></span> }
-					<span className="btn-text">{ text || __( 'Thêm tên nút...', 'laca' ) }</span>
+				<div
+					className={ `btn btn-${ style } ${
+						fullWidth ? 'is-full-width' : ''
+					}` }
+				>
+					{ style === 'minimal' && (
+						<span className="btn-icon"></span>
+					) }
+					<span className="btn-text">
+						{ text || __( 'Thêm tên nút…', 'laca' ) }
+					</span>
 				</div>
 			</div>
 		</>

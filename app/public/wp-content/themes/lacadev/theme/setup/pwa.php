@@ -88,7 +88,7 @@ class ThemePWA
 
         // Fallback icon từ theme
         if (!$iconUrl) {
-            $iconUrl = get_template_directory_uri() . '/dist/images/icon-192.png';
+            $iconUrl = lacaResourceUrl('images/favicon/android-icon-192x192.png');
         }
 
         $manifest = [
@@ -152,7 +152,7 @@ class ThemePWA
 
         $siteUrl   = home_url();
         $siteName  = get_bloginfo('name');
-        $iconUrl   = get_template_directory_uri() . '/dist/images/icon-192.png';
+        $iconUrl   = lacaResourceUrl('images/favicon/android-icon-192x192.png');
         $themeColor = '#2563eb';
         ?>
         <!-- PWA Manifest -->

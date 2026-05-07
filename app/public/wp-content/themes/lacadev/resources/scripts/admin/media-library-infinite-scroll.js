@@ -10,8 +10,7 @@
 		'.media-frame-content',
 		'.media-modal-content',
 	];
-	const LOAD_MORE_BUTTON_SELECTOR =
-		'.media-modal .load-more-wrapper .button';
+	const LOAD_MORE_BUTTON_SELECTOR = '.media-modal .load-more-wrapper .button';
 	const BOTTOM_THRESHOLD = 220;
 
 	function getScrollContainer( modal ) {
@@ -120,4 +119,3 @@
 		initMediaLibraryInfiniteScroll();
 	}
 } )();
-

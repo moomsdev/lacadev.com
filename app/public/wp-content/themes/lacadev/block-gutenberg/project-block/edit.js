@@ -20,15 +20,6 @@ import { useSelect } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
-		return (
-			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
-			</div>
-		);
-	}
-
-
 	const {
 		postType,
 		taxonomy,
@@ -59,34 +50,40 @@ export default function Edit( { attributes, setAttributes } ) {
 			} ) );
 	}, [] );
 
-	const taxonomies = useSelect( ( select ) => {
-		const list = select( 'core' ).getTaxonomies
-			? select( 'core' ).getTaxonomies( { per_page: -1 } )
-			: [];
-		return ( list || [] )
-			.filter(
-				( t ) =>
-					Array.isArray( t.types ) && t.types.includes( postType )
-			)
-			.map( ( t ) => ( {
-				label: t.labels?.singular_name || t.name,
-				value: t.slug,
-				restBase: t.rest_base || t.slug,
-			} ) );
-	}, [ postType ] );
+	const taxonomies = useSelect(
+		( select ) => {
+			const list = select( 'core' ).getTaxonomies
+				? select( 'core' ).getTaxonomies( { per_page: -1 } )
+				: [];
+			return ( list || [] )
+				.filter(
+					( t ) =>
+						Array.isArray( t.types ) && t.types.includes( postType )
+				)
+				.map( ( t ) => ( {
+					label: t.labels?.singular_name || t.name,
+					value: t.slug,
+					restBase: t.rest_base || t.slug,
+				} ) );
+		},
+		[ postType ]
+	);
 
 	const selectedTax = taxonomies.find( ( t ) => t.value === taxonomy );
 	const taxonomyRestBase = selectedTax?.restBase || taxonomy;
 
-	const terms = useSelect( ( select ) => {
-		if ( ! taxonomy ) {
-			return [];
-		}
-		return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
-			per_page: -1,
-			hide_empty: true,
-		} );
-	}, [ taxonomy ] );
+	const terms = useSelect(
+		( select ) => {
+			if ( ! taxonomy ) {
+				return [];
+			}
+			return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
+				per_page: -1,
+				hide_empty: true,
+			} );
+		},
+		[ taxonomy ]
+	);
 
 	// Back-compat: old `categoryIds`
 	const effectiveTermIds =
@@ -96,7 +93,8 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	const { displayPosts, isLoading } = useSelect(
 		( select ) => {
-			const { getEntityRecords, isResolving: isResolvingSelector } = select( 'core' );
+			const { getEntityRecords, isResolving: isResolvingSelector } =
+				select( 'core' );
 			const query = {
 				per_page: maxCount,
 				status: 'publish',
@@ -104,19 +102,51 @@ export default function Edit( { attributes, setAttributes } ) {
 			};
 
 			if ( taxonomy && effectiveTermIds && effectiveTermIds.length > 0 ) {
-				query[ taxonomyRestBase ] = effectiveTermIds.map(id => String(id)).join(',');
+				query[ taxonomyRestBase ] = effectiveTermIds
+					.map( ( id ) => String( id ) )
+					.join( ',' );
 			}
 
 			const records = getEntityRecords( 'postType', postType, query );
-			const resolving = isResolvingSelector( 'getEntityRecords', [ 'postType', postType, query ] );
-			
+			const resolving = isResolvingSelector( 'getEntityRecords', [
+				'postType',
+				postType,
+				query,
+			] );
+
 			return {
 				displayPosts: records || [],
 				isLoading: resolving,
 			};
 		},
-		[ maxCount, effectiveTermIds, taxonomy, taxonomyRestBase, postType, orderBy ]
+		[
+			maxCount,
+			effectiveTermIds,
+			taxonomy,
+			taxonomyRestBase,
+			postType,
+			orderBy,
+		]
 	);
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
+		return (
+			<div style={ { width: '100%', lineHeight: 0 } }>
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
+			</div>
+		);
+	}
 
 	const toggleCategory = ( id ) => {
 		const newList = [ ...effectiveTermIds ];
@@ -127,6 +157,37 @@ export default function Edit( { attributes, setAttributes } ) {
 			newList.push( id );
 		}
 		setAttributes( { termIds: newList, categoryIds: [] } );
+	};
+
+	const renderTermPicker = () => {
+		if ( ! taxonomy ) {
+			return <p>{ __( 'Chọn taxonomy để bật tab.', 'laca' ) }</p>;
+		}
+
+		if ( ! terms ) {
+			return <Spinner />;
+		}
+
+		return (
+			<div
+				style={ {
+					maxHeight: '200px',
+					overflowY: 'auto',
+					border: '1px solid #ddd',
+					padding: '10px',
+					marginBottom: '15px',
+				} }
+			>
+				{ terms.map( ( cat ) => (
+					<CheckboxControl
+						key={ cat.id }
+						label={ cat.name }
+						checked={ effectiveTermIds.includes( cat.id ) }
+						onChange={ () => toggleCategory( cat.id ) }
+					/>
+				) ) }
+			</div>
+		);
 	};
 
 	return (
@@ -150,7 +211,10 @@ export default function Edit( { attributes, setAttributes } ) {
 						label={ __( 'Taxonomy (Tab)', 'laca' ) }
 						value={ taxonomy }
 						options={ [
-							{ label: __( 'Không dùng tab', 'laca' ), value: '' },
+							{
+								label: __( 'Không dùng tab', 'laca' ),
+								value: '',
+							},
 							...taxonomies.map( ( t ) => ( {
 								label: t.label,
 								value: t.value,
@@ -180,34 +244,31 @@ export default function Edit( { attributes, setAttributes } ) {
 						rows={ 3 }
 					/>
 					<hr />
-					
-					<p><strong>{ __( 'Chọn danh mục hiển thị (Tab)', 'laca' ) }</strong></p>
-					{ ! taxonomy ? (
-						<p>{ __( 'Chọn taxonomy để bật tab.', 'laca' ) }</p>
-					) : ! terms ? (
-						<Spinner />
-					) : (
-						<div style={ { maxHeight: '200px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', marginBottom: '15px' } }>
-							{ terms.map( ( cat ) => (
-								<CheckboxControl
-									key={ cat.id }
-									label={ cat.name }
-									checked={ effectiveTermIds.includes( cat.id ) }
-									onChange={ () => toggleCategory( cat.id ) }
-								/>
-							) ) }
-						</div>
-					) }
+
+					<p>
+						<strong>
+							{ __( 'Chọn danh mục hiển thị (Tab)', 'laca' ) }
+						</strong>
+					</p>
+					{ renderTermPicker() }
 
 					<SelectControl
 						label={ __( 'Sắp xếp theo', 'laca' ) }
 						value={ orderBy }
 						options={ [
 							{ label: __( 'Mới nhất', 'laca' ), value: 'date' },
-							{ label: __( 'Ngẫu nhiên', 'laca' ), value: 'rand' },
-							{ label: __( 'Dự án thực tế', 'laca' ), value: 'hand_made' },
+							{
+								label: __( 'Ngẫu nhiên', 'laca' ),
+								value: 'rand',
+							},
+							{
+								label: __( 'Dự án thực tế', 'laca' ),
+								value: 'hand_made',
+							},
 						] }
-						onChange={ ( value ) => setAttributes( { orderBy: value } ) }
+						onChange={ ( value ) =>
+							setAttributes( { orderBy: value } )
+						}
 					/>
 
 					<RangeControl
@@ -219,7 +280,7 @@ export default function Edit( { attributes, setAttributes } ) {
 						min={ 1 }
 						max={ 20 }
 					/>
-                    
+
 					<RangeControl
 						label={ __( 'Số lượng hiển thị (Mobile)', 'laca' ) }
 						value={ countMobile }
@@ -242,7 +303,9 @@ export default function Edit( { attributes, setAttributes } ) {
 						}
 					/>
 					<div style={ { marginBottom: '15px' } }>
-						<div style={ { display: 'block', marginBottom: '5px' } }>
+						<div
+							style={ { display: 'block', marginBottom: '5px' } }
+						>
 							{ __( 'Nhập URL:', 'laca' ) }
 						</div>
 						<URLInput
@@ -267,7 +330,10 @@ export default function Edit( { attributes, setAttributes } ) {
 									onChange={ ( value ) =>
 										setAttributes( { title: value } )
 									}
-									placeholder={ __( 'Nhập tiêu đề…', 'laca' ) }
+									placeholder={ __(
+										'Nhập tiêu đề…',
+										'laca'
+									) }
 								/>
 							) }
 							{ description && (
@@ -284,29 +350,48 @@ export default function Edit( { attributes, setAttributes } ) {
 						</div>
 					) }
 
-					{ taxonomy && effectiveTermIds && effectiveTermIds.length > 0 && (
-						<div className="laca-project-block__tabs">
-							<div className="tab-item is-active">{ __( 'All', 'laca' ) }</div>
-							{ terms && terms.filter(c => effectiveTermIds.includes(c.id)).map(cat => (
-								<div key={cat.id} className="tab-item">{cat.name}</div>
-							))}
-						</div>
-					)}
+					{ taxonomy &&
+						effectiveTermIds &&
+						effectiveTermIds.length > 0 && (
+							<div className="laca-project-block__tabs">
+								<div className="tab-item is-active">
+									{ __( 'All', 'laca' ) }
+								</div>
+								{ terms &&
+									terms
+										.filter( ( c ) =>
+											effectiveTermIds.includes( c.id )
+										)
+										.map( ( cat ) => (
+											<div
+												key={ cat.id }
+												className="tab-item"
+											>
+												{ cat.name }
+											</div>
+										) ) }
+							</div>
+						) }
 
 					<div className="laca-project-block__grid">
 						{ isLoading ? (
 							<div className="laca-editor-placeholder">
 								<Spinner />
-								<p>{ __( 'Đang tải dự án...', 'laca' ) }</p>
+								<p>{ __( 'Đang tải dự án…', 'laca' ) }</p>
 							</div>
 						) : (
 							<>
 								{ displayPosts.length === 0 && (
 									<div className="laca-editor-placeholder">
-										<p>{ __( 'Không tìm thấy dự án nào. Vui lòng kiểm tra lại danh mục hoặc trạng thái bài viết.', 'laca' ) }</p>
+										<p>
+											{ __(
+												'Không tìm thấy dự án nào. Vui lòng kiểm tra lại danh mục hoặc trạng thái bài viết.',
+												'laca'
+											) }
+										</p>
 									</div>
 								) }
-								
+
 								{ displayPosts.map( ( post, index ) => {
 									let itemClass = 'laca-project-block__item';
 									if ( index + 1 > countDesktop ) {
@@ -316,21 +401,39 @@ export default function Edit( { attributes, setAttributes } ) {
 										itemClass += ' hidden-on-mobile';
 									}
 
-									const quickViewImgId = post.meta?.quick_view_img;
+									const quickViewImgId =
+										post.meta?.quick_view_img;
 
 									return (
-										<div key={ post.id } className={ itemClass }>
-											<div className="laca-project-block__card-link" style={ { pointerEvents: 'none' } }>
+										<div
+											key={ post.id }
+											className={ itemClass }
+										>
+											<div
+												className="laca-project-block__card-link"
+												style={ {
+													pointerEvents: 'none',
+												} }
+											>
 												<div className="laca-project-block__image-wrap">
 													{ post.featured_media ? (
-														<PostImage id={ post.featured_media } />
+														<PostImage
+															id={
+																post.featured_media
+															}
+														/>
 													) : (
 														<div className="laca-project-block__image-placeholder"></div>
 													) }
-													
+
 													{ quickViewImgId && (
 														<div className="laca-project-block__hover-img-wrap">
-															<PostImage id={ quickViewImgId } isHover={true} />
+															<PostImage
+																id={
+																	quickViewImgId
+																}
+																isHover={ true }
+															/>
 														</div>
 													) }
 												</div>
@@ -361,16 +464,20 @@ function PostImage( { id, isHover = false } ) {
 		( select ) => {
 			// Carbon Fields might return a URL instead of ID if configured that way
 			// We check if id is a number
-			return isNaN(parseInt(id)) ? null : select( 'core' ).getMedia( id );
+			return isNaN( parseInt( id ) )
+				? null
+				: select( 'core' ).getMedia( id );
 		},
 		[ id ]
 	);
 
-	const className = isHover ? 'laca-project-block__hover-img' : 'laca-project-block__img';
+	const className = isHover
+		? 'laca-project-block__hover-img'
+		: 'laca-project-block__img';
 
 	if ( ! media ) {
 		// If id is a URL, use it directly
-		if ( typeof id === 'string' && id.startsWith('http') ) {
+		if ( typeof id === 'string' && id.startsWith( 'http' ) ) {
 			return <img src={ id } alt="" className={ className } />;
 		}
 		return <div className="laca-project-block__image-placeholder"></div>;

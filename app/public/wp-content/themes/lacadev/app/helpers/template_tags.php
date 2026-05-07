@@ -46,7 +46,7 @@ function getPostThumbnailUrl($postId, $width = null, $height = null) {
     
     // If no default_image option is set, use theme default image
     if (empty($defaultImage)) {
-        $defaultImage = get_template_directory_uri() . '/resources/images/default-img.webp';
+        $defaultImage = lacaResourceUrl('images/default-img.webp');
     }
     
     try {

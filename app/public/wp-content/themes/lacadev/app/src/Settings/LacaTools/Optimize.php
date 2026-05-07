@@ -106,14 +106,14 @@ class Optimize
     public function enableInstantPage()
     {
         add_action('wp_enqueue_scripts', function () {
-            wp_enqueue_script('instantpage', get_template_directory_uri() . '/dist/instantpage.js', array(), '5.7.0', true);
+            wp_enqueue_script('instantpage', \lacaDistUrl('instantpage.js'), array(), '5.7.0', true);
         });
     }
 
     public function enableSmoothScroll()
     {
         add_action('wp_enqueue_scripts', function () {
-            wp_enqueue_script('smooth-scroll', get_template_directory_uri() . '/dist/smooth-scroll.min.js', array(), '1.4.16', true);
+            wp_enqueue_script('smooth-scroll', \lacaDistUrl('smooth-scroll.min.js'), array(), '1.4.16', true);
         });
     }
 
@@ -179,9 +179,26 @@ class Optimize
      */
     public function registerServiceWorker()
     {
-        add_action('wp_footer', function () {
-            $swUrl = get_template_directory_uri() . '/dist/sw.js';
-            echo '<script>if("serviceWorker"in navigator){navigator.serviceWorker.register(' . wp_json_encode($swUrl) . ').catch(()=>{})};</script>' . "\n";
-        }, 99);
+        add_action('wp_enqueue_scripts', function () {
+            if (!file_exists(\lacaDistDir('sw.js'))) {
+                return;
+            }
+
+            if (wp_script_is('laca-sw-register', 'enqueued')) {
+                return;
+            }
+
+            wp_enqueue_script(
+                'laca-sw-register',
+                \lacaResourceUrl('scripts/theme/service-worker-register.js'),
+                [],
+                wp_get_theme()->get('Version'),
+                true
+            );
+            wp_localize_script('laca-sw-register', 'swConfig', [
+                'swUrl' => \lacaDistUrl('sw.js'),
+                'debug' => defined('WP_DEBUG') && WP_DEBUG ? 'true' : 'false',
+            ]);
+        });
     }
 }

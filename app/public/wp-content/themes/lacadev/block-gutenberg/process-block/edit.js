@@ -16,16 +16,27 @@ import {
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
+	const { title, description, steps } = attributes;
+	const blockProps = useBlockProps( { className: 'block-process' } );
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
 		return (
 			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
 			</div>
 		);
 	}
-
-
-	const { title, description, steps } = attributes;
 
 	const updateStep = ( index, key, value ) => {
 		const newSteps = [ ...steps ];
@@ -196,7 +207,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<section { ...useBlockProps( { className: 'block-process' } ) }>
+			<section { ...blockProps }>
 				<div className="container">
 					<div className="block-header">
 						<RichText

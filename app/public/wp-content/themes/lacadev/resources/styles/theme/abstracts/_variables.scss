@@ -1,4 +1,9 @@
-@use "./mixin.scss" as *;
+@use "sass:math";
+
+/// Chuyển đổi px -> rem cho design tokens trong file variables.
+@function rem($px) {
+  @return #{math.div($px, 16)}rem;
+}
 
 // Fonts
 $primaryFont: "Be Vietnam Pro", sans-serif;
@@ -11,6 +16,10 @@ $backgroundColorAd: var(--bg-color-ad);
 $textColorAd: var(--text-color-ad);
 
 // Theme colors
+$cText: #2d3435;
+$cMuted: #6f7778;
+$cSurface: #ffffff;
+$cBorder: #e5e2f3;
 $primaryColor: var(--primary-color);
 $secondaryColor: var(--secondary-color);
 $backgroundColor: var(--bg-color);
@@ -64,3 +73,8 @@ $rMd: rem(10); // 10px
 $rLg: rem(14); // 14px
 $rXl: rem(20); // 20px
 $rPill: rem(999); // 999px
+
+// Shadows
+$shXs: 0 1px 2px rgba(15, 23, 42, 0.06);
+$shSm: 0 4px 10px rgba(15, 23, 42, 0.08);
+$shMd: 0 12px 30px rgba(15, 23, 42, 0.12);

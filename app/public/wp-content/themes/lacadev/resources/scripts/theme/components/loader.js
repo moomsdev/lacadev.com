@@ -10,27 +10,39 @@ const HOURS_24 = 24 * 60 * 60 * 1000;
 
 let flickerInterval;
 
-const WORDS = [ 'LA CÀ DEV', 'WORDPRESS', 'BLOG', 'TRAVELLING', 'MINIMAL', 'CLEAN' ];
+const WORDS = [
+	'LA CÀ DEV',
+	'WORDPRESS',
+	'BLOG',
+	'TRAVELLING',
+	'MINIMAL',
+	'CLEAN',
+];
 
 function startFlicker() {
 	stopFlicker();
 	const randoms = document.querySelectorAll( '.randoms' );
 	flickerInterval = setInterval( () => {
 		randoms.forEach( ( el ) => {
-			el.textContent = WORDS[ Math.floor( Math.random() * WORDS.length ) ];
+			el.textContent =
+				WORDS[ Math.floor( Math.random() * WORDS.length ) ];
 			el.style.opacity = Math.random() > 0.5 ? '1' : '0.1';
 		} );
 	}, 120 );
 }
 
 function stopFlicker() {
-	if ( flickerInterval ) clearInterval( flickerInterval );
+	if ( flickerInterval ) {
+		clearInterval( flickerInterval );
+	}
 }
 
 function showPageLoader() {
 	const loader = document.querySelector( '.page-loader' );
 	const textLoader = document.querySelector( '.text-loader' );
-	if ( ! loader || ! textLoader ) return;
+	if ( ! loader || ! textLoader ) {
+		return;
+	}
 
 	loader.classList.add( 'active' );
 	gsap.set( [ loader, textLoader ], { display: 'block', opacity: 1 } );
@@ -41,15 +53,25 @@ function showPageLoader() {
 function hidePageLoader() {
 	const loader = document.querySelector( '.page-loader' );
 	const textLoader = document.querySelector( '.text-loader' );
-	if ( ! loader || ! textLoader ) return;
+	if ( ! loader || ! textLoader ) {
+		return;
+	}
 
-	document.querySelectorAll( '.randoms' ).forEach( ( el ) => ( el.style.opacity = '1' ) );
+	document
+		.querySelectorAll( '.randoms' )
+		.forEach( ( el ) => ( el.style.opacity = '1' ) );
 
 	gsap.to( textLoader, {
-		opacity: 0, duration: 0.5, delay: 0.3, ease: 'power2.inOut',
+		opacity: 0,
+		duration: 0.5,
+		delay: 0.3,
+		ease: 'power2.inOut',
 		onComplete: () => {
 			gsap.to( loader, {
-				opacity: 0, duration: 0.6, delay: 0.1, ease: 'power2.inOut',
+				opacity: 0,
+				duration: 0.6,
+				delay: 0.1,
+				ease: 'power2.inOut',
 				onComplete: () => {
 					loader.style.display = 'none';
 					loader.classList.remove( 'active' );
@@ -64,12 +86,14 @@ function hidePageLoader() {
 
 export function shouldShowLoader() {
 	const lastShown = localStorage.getItem( LOADER_KEY );
-	return ! lastShown || ( Date.now() - parseInt( lastShown ) ) >= HOURS_24;
+	return ! lastShown || Date.now() - parseInt( lastShown ) >= HOURS_24;
 }
 
 export function initPageLoader( isMobile ) {
 	const loader = document.querySelector( '.page-loader' );
-	if ( ! loader ) return;
+	if ( ! loader ) {
+		return;
+	}
 
 	if ( isMobile ) {
 		loader.style.display = 'none';
@@ -97,7 +121,10 @@ export function initPageLoader( isMobile ) {
 	const MIN_DISPLAY = 1000;
 
 	const handleFinish = () => {
-		const remaining = Math.max( 0, MIN_DISPLAY - ( Date.now() - startTime ) );
+		const remaining = Math.max(
+			0,
+			MIN_DISPLAY - ( Date.now() - startTime )
+		);
 		setTimeout( hidePageLoader, remaining );
 	};
 
@@ -108,6 +135,8 @@ export function initPageLoader( isMobile ) {
 	}
 
 	setTimeout( () => {
-		if ( loader.style.display !== 'none' ) hidePageLoader();
+		if ( loader.style.display !== 'none' ) {
+			hidePageLoader();
+		}
 	}, 5000 );
 }

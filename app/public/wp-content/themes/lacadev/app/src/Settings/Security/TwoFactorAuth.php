@@ -404,6 +404,6 @@ class TwoFactorAuth
             $qrSrc = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
         }
         wp_enqueue_script('laca-qrcode', $qrSrc, [], '1.0.0', true);
-        wp_enqueue_script('laca-2fa-profile', get_template_directory_uri() . '/resources/scripts/admin/laca-2fa.js', ['laca-qrcode', 'jquery'], '1.0.0', true);
+        wp_enqueue_script('laca-2fa-profile', \lacaResourceUrl('scripts/admin/laca-2fa.js'), ['laca-qrcode', 'jquery'], '1.0.0', true);
     }
 }

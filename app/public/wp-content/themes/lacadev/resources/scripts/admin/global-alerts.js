@@ -69,9 +69,7 @@ import Swal from 'sweetalert2';
 					Swal.fire( {
 						icon: 'error',
 						title: 'Lỗi',
-						text: res.data
-							? res.data.message
-							: 'Có lỗi xảy ra.',
+						text: res.data ? res.data.message : 'Có lỗi xảy ra.',
 					} );
 				}
 			} )
@@ -201,12 +199,10 @@ import Swal from 'sweetalert2';
 				.then( ( r ) => r.json() )
 				.then( ( res ) => {
 					if ( res.success ) {
-						const badge = document.querySelector(
-							'.laca-total-badge'
-						);
+						const badge =
+							document.querySelector( '.laca-total-badge' );
 						if ( badge ) {
-							badge.textContent =
-								res.data.count + ' chưa xử lý';
+							badge.textContent = res.data.count + ' chưa xử lý';
 						}
 					}
 				} );

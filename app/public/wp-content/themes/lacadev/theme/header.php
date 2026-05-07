@@ -40,31 +40,37 @@ if (!defined('ABSPATH')) {
 	<meta name="msapplication-TileImage" content="<?php theAsset('favicon/ms-icon-144x144.png'); ?>">
     <meta name="theme-color" content="#ffffff">
     <?php
-    $critical_css_path = get_template_directory() . '/dist/styles/critical.css';
+    $critical_css_path = lacaDistDir('styles/critical.css');
     if (file_exists($critical_css_path)) {
         echo '<style id="critical-css">' . file_get_contents($critical_css_path) . '</style>';
     }
+    $primary_color = lacaSanitizeCssColor(carbon_get_theme_option('primary_color'), '#0ea5e9');
+    $secondary_color = lacaSanitizeCssColor(carbon_get_theme_option('secondary_color'), '#f59e0b');
+    $bg_color = lacaSanitizeCssColor(carbon_get_theme_option('bg_color'), '#ffffff');
+    $primary_color_dark = lacaSanitizeCssColor(carbon_get_theme_option('primary_color_dark'), '#0284c7');
+    $secondary_color_dark = lacaSanitizeCssColor(carbon_get_theme_option('secondary_color_dark'), '#d97706');
+    $bg_color_dark = lacaSanitizeCssColor(carbon_get_theme_option('bg_color_dark'), '#0f172a');
     ?>
     <style>
         :root {
             /* Theme colors */
-            --primary-color: <?php echo carbon_get_theme_option('primary_color'); ?>;
-            --secondary-color: <?php echo carbon_get_theme_option('secondary_color'); ?>;
-            --bg-color: <?php echo carbon_get_theme_option('bg_color'); ?>;
+            --primary-color: <?php echo esc_html($primary_color); ?>;
+            --secondary-color: <?php echo esc_html($secondary_color); ?>;
+            --bg-color: <?php echo esc_html($bg_color); ?>;
 
-            --primary-color-dark: <?php echo carbon_get_theme_option('primary_color_dark'); ?>;
-            --secondary-color-dark: <?php echo carbon_get_theme_option('secondary_color_dark'); ?>;
-            --bg-color-dark: <?php echo carbon_get_theme_option('bg_color_dark'); ?>;
+            --primary-color-dark: <?php echo esc_html($primary_color_dark); ?>;
+            --secondary-color-dark: <?php echo esc_html($secondary_color_dark); ?>;
+            --bg-color-dark: <?php echo esc_html($bg_color_dark); ?>;
         }
 
         html[data-theme="dark"] {
-            --primary-color: <?php echo carbon_get_theme_option('primary_color_dark'); ?>;
-            --secondary-color: <?php echo carbon_get_theme_option('secondary_color_dark'); ?>;
-            --bg-color: <?php echo carbon_get_theme_option('bg_color_dark'); ?>;
+            --primary-color: <?php echo esc_html($primary_color_dark); ?>;
+            --secondary-color: <?php echo esc_html($secondary_color_dark); ?>;
+            --bg-color: <?php echo esc_html($bg_color_dark); ?>;
 
-            --primary-color-dark: <?php echo carbon_get_theme_option('primary_color'); ?>;
-            --secondary-color-dark: <?php echo carbon_get_theme_option('secondary_color'); ?>;
-            --bg-color-dark: <?php echo carbon_get_theme_option('bg_color'); ?>;
+            --primary-color-dark: <?php echo esc_html($primary_color); ?>;
+            --secondary-color-dark: <?php echo esc_html($secondary_color); ?>;
+            --bg-color-dark: <?php echo esc_html($bg_color); ?>;
         }
     </style>
 </head>

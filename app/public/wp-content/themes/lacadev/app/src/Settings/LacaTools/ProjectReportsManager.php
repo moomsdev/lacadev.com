@@ -29,10 +29,8 @@ class ProjectReportsManager
             return;
         }
 
-        $primary = carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc';
-
         wp_localize_script('theme-admin-js-bundle', 'lacaProjectCharts', [
-            'primary'  => sanitize_hex_color($primary),
+            'primary'  => \lacaSanitizeCssColor(carbon_get_theme_option('primary_color_ad'), '#2ea2cc'),
             'byStatus' => $this->getByStatus(),
             'byMonth'  => $this->getByMonth(),
         ]);

@@ -1,5 +1,10 @@
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, RichText, InspectorControls, MediaUpload, MediaUploadCheck ,
+import {
+	useBlockProps,
+	RichText,
+	InspectorControls,
+	MediaUpload,
+	MediaUploadCheck,
 	useBlockEditContext,
 } from '@wordpress/block-editor';
 import previewImage from './preview.png';
@@ -7,16 +12,27 @@ import { PanelBody, Button, Dashicon } from '@wordpress/components';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
+	const { technologies } = attributes;
+	const blockProps = useBlockProps( { className: 'block-tech-list' } );
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
 		return (
 			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
 			</div>
 		);
 	}
-
-
-	const { technologies } = attributes;
 
 	const updateTech = ( index, key, value ) => {
 		const newTech = [ ...technologies ];
@@ -42,7 +58,10 @@ export default function Edit( { attributes, setAttributes } ) {
 		const newTech = [ ...technologies ];
 		const newIndex = direction === 'up' ? index - 1 : index + 1;
 		if ( newIndex >= 0 && newIndex < newTech.length ) {
-			[ newTech[ index ], newTech[ newIndex ] ] = [ newTech[ newIndex ], newTech[ index ] ];
+			[ newTech[ index ], newTech[ newIndex ] ] = [
+				newTech[ newIndex ],
+				newTech[ index ],
+			];
 			setAttributes( { technologies: newTech } );
 		}
 	};
@@ -55,9 +74,20 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Cài đặt danh sách công nghệ', 'laca' ) }>
-					<p style={ { fontSize: '12px', color: '#666', marginBottom: '15px' } }>
-						{ __( 'Thêm, sửa, hoặc xóa các công nghệ sử dụng.', 'laca' ) }
+				<PanelBody
+					title={ __( 'Cài đặt danh sách công nghệ', 'laca' ) }
+				>
+					<p
+						style={ {
+							fontSize: '12px',
+							color: '#666',
+							marginBottom: '15px',
+						} }
+					>
+						{ __(
+							'Thêm, sửa, hoặc xóa các công nghệ sử dụng.',
+							'laca'
+						) }
 					</p>
 					{ technologies.map( ( tech, index ) => (
 						<div
@@ -87,7 +117,9 @@ export default function Edit( { attributes, setAttributes } ) {
 								<Button
 									isSmall
 									onClick={ () => moveTech( index, 'down' ) }
-									disabled={ index === technologies.length - 1 }
+									disabled={
+										index === technologies.length - 1
+									}
 									icon="arrow-down-alt2"
 								/>
 								<Button
@@ -97,38 +129,91 @@ export default function Edit( { attributes, setAttributes } ) {
 									icon="no-alt"
 								/>
 							</div>
-							
-							<div style={{ marginBottom: '10px' }}>
-								<label style={{ display: 'block', fontSize: '12px', marginBottom: '5px' }}>
+
+							<div style={ { marginBottom: '10px' } }>
+								<label
+									style={ {
+										display: 'block',
+										fontSize: '12px',
+										marginBottom: '5px',
+									} }
+								>
 									{ __( 'Biểu tượng/Logo', 'laca' ) }
 								</label>
 								<MediaUploadCheck>
 									<MediaUpload
 										onSelect={ ( media ) => {
-											updateTech( index, 'iconId', media.id );
-											updateTech( index, 'iconUrl', media.url );
+											updateTech(
+												index,
+												'iconId',
+												media.id
+											);
+											updateTech(
+												index,
+												'iconUrl',
+												media.url
+											);
 										} }
 										allowedTypes={ [ 'image' ] }
 										value={ tech.iconId }
 										render={ ( { open } ) => (
-											<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+											<div
+												style={ {
+													display: 'flex',
+													gap: '10px',
+													alignItems: 'center',
+												} }
+											>
 												{ tech.iconUrl ? (
 													<>
-														<img 
-															src={ tech.iconUrl } 
-															alt="Preview" 
-															style={{ width: '40px', height: '40px', objectFit: 'contain', background: '#e0e0e0', padding: '5px', borderRadius: '4px' }} 
+														<img
+															src={ tech.iconUrl }
+															alt="Preview"
+															style={ {
+																width: '40px',
+																height: '40px',
+																objectFit:
+																	'contain',
+																background:
+																	'#e0e0e0',
+																padding: '5px',
+																borderRadius:
+																	'4px',
+															} }
 														/>
-														<Button isSecondary onClick={ open }>
-															{ __( 'Đổi', 'laca' ) }
+														<Button
+															isSecondary
+															onClick={ open }
+														>
+															{ __(
+																'Đổi',
+																'laca'
+															) }
 														</Button>
-														<Button isDestructive isLink onClick={ () => removeMedia(index) }>
-															{ __( 'Xóa', 'laca' ) }
+														<Button
+															isDestructive
+															isLink
+															onClick={ () =>
+																removeMedia(
+																	index
+																)
+															}
+														>
+															{ __(
+																'Xóa',
+																'laca'
+															) }
 														</Button>
 													</>
 												) : (
-													<Button isPrimary onClick={ open }>
-														{ __( 'Chọn Ảnh/SVG', 'laca' ) }
+													<Button
+														isPrimary
+														onClick={ open }
+													>
+														{ __(
+															'Chọn Ảnh/SVG',
+															'laca'
+														) }
 													</Button>
 												) }
 											</div>
@@ -148,24 +233,36 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<section { ...useBlockProps( { className: 'block-tech-list' } ) }>
+			<section { ...blockProps }>
 				<div className="container">
 					<div className="tech-list-grid">
 						{ technologies.map( ( tech, index ) => (
 							<div key={ index } className="tech-item">
 								<div className="tech-icon-wrapper">
 									{ tech.iconUrl ? (
-										<img src={ tech.iconUrl } alt={ tech.name } className="tech-icon" />
+										<img
+											src={ tech.iconUrl }
+											alt={ tech.name }
+											className="tech-icon"
+										/>
 									) : (
-										<Dashicon icon="desktop" className="tech-placeholder" />
+										<Dashicon
+											icon="desktop"
+											className="tech-placeholder"
+										/>
 									) }
 								</div>
 								<RichText
 									tagName="div"
 									className="tech-name"
 									value={ tech.name }
-									onChange={ ( val ) => updateTech( index, 'name', val ) }
-									placeholder={ __( 'Tên công nghệ…', 'laca' ) }
+									onChange={ ( val ) =>
+										updateTech( index, 'name', val )
+									}
+									placeholder={ __(
+										'Tên công nghệ…',
+										'laca'
+									) }
 								/>
 							</div>
 						) ) }

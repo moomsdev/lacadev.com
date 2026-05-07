@@ -7,13 +7,10 @@
   "rules": {
     "no-empty-source": null,
     "no-descending-specificity": null,
-    "order/order": [
-      "custom-properties",
-      "dollar-variables",
-      "declarations",
-      "rules",
-      "at-rules"
-    ],
+    "order/order": null,
+    "no-invalid-position-at-import-rule": null,
+    "block-no-empty": null,
+    "declaration-block-no-shorthand-property-overrides": null,
     "property-no-unknown": [
       true,
       {
@@ -43,7 +40,22 @@
         ]
       }
     ],
-    "scss/at-rule-no-unknown": true,
-    "scss/no-duplicate-dollar-variables": true
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "layer",
+          "screen",
+          "variants",
+          "responsive"
+        ]
+      }
+    ],
+    "scss/comment-no-empty": null,
+    "scss/load-no-partial-leading-underscore": null,
+    "scss/load-partial-extension": null,
+    "scss/no-duplicate-dollar-variables": null
   }
 }

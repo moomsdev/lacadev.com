@@ -6,14 +6,14 @@
  *   2. Copy Code button (auto-inject vào <pre><code>)
  *   3. Image Lightbox (click-to-zoom cho ảnh trong bài viết)
  *
- * @package LacaDev
+ * @package
  */
 
 // ─── 1. Back to Top ──────────────────────────────────────────────────────────
 
 export function initBackToTop() {
 	const btn = document.createElement( 'button' );
-	btn.id            = 'laca-back-top';
+	btn.id = 'laca-back-top';
 	btn.setAttribute( 'aria-label', 'Về đầu trang' );
 	btn.setAttribute( 'title', 'Về đầu trang' );
 	btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -44,30 +44,36 @@ export function initBackToTop() {
 
 	const toggle = () => {
 		const show = window.scrollY > 300;
-		btn.style.opacity   = show ? '1' : '0';
+		btn.style.opacity = show ? '1' : '0';
 		btn.style.transform = show ? 'translateY(0)' : 'translateY(10px)';
 		btn.style.pointerEvents = show ? 'auto' : 'none';
 	};
 
 	window.addEventListener( 'scroll', toggle, { passive: true } );
-	btn.addEventListener( 'click', () => window.scrollTo( { top: 0, behavior: 'smooth' } ) );
+	btn.addEventListener( 'click', () =>
+		window.scrollTo( { top: 0, behavior: 'smooth' } )
+	);
 	toggle();
 }
 
 // ─── 2. Copy Code Button ──────────────────────────────────────────────────────
 
 export function initCopyCode() {
-	document.querySelectorAll( 'pre code, .wp-block-code code' ).forEach( ( code ) => {
-		const pre = code.closest( 'pre' );
-		if ( ! pre || pre.querySelector( '.laca-copy-btn' ) ) return;
+	document
+		.querySelectorAll( 'pre code, .wp-block-code code' )
+		.forEach( ( code ) => {
+			const pre = code.closest( 'pre' );
+			if ( ! pre || pre.querySelector( '.laca-copy-btn' ) ) {
+				return;
+			}
 
-		pre.style.position = 'relative';
+			pre.style.position = 'relative';
 
-		const btn = document.createElement( 'button' );
-		btn.className = 'laca-copy-btn';
-		btn.textContent = 'Copy';
-		btn.setAttribute( 'aria-label', 'Copy code' );
-		btn.style.cssText = `
+			const btn = document.createElement( 'button' );
+			btn.className = 'laca-copy-btn';
+			btn.textContent = 'Copy';
+			btn.setAttribute( 'aria-label', 'Copy code' );
+			btn.style.cssText = `
 			position: absolute;
 			top: 8px;
 			right: 8px;
@@ -83,22 +89,27 @@ export function initCopyCode() {
 			backdrop-filter: blur(4px);
 		`;
 
-		btn.addEventListener( 'click', () => {
-			navigator.clipboard.writeText( code.innerText ).then( () => {
-				btn.textContent = '✓ Copied!';
-				btn.style.background = 'rgba(76,175,80,.4)';
-				setTimeout( () => {
-					btn.textContent = 'Copy';
-					btn.style.background = 'rgba(255,255,255,.15)';
-				}, 1800 );
-			} ).catch( () => {
-				btn.textContent = 'Lỗi';
-				setTimeout( () => { btn.textContent = 'Copy'; }, 1500 );
+			btn.addEventListener( 'click', () => {
+				navigator.clipboard
+					.writeText( code.innerText )
+					.then( () => {
+						btn.textContent = '✓ Copied!';
+						btn.style.background = 'rgba(76,175,80,.4)';
+						setTimeout( () => {
+							btn.textContent = 'Copy';
+							btn.style.background = 'rgba(255,255,255,.15)';
+						}, 1800 );
+					} )
+					.catch( () => {
+						btn.textContent = 'Lỗi';
+						setTimeout( () => {
+							btn.textContent = 'Copy';
+						}, 1500 );
+					} );
 			} );
-		} );
 
-		pre.appendChild( btn );
-	} );
+			pre.appendChild( btn );
+		} );
 }
 
 // ─── 3. Image Lightbox ────────────────────────────────────────────────────────
@@ -107,7 +118,7 @@ export function initImageLightbox() {
 	// Inject styles once
 	if ( ! document.getElementById( 'laca-lightbox-style' ) ) {
 		const style = document.createElement( 'style' );
-		style.id    = 'laca-lightbox-style';
+		style.id = 'laca-lightbox-style';
 		style.textContent = `
 			#laca-lightbox {
 				position: fixed; inset: 0; z-index: 99999;
@@ -159,48 +170,70 @@ export function initImageLightbox() {
 			document.body.style.overflow = '';
 		};
 
-		document.getElementById( 'laca-lightbox-close' ).addEventListener( 'click', close );
-		box.addEventListener( 'click', ( e ) => { if ( e.target === box ) close(); } );
-		document.addEventListener( 'keydown', ( e ) => { if ( e.key === 'Escape' ) close(); } );
+		document
+			.getElementById( 'laca-lightbox-close' )
+			.addEventListener( 'click', close );
+		box.addEventListener( 'click', ( e ) => {
+			if ( e.target === box ) {
+				close();
+			}
+		} );
+		document.addEventListener( 'keydown', ( e ) => {
+			if ( e.key === 'Escape' ) {
+				close();
+			}
+		} );
 	}
 
-	const img    = document.getElementById( 'laca-lightbox-img' );
+	const img = document.getElementById( 'laca-lightbox-img' );
 	const caption = document.getElementById( 'laca-lightbox-caption' );
 
 	// Find all linked images in post content: <a href="*.jpg"><img></a>
 	const imgExtRe = /\.(jpe?g|png|gif|webp|avif|svg)(\?.*)?$/i;
 
-	document.querySelectorAll( '.post-body a[href], .entry-content a[href], .single-template a[href]' ).forEach( ( link ) => {
-		const href   = link.getAttribute( 'href' ) || '';
-		const child  = link.querySelector( 'img' );
-		if ( ! child || ! imgExtRe.test( href ) ) return;
+	document
+		.querySelectorAll(
+			'.post-body a[href], .entry-content a[href], .single-template a[href]'
+		)
+		.forEach( ( link ) => {
+			const href = link.getAttribute( 'href' ) || '';
+			const child = link.querySelector( 'img' );
+			if ( ! child || ! imgExtRe.test( href ) ) {
+				return;
+			}
 
-		link.style.cursor = 'zoom-in';
+			link.style.cursor = 'zoom-in';
 
-		link.addEventListener( 'click', ( e ) => {
-			e.preventDefault();
-			img.src            = href;
-			img.alt            = child.alt || '';
-			caption.textContent = child.alt || '';
-			box.classList.add( 'is-open' );
-			document.body.style.overflow = 'hidden';
+			link.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				img.src = href;
+				img.alt = child.alt || '';
+				caption.textContent = child.alt || '';
+				box.classList.add( 'is-open' );
+				document.body.style.overflow = 'hidden';
+			} );
 		} );
-	} );
 
 	// Also handle bare <img> not inside a link (in .post-body only)
-	document.querySelectorAll( '.post-body img, .entry-content img' ).forEach( ( image ) => {
-		if ( image.closest( 'a' ) ) return; // already handled above
-		const src = image.getAttribute( 'data-src' ) || image.src;
-		if ( ! src || ! imgExtRe.test( src ) ) return;
+	document
+		.querySelectorAll( '.post-body img, .entry-content img' )
+		.forEach( ( image ) => {
+			if ( image.closest( 'a' ) ) {
+				return;
+			} // already handled above
+			const src = image.getAttribute( 'data-src' ) || image.src;
+			if ( ! src || ! imgExtRe.test( src ) ) {
+				return;
+			}
 
-		image.style.cursor = 'zoom-in';
+			image.style.cursor = 'zoom-in';
 
-		image.addEventListener( 'click', () => {
-			img.src            = src;
-			img.alt            = image.alt || '';
-			caption.textContent = image.alt || '';
-			box.classList.add( 'is-open' );
-			document.body.style.overflow = 'hidden';
+			image.addEventListener( 'click', () => {
+				img.src = src;
+				img.alt = image.alt || '';
+				caption.textContent = image.alt || '';
+				box.classList.add( 'is-open' );
+				document.body.style.overflow = 'hidden';
+			} );
 		} );
-	} );
 }

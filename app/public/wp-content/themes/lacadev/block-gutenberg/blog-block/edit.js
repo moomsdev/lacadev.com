@@ -21,15 +21,6 @@ import { useSelect } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
-		return (
-			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
-			</div>
-		);
-	}
-
-
 	const {
 		postType,
 		taxonomy,
@@ -61,34 +52,40 @@ export default function Edit( { attributes, setAttributes } ) {
 			} ) );
 	}, [] );
 
-	const taxonomies = useSelect( ( select ) => {
-		const list = select( 'core' ).getTaxonomies
-			? select( 'core' ).getTaxonomies( { per_page: -1 } )
-			: [];
-		return ( list || [] )
-			.filter(
-				( t ) =>
-					Array.isArray( t.types ) && t.types.includes( postType )
-			)
-			.map( ( t ) => ( {
-				label: t.labels?.singular_name || t.name,
-				value: t.slug,
-				restBase: t.rest_base || t.slug,
-			} ) );
-	}, [ postType ] );
+	const taxonomies = useSelect(
+		( select ) => {
+			const list = select( 'core' ).getTaxonomies
+				? select( 'core' ).getTaxonomies( { per_page: -1 } )
+				: [];
+			return ( list || [] )
+				.filter(
+					( t ) =>
+						Array.isArray( t.types ) && t.types.includes( postType )
+				)
+				.map( ( t ) => ( {
+					label: t.labels?.singular_name || t.name,
+					value: t.slug,
+					restBase: t.rest_base || t.slug,
+				} ) );
+		},
+		[ postType ]
+	);
 
 	const selectedTax = taxonomies.find( ( t ) => t.value === taxonomy );
 	const taxonomyRestBase = selectedTax?.restBase || taxonomy;
 
-	const terms = useSelect( ( select ) => {
-		if ( ! taxonomy ) {
-			return [];
-		}
-		return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
-			per_page: -1,
-			hide_empty: true,
-		} );
-	}, [ taxonomy ] );
+	const terms = useSelect(
+		( select ) => {
+			if ( ! taxonomy ) {
+				return [];
+			}
+			return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
+				per_page: -1,
+				hide_empty: true,
+			} );
+		},
+		[ taxonomy ]
+	);
 
 	// Back-compat: if old categoryIds exists and termIds is empty, reuse it
 	const effectiveTermIds =
@@ -112,7 +109,11 @@ export default function Edit( { attributes, setAttributes } ) {
 				query.include = postIds;
 				query.orderby = 'include';
 			} else {
-				if ( taxonomy && effectiveTermIds && effectiveTermIds.length > 0 ) {
+				if (
+					taxonomy &&
+					effectiveTermIds &&
+					effectiveTermIds.length > 0
+				) {
 					query[ taxonomyRestBase ] = effectiveTermIds
 						.map( ( id ) => String( id ) )
 						.join( ',' );
@@ -122,7 +123,16 @@ export default function Edit( { attributes, setAttributes } ) {
 
 			return getEntityRecords( 'postType', postType, query );
 		},
-		[ mode, postIds, count, orderBy, taxonomy, taxonomyRestBase, postType, effectiveTermIds ]
+		[
+			mode,
+			postIds,
+			count,
+			orderBy,
+			taxonomy,
+			taxonomyRestBase,
+			postType,
+			effectiveTermIds,
+		]
 	);
 
 	const manualPosts = useSelect(
@@ -135,6 +145,25 @@ export default function Edit( { attributes, setAttributes } ) {
 		[ postType ]
 	);
 
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
+		return (
+			<div style={ { width: '100%', lineHeight: 0 } }>
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
+			</div>
+		);
+	}
+
 	const toggleItem = ( list, id ) => {
 		const newList = [ ...list ];
 		if ( newList.includes( id ) ) {
@@ -144,6 +173,46 @@ export default function Edit( { attributes, setAttributes } ) {
 			newList.push( id );
 		}
 		return newList;
+	};
+
+	const renderTermPicker = () => {
+		if ( ! taxonomy ) {
+			return <p>{ __( 'Chọn taxonomy để bật bộ lọc.', 'laca' ) }</p>;
+		}
+
+		if ( ! terms ) {
+			return <Spinner />;
+		}
+
+		return (
+			<div
+				style={ {
+					maxHeight: '150px',
+					overflowY: 'auto',
+					border: '1px solid #ddd',
+					padding: '10px',
+					marginBottom: '15px',
+				} }
+			>
+				{ terms.map( ( term ) => (
+					<CheckboxControl
+						key={ term.id }
+						label={ term.name }
+						checked={ effectiveTermIds.includes( term.id ) }
+						onChange={ () =>
+							setAttributes( {
+								termIds: toggleItem(
+									effectiveTermIds,
+									term.id
+								),
+								// Clear legacy field to avoid conflicting sources
+								categoryIds: [],
+							} )
+						}
+					/>
+				) ) }
+			</div>
+		);
 	};
 
 	return (
@@ -224,41 +293,7 @@ export default function Edit( { attributes, setAttributes } ) {
 									{ __( 'Lọc theo taxonomy:', 'laca' ) }
 								</strong>
 							</p>
-							{ ! taxonomy ? (
-								<p>{ __( 'Chọn taxonomy để bật bộ lọc.', 'laca' ) }</p>
-							) : ! terms ? (
-								<Spinner />
-							) : (
-								<div
-									style={ {
-										maxHeight: '150px',
-										overflowY: 'auto',
-										border: '1px solid #ddd',
-										padding: '10px',
-										marginBottom: '15px',
-									} }
-								>
-									{ terms.map( ( term ) => (
-										<CheckboxControl
-											key={ term.id }
-											label={ term.name }
-											checked={ effectiveTermIds.includes(
-												term.id
-											) }
-											onChange={ () =>
-												setAttributes( {
-													termIds: toggleItem(
-														effectiveTermIds,
-														term.id
-													),
-													// Clear legacy field to avoid conflicting sources
-													categoryIds: [],
-												} )
-											}
-										/>
-									) ) }
-								</div>
-							) }
+							{ renderTermPicker() }
 
 							<SelectControl
 								label={ __( 'Sắp xếp theo', 'laca' ) }

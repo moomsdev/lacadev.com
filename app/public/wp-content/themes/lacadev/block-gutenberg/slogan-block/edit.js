@@ -10,20 +10,29 @@ import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
-		return (
-			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
-			</div>
-		);
-	}
-
-
 	const { slogan } = attributes;
-
 	const blockProps = useBlockProps( {
 		className: 'block-slogan editor-view',
 	} );
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
+		return (
+			<div style={ { width: '100%', lineHeight: 0 } }>
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<>

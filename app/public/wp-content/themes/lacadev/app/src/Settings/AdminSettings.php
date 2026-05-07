@@ -73,22 +73,32 @@ class AdminSettings
 		});
 
 		add_action('wp_ajax_mm_get_attachment_url_thumbnail', static function () {
-			$url          = '';
-			$attachmentID = isset($_REQUEST['attachmentID']) ? $_REQUEST['attachmentID'] : '';
-			if ($attachmentID) {
-				$url = wp_get_attachment_url($attachmentID);
+			if (!current_user_can('upload_files')) {
+				wp_send_json_error(['message' => __('Insufficient permissions.', 'laca')], 403);
 			}
-			die($url);
+
+			if (!check_ajax_referer('laca_get_attachment_url', 'nonce', false)) {
+				wp_send_json_error(['message' => __('Invalid nonce.', 'laca')], 403);
+			}
+
+			$attachmentID = isset($_REQUEST['attachmentID']) ? absint(wp_unslash($_REQUEST['attachmentID'])) : 0;
+			$url = $attachmentID ? wp_get_attachment_url($attachmentID) : '';
+
+			if (!$url) {
+				wp_send_json_error(['message' => __('Attachment not found.', 'laca')], 404);
+			}
+
+			wp_send_json_success(['url' => esc_url_raw($url)]);
 		});
 	}
 
 	public function applyAdminColorVariables(): void
 	{
 		$printColors = static function () {
-			$primary   = carbon_get_theme_option('primary_color_ad') ?: '#566a7f';
-			$secondary = carbon_get_theme_option('secondary_color_ad') ?: '#566a7f';
-			$bg        = carbon_get_theme_option('bg_color_ad') ?: '#E6E4FC';
-			$text      = carbon_get_theme_option('text_color_ad') ?: '#000';
+			$primary   = \lacaSanitizeCssColor(carbon_get_theme_option('primary_color_ad'), '#566a7f');
+			$secondary = \lacaSanitizeCssColor(carbon_get_theme_option('secondary_color_ad'), '#566a7f');
+			$bg        = \lacaSanitizeCssColor(carbon_get_theme_option('bg_color_ad'), '#E6E4FC');
+			$text      = \lacaSanitizeCssColor(carbon_get_theme_option('text_color_ad'), '#000000');
 
 			echo '<style>:root{'
 				. '--primary-color-ad:' . esc_attr($primary) . ';'
@@ -115,7 +125,7 @@ class AdminSettings
 		add_action('login_enqueue_scripts', function () {
 			wp_enqueue_script(
 				'laca-remove-pw-weak',
-				get_template_directory_uri() . '/resources/scripts/login/remove-pw-weak.js',
+				\lacaResourceUrl('scripts/login/remove-pw-weak.js'),
 				[],
 				wp_get_theme()->get('Version'),
 				true
@@ -128,8 +138,8 @@ class AdminSettings
 		add_action('wp_dashboard_setup', static function () {
 			wp_add_dashboard_widget('custom_help_widget', 'Giới thiệu', static function () { ?>
 				<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
-					<a target="_blank" href="<?php echo AUTHOR['website'] ?>" title="<?php echo AUTHOR['name'] ?>" style="opacity: 0.9; transition: opacity 0.2s;">
-						<img style="max-width: 160px; height: auto; display: block;" src="<?php echo get_site_url() . '/wp-content/themes/lacadev/resources/images/dev/moomsdev-black.png' ?>" alt="<?php echo AUTHOR['name'] ?>">
+					<a target="_blank" href="<?php echo esc_url(AUTHOR['website']); ?>" title="<?php echo esc_attr(AUTHOR['name']); ?>" style="opacity: 0.9; transition: opacity 0.2s;">
+						<img style="max-width: 160px; height: auto; display: block;" src="<?php echo esc_url(\lacaResourceUrl('images/dev/moomsdev-black.png')); ?>" alt="<?php echo esc_attr(AUTHOR['name']); ?>">
 					</a>
 					<div style="margin-top: 20px; text-align: center;">
 						

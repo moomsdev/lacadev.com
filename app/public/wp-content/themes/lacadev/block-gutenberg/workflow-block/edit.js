@@ -100,16 +100,33 @@ const S = {
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
+	const { subTitle, title, steps, backgroundColor } = attributes;
+	const blockProps = useBlockProps( {
+		className: 'py-32 px-8 overflow-hidden',
+		style: {
+			...S.wrap,
+			...( backgroundColor ? { backgroundColor } : {} ),
+		},
+	} );
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
 		return (
 			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
 			</div>
 		);
 	}
-
-
-	const { subTitle, title, steps, backgroundColor } = attributes;
 
 	const formatNum = ( index ) => String( index + 1 ).padStart( 2, '0' );
 
@@ -121,7 +138,10 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	const addStep = () =>
 		setAttributes( {
-			steps: [ ...steps, { title: 'New Step', desc: 'Step description here.' } ],
+			steps: [
+				...steps,
+				{ title: 'New Step', desc: 'Step description here.' },
+			],
 		} );
 
 	const removeStep = ( index ) =>
@@ -131,29 +151,27 @@ export default function Edit( { attributes, setAttributes } ) {
 		const newSteps = [ ...steps ];
 		const newIndex = direction === 'up' ? index - 1 : index + 1;
 		if ( newIndex >= 0 && newIndex < newSteps.length ) {
-			[ newSteps[ index ], newSteps[ newIndex ] ] = [ newSteps[ newIndex ], newSteps[ index ] ];
+			[ newSteps[ index ], newSteps[ newIndex ] ] = [
+				newSteps[ newIndex ],
+				newSteps[ index ],
+			];
 			setAttributes( { steps: newSteps } );
 		}
 	};
 
-	const onDragStart = ( e, index ) => e.dataTransfer.setData( 'dragIndex', String( index ) );
-	const onDragOver  = ( e ) => e.preventDefault();
+	const onDragStart = ( e, index ) =>
+		e.dataTransfer.setData( 'dragIndex', String( index ) );
+	const onDragOver = ( e ) => e.preventDefault();
 	const onDrop = ( e, dropIndex ) => {
 		const dragIndex = parseInt( e.dataTransfer.getData( 'dragIndex' ), 10 );
-		if ( isNaN( dragIndex ) || dragIndex === dropIndex ) return;
+		if ( isNaN( dragIndex ) || dragIndex === dropIndex ) {
+			return;
+		}
 		const newSteps = [ ...steps ];
 		const [ dragged ] = newSteps.splice( dragIndex, 1 );
 		newSteps.splice( dropIndex, 0, dragged );
 		setAttributes( { steps: newSteps } );
 	};
-
-	const blockProps = useBlockProps( {
-		className: 'py-32 px-8 overflow-hidden',
-		style: {
-			...S.wrap,
-			...(backgroundColor ? { backgroundColor } : {} ),
-		},
-	} );
 
 	return (
 		<>
@@ -165,7 +183,8 @@ export default function Edit( { attributes, setAttributes } ) {
 					colorSettings={ [
 						{
 							value: backgroundColor,
-							onChange: ( val ) => setAttributes( { backgroundColor: val || '' } ),
+							onChange: ( val ) =>
+								setAttributes( { backgroundColor: val || '' } ),
 							label: __( 'Background color', 'laca' ),
 						},
 					] }
@@ -174,7 +193,9 @@ export default function Edit( { attributes, setAttributes } ) {
 					<TextControl
 						label={ __( 'Sub tiêu đề (nhỏ phía trên)', 'laca' ) }
 						value={ subTitle }
-						onChange={ ( val ) => setAttributes( { subTitle: val } ) }
+						onChange={ ( val ) =>
+							setAttributes( { subTitle: val } )
+						}
 					/>
 					<TextControl
 						label={ __( 'Tiêu đề chính', 'laca' ) }
@@ -184,8 +205,18 @@ export default function Edit( { attributes, setAttributes } ) {
 				</PanelBody>
 
 				<PanelBody title={ __( 'Các bước — Steps', 'laca' ) }>
-					<p style={ { fontSize: '12px', color: '#666', marginBottom: '12px', fontStyle: 'italic' } }>
-						{ __( 'Số thứ tự tự động sinh. Kéo thả để đổi thứ tự.', 'laca' ) }
+					<p
+						style={ {
+							fontSize: '12px',
+							color: '#666',
+							marginBottom: '12px',
+							fontStyle: 'italic',
+						} }
+					>
+						{ __(
+							'Số thứ tự tự động sinh. Kéo thả để đổi thứ tự.',
+							'laca'
+						) }
 					</p>
 					{ steps.map( ( step, index ) => (
 						<div
@@ -194,24 +225,84 @@ export default function Edit( { attributes, setAttributes } ) {
 							onDragStart={ ( e ) => onDragStart( e, index ) }
 							onDragOver={ onDragOver }
 							onDrop={ ( e ) => onDrop( e, index ) }
-							style={ { padding: '14px', border: '1px solid #ddd', marginBottom: '12px', borderRadius: '8px', background: '#fafafa', cursor: 'grab' } }
+							style={ {
+								padding: '14px',
+								border: '1px solid #ddd',
+								marginBottom: '12px',
+								borderRadius: '8px',
+								background: '#fafafa',
+								cursor: 'grab',
+							} }
 						>
-							<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } }>
-								<span style={ { fontSize: '16px', fontWeight: '700', color: '#bbb', fontFamily: 'monospace' } }>
+							<div
+								style={ {
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'space-between',
+									marginBottom: '10px',
+								} }
+							>
+								<span
+									style={ {
+										fontSize: '16px',
+										fontWeight: '700',
+										color: '#bbb',
+										fontFamily: 'monospace',
+									} }
+								>
 									{ formatNum( index ) }
 								</span>
 								<div style={ { display: 'flex', gap: '4px' } }>
-									<Dashicon icon="move" style={ { opacity: 0.3 } } />
-									<Button isSmall icon="arrow-up-alt2"   onClick={ () => moveStep( index, 'up' ) }   disabled={ index === 0 } />
-									<Button isSmall icon="arrow-down-alt2" onClick={ () => moveStep( index, 'down' ) } disabled={ index === steps.length - 1 } />
-									<Button isSmall isDestructive icon="no-alt" onClick={ () => removeStep( index ) } />
+									<Dashicon
+										icon="move"
+										style={ { opacity: 0.3 } }
+									/>
+									<Button
+										isSmall
+										icon="arrow-up-alt2"
+										onClick={ () =>
+											moveStep( index, 'up' )
+										}
+										disabled={ index === 0 }
+									/>
+									<Button
+										isSmall
+										icon="arrow-down-alt2"
+										onClick={ () =>
+											moveStep( index, 'down' )
+										}
+										disabled={ index === steps.length - 1 }
+									/>
+									<Button
+										isSmall
+										isDestructive
+										icon="no-alt"
+										onClick={ () => removeStep( index ) }
+									/>
 								</div>
 							</div>
-							<TextControl    label={ __( 'Tiêu đề bước', 'laca' ) } value={ step.title } onChange={ ( v ) => updateStep( index, 'title', v ) } />
-							<TextareaControl label={ __( 'Mô tả bước', 'laca' ) }  value={ step.desc }  onChange={ ( v ) => updateStep( index, 'desc',  v ) } rows={ 2 } />
+							<TextControl
+								label={ __( 'Tiêu đề bước', 'laca' ) }
+								value={ step.title }
+								onChange={ ( v ) =>
+									updateStep( index, 'title', v )
+								}
+							/>
+							<TextareaControl
+								label={ __( 'Mô tả bước', 'laca' ) }
+								value={ step.desc }
+								onChange={ ( v ) =>
+									updateStep( index, 'desc', v )
+								}
+								rows={ 2 }
+							/>
 						</div>
 					) ) }
-					<Button variant="primary" onClick={ addStep } style={ { width: '100%', justifyContent: 'center' } }>
+					<Button
+						variant="primary"
+						onClick={ addStep }
+						style={ { width: '100%', justifyContent: 'center' } }
+					>
 						{ __( '+ Thêm bước', 'laca' ) }
 					</Button>
 				</PanelBody>
@@ -220,14 +311,19 @@ export default function Edit( { attributes, setAttributes } ) {
 			{ /* ── Editor Preview ── */ }
 			<section { ...blockProps }>
 				<div style={ S.inner }>
-
 					<div style={ S.header }>
-						<RichText tagName="span" style={ S.subTitle }
+						<RichText
+							tagName="span"
+							style={ S.subTitle }
 							value={ subTitle }
-							onChange={ ( v ) => setAttributes( { subTitle: v } ) }
+							onChange={ ( v ) =>
+								setAttributes( { subTitle: v } )
+							}
 							placeholder={ __( 'Sub tiêu đề…', 'laca' ) }
 						/>
-						<RichText tagName="h2" style={ S.title }
+						<RichText
+							tagName="h2"
+							style={ S.title }
 							value={ title }
 							onChange={ ( v ) => setAttributes( { title: v } ) }
 							placeholder={ __( 'Tiêu đề…', 'laca' ) }
@@ -240,22 +336,34 @@ export default function Edit( { attributes, setAttributes } ) {
 						{ steps.map( ( step, index ) => (
 							<div key={ index } style={ S.step }>
 								<div style={ S.badge }>
-									<span style={ S.num }>{ formatNum( index ) }</span>
+									<span style={ S.num }>
+										{ formatNum( index ) }
+									</span>
 								</div>
-								<RichText tagName="h4" style={ S.stepTitle }
+								<RichText
+									tagName="h4"
+									style={ S.stepTitle }
 									value={ step.title }
-									onChange={ ( v ) => updateStep( index, 'title', v ) }
-									placeholder={ __( 'Tiêu đề bước…', 'laca' ) }
+									onChange={ ( v ) =>
+										updateStep( index, 'title', v )
+									}
+									placeholder={ __(
+										'Tiêu đề bước…',
+										'laca'
+									) }
 								/>
-								<RichText tagName="p" style={ S.stepDesc }
+								<RichText
+									tagName="p"
+									style={ S.stepDesc }
 									value={ step.desc }
-									onChange={ ( v ) => updateStep( index, 'desc', v ) }
+									onChange={ ( v ) =>
+										updateStep( index, 'desc', v )
+									}
 									placeholder={ __( 'Mô tả…', 'laca' ) }
 								/>
 							</div>
 						) ) }
 					</div>
-
 				</div>
 			</section>
 		</>

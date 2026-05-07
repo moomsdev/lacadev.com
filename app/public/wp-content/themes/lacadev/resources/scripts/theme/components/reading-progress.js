@@ -6,16 +6,20 @@
  *
  * Chỉ chạy trên trang single post/page có class `.single-post-template`.
  *
- * @package LacaDev
+ * @package
  */
 
 export function initReadingProgress() {
 	// Chỉ chạy trên trang single post
 	const article = document.querySelector( '.single-post-template' );
-	if ( ! article ) return;
+	if ( ! article ) {
+		return;
+	}
 
 	const postBody = article.querySelector( '.post-body' );
-	if ( ! postBody ) return;
+	if ( ! postBody ) {
+		return;
+	}
 
 	// ── 1. Reading Progress Bar ────────────────────────────────────────────
 	const bar = document.createElement( 'div' );
@@ -35,23 +39,25 @@ export function initReadingProgress() {
 	document.body.prepend( bar );
 
 	function updateProgressBar() {
-		const rect       = postBody.getBoundingClientRect();
+		const rect = postBody.getBoundingClientRect();
 		const totalHeight = postBody.offsetHeight;
-		const scrolled   = Math.max( 0, -rect.top );
-		const pct        = Math.min( 100, ( scrolled / totalHeight ) * 100 );
-		bar.style.width  = pct + '%';
+		const scrolled = Math.max( 0, -rect.top );
+		const pct = Math.min( 100, ( scrolled / totalHeight ) * 100 );
+		bar.style.width = pct + '%';
 	}
 
 	window.addEventListener( 'scroll', updateProgressBar, { passive: true } );
 	updateProgressBar();
 
 	// ── 2. Estimated Read Time ─────────────────────────────────────────────
-	const text      = postBody.innerText || postBody.textContent || '';
+	const text = postBody.innerText || postBody.textContent || '';
 	const wordCount = text.trim().split( /\s+/ ).length;
-	const minutes   = Math.max( 1, Math.round( wordCount / 200 ) ); // ~200 words/min
+	const minutes = Math.max( 1, Math.round( wordCount / 200 ) ); // ~200 words/min
 
 	// Tìm vị trí để inject: sau post-hero hoặc trước .post-body
-	const hero = article.querySelector( '.post-hero, .post-hero-content, header.post-header' );
+	const hero = article.querySelector(
+		'.post-hero, .post-hero-content, header.post-header'
+	);
 	const target = hero || postBody;
 	const insertBefore = hero ? target.nextElementSibling : target;
 

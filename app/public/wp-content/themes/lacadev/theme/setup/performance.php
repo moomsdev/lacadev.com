@@ -34,14 +34,11 @@ class ThemePerformance
         add_filter('wp_get_attachment_image_attributes', [self::class, 'optimize_images'], 10, 3);
         add_filter('the_content', [self::class, 'optimize_content_images']);
 
-        // Advanced compression
-        add_action('template_redirect', [self::class, 'enable_compression']);
-
         // Service Worker
-        add_action('wp_footer', [self::class, 'register_service_worker']);
+        add_action('wp_enqueue_scripts', [self::class, 'register_service_worker']);
 
         // Performance monitoring
-        add_action('wp_footer', [self::class, 'add_performance_monitoring']);
+        add_action('wp_enqueue_scripts', [self::class, 'add_performance_monitoring']);
     }
 
     /**
@@ -203,12 +200,9 @@ class ThemePerformance
      */
     public static function enable_compression()
     {
-        if (!is_admin()) {
-            // Enable gzip compression
-            if (function_exists('gzencode') && !ob_get_contents()) {
-                ob_start('ob_gzhandler');
-            }
-        }
+        // Compression belongs at the server/cache layer. Keeping this method as a
+        // no-op avoids conflicts with page caches, REST responses, and web server
+        // gzip/brotli settings if older code calls it.
     }
 
     /**
@@ -217,26 +211,28 @@ class ThemePerformance
     public static function register_service_worker()
     {
         if (!is_admin() && !is_user_logged_in()) {
-            $sw_path = get_template_directory() . '/dist/sw.js';
+            $sw_path = lacaDistDir('sw.js');
 
             // Only register if SW file exists
             if (!file_exists($sw_path)) {
                 return;
             }
 
-            add_action('wp_enqueue_scripts', function () {
-                wp_enqueue_script(
-                    'laca-sw-register',
-                    get_template_directory_uri() . '/resources/scripts/theme/service-worker-register.js',
-                    [],
-                    wp_get_theme()->get('Version'),
-                    true
-                );
-                wp_localize_script('laca-sw-register', 'swConfig', [
-                    'swUrl' => get_template_directory_uri() . '/dist/sw.js',
-                    'debug' => defined('WP_DEBUG') && WP_DEBUG ? 'true' : 'false',
-                ]);
-            });
+            if (wp_script_is('laca-sw-register', 'enqueued')) {
+                return;
+            }
+
+            wp_enqueue_script(
+                'laca-sw-register',
+                lacaResourceUrl('scripts/theme/service-worker-register.js'),
+                [],
+                wp_get_theme()->get('Version'),
+                true
+            );
+            wp_localize_script('laca-sw-register', 'swConfig', [
+                'swUrl' => lacaDistUrl('sw.js'),
+                'debug' => defined('WP_DEBUG') && WP_DEBUG ? 'true' : 'false',
+            ]);
         }
     }
 
@@ -247,15 +243,13 @@ class ThemePerformance
     public static function add_performance_monitoring()
     {
         if ( ! is_admin() && defined('WP_DEBUG') && WP_DEBUG ) {
-            add_action('wp_enqueue_scripts', function () {
-                wp_enqueue_script(
-                    'laca-web-vitals',
-                    get_template_directory_uri() . '/resources/scripts/theme/web-vitals.js',
-                    [],
-                    wp_get_theme()->get('Version'),
-                    true
-                );
-            });
+            wp_enqueue_script(
+                'laca-web-vitals',
+                lacaResourceUrl('scripts/theme/web-vitals.js'),
+                [],
+                wp_get_theme()->get('Version'),
+                true
+            );
         }
     }
 }

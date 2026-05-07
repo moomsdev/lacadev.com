@@ -19,7 +19,7 @@
  */
 function getFallbackResponsiveImage($size = 'mobile', $attr = []) {
 
-    $img_url = get_template_directory_uri() . '/../resources/images/default-img.webp';
+    $img_url = lacaResourceUrl('images/default-img.webp');
     $class = isset($attr['class']) ? $attr['class'] : '';
     $alt = isset($attr['alt']) ? $attr['alt'] : 'Default Image';
 

@@ -128,16 +128,29 @@ const CampingScene = ( { onOpenMedia } ) => (
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
+	const { content, bgImageId, bgImageUrl } = attributes;
+	const blockProps = useBlockProps( {
+		className: 'block-about-laca editor-view',
+	} );
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
 		return (
 			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
 			</div>
 		);
 	}
-
-
-	const { content, bgImageId, bgImageUrl } = attributes;
 
 	const onSelectImage = ( media ) => {
 		setAttributes( {
@@ -152,10 +165,6 @@ export default function Edit( { attributes, setAttributes } ) {
 			bgImageUrl: undefined,
 		} );
 	};
-
-	const blockProps = useBlockProps( {
-		className: 'block-about-laca editor-view',
-	} );
 
 	return (
 		<>

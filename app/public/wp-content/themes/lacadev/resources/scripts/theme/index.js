@@ -12,22 +12,35 @@ import barba from '@barba/core';
 import Swal from 'sweetalert2';
 window.Swal = Swal; // Expose globally for shortcode inline JS
 
-import { initAnimations, animateText, setupGsap404 } from './components/animations.js';
-import { initToggleDarkMode }                          from './components/dark-mode.js';
-import { initHeaderScroll, resetHeaderState }           from './components/header.js';
-import { initMobileMenu, closeMobileMenu }             from './components/mobile-menu.js';
-import { initPageLoader, shouldShowLoader }            from './components/loader.js';
-import { initAboutLacaHero }                           from './pages/about-laca.js';
-import { initContactPage }                             from './pages/contact.js';
-import { initCommentForm }                             from './pages/comments.js';
-import { initScrollReveal, initCounters, initRippleEffect } from './micro-interactions.js';
-import { initReadingProgress }                              from './components/reading-progress.js';
-import { initBackToTop, initCopyCode, initImageLightbox }  from './components/ui-utilities.js';
+import {
+	initAnimations,
+	animateText,
+	setupGsap404,
+} from './components/animations.js';
+import { initToggleDarkMode } from './components/dark-mode.js';
+import { initHeaderScroll, resetHeaderState } from './components/header.js';
+import { initMobileMenu, closeMobileMenu } from './components/mobile-menu.js';
+import { initPageLoader, shouldShowLoader } from './components/loader.js';
+import { initAboutLacaHero } from './pages/about-laca.js';
+import { initContactPage } from './pages/contact.js';
+import { initCommentForm } from './pages/comments.js';
+import {
+	initScrollReveal,
+	initCounters,
+	initRippleEffect,
+} from './micro-interactions.js';
+import { initReadingProgress } from './components/reading-progress.js';
+import {
+	initBackToTop,
+	initCopyCode,
+	initImageLightbox,
+} from './components/ui-utilities.js';
 
 gsap.registerPlugin( ScrollTrigger );
 
 // ─── Device check ────────────────────────────────────────────────────────────
-const isMobile = window.matchMedia && window.matchMedia( '(max-width: 768px)' ).matches;
+const isMobile =
+	window.matchMedia && window.matchMedia( '(max-width: 768px)' ).matches;
 
 // Show loader ngay trước DOMContentLoaded để tránh flash of content
 if ( ! isMobile && shouldShowLoader() ) {
@@ -77,27 +90,29 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	initMobileMenu();
 	initToggleDarkMode();
 	initRippleEffect(); // document-level delegation — must only run once
-	initBackToTop();    // single fixed button — must only run once
+	initBackToTop(); // single fixed button — must only run once
 
 	// Init Barba.js page transitions
 	barba.init( {
-		transitions: [ {
-			name: 'default-transition',
-			leave( { current } ) {
-				return gsap.to( current.container, {
-					opacity: 0,
-					duration: 0.3,
-					ease: 'power2.inOut',
-				} );
+		transitions: [
+			{
+				name: 'default-transition',
+				leave( { current } ) {
+					return gsap.to( current.container, {
+						opacity: 0,
+						duration: 0.3,
+						ease: 'power2.inOut',
+					} );
+				},
+				enter( { next } ) {
+					return gsap.from( next.container, {
+						opacity: 0,
+						duration: 0.3,
+						ease: 'power2.inOut',
+					} );
+				},
 			},
-			enter( { next } ) {
-				return gsap.from( next.container, {
-					opacity: 0,
-					duration: 0.3,
-					ease: 'power2.inOut',
-				} );
-			},
-		} ],
+		],
 	} );
 
 	window.barba = barba; // Expose for register.js → barba.go()

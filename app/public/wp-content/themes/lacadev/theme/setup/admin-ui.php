@@ -18,7 +18,7 @@ add_action('admin_bar_menu', function (\WP_Admin_Bar $wp_admin_bar) {
     $wp_admin_bar->remove_node('wp-logo');
 
     // Thêm node logo LacaDev
-    $logo_url = get_template_directory_uri() . '/dist/images/logo.png';
+    $logo_url = lacaResourceUrl('images/dev/icon.svg');
     $fallback = 'https://lacadev.com';
 
     $wp_admin_bar->add_node([

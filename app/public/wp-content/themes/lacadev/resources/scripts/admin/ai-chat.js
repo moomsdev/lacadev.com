@@ -32,7 +32,9 @@
 
 	function createUI() {
 		const contextHTML = context
-			? `<span class="laca-ai-context" title="${ escAttr( context ) }">${ escHTML( context ) }</span>`
+			? `<span class="laca-ai-context" title="${ escAttr(
+					context
+			  ) }">${ escHTML( context ) }</span>`
 			: '';
 
 		const btn = document.createElement( 'button' );
@@ -91,51 +93,61 @@
 		return str.replace( /"/g, '&quot;' );
 	}
 
-	/** Convert basic markdown → HTML (bold, code, lists) */
+	/**
+	 * Convert basic markdown → HTML (bold, code, lists)
+	 * @param text
+	 */
 	function markdownToHTML( text ) {
-		return text
-			.replace( /&/g, '&amp;' )
-			.replace( /</g, '&lt;' )
-			.replace( />/g, '&gt;' )
-			// code blocks
-			.replace( /```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>' )
-			// inline code
-			.replace( /`([^`]+)`/g, '<code>$1</code>' )
-			// bold
-			.replace( /\*\*(.+?)\*\*/g, '<strong>$1</strong>' )
-			// italic
-			.replace( /\*(.+?)\*/g, '<em>$1</em>' )
-			// unordered list
-			.replace( /^- (.+)$/gm, '<li>$1</li>' )
-			.replace( /(<li>.*<\/li>)/gs, '<ul>$1</ul>' )
-			// numbered list
-			.replace( /^\d+\. (.+)$/gm, '<li>$1</li>' )
-			// line breaks
-			.replace( /\n\n/g, '</p><p>' )
-			.replace( /\n/g, '<br>' );
+		return (
+			text
+				.replace( /&/g, '&amp;' )
+				.replace( /</g, '&lt;' )
+				.replace( />/g, '&gt;' )
+				// code blocks
+				.replace(
+					/```[\w]*\n?([\s\S]*?)```/g,
+					'<pre><code>$1</code></pre>'
+				)
+				// inline code
+				.replace( /`([^`]+)`/g, '<code>$1</code>' )
+				// bold
+				.replace( /\*\*(.+?)\*\*/g, '<strong>$1</strong>' )
+				// italic
+				.replace( /\*(.+?)\*/g, '<em>$1</em>' )
+				// unordered list
+				.replace( /^- (.+)$/gm, '<li>$1</li>' )
+				.replace( /(<li>.*<\/li>)/gs, '<ul>$1</ul>' )
+				// numbered list
+				.replace( /^\d+\. (.+)$/gm, '<li>$1</li>' )
+				// line breaks
+				.replace( /\n\n/g, '</p><p>' )
+				.replace( /\n/g, '<br>' )
+		);
 	}
 
 	// ── State ─────────────────────────────────────────────────
 
 	const history = []; // { role: 'user'|'ai', content: string }
-	let isOpen    = false;
-	let isBusy    = false;
+	let isOpen = false;
+	let isBusy = false;
 
 	// ── Chat Logic ────────────────────────────────────────────
 
 	function appendMessage( role, content, isThinking = false ) {
-		const msgs     = document.getElementById( 'laca-ai-messages' );
-		const empty    = msgs.querySelector( '.laca-ai-empty' );
-		if ( empty ) empty.remove();
+		const msgs = document.getElementById( 'laca-ai-messages' );
+		const empty = msgs.querySelector( '.laca-ai-empty' );
+		if ( empty ) {
+			empty.remove();
+		}
 
 		const div = document.createElement( 'div' );
 
 		if ( isThinking ) {
 			div.className = 'laca-ai-msg laca-ai-msg--thinking';
-			div.id        = 'laca-ai-thinking';
+			div.id = 'laca-ai-thinking';
 			div.innerHTML = '<span></span><span></span><span></span>';
 		} else if ( role === 'user' ) {
-			div.className   = 'laca-ai-msg laca-ai-msg--user';
+			div.className = 'laca-ai-msg laca-ai-msg--user';
 			div.textContent = content;
 		} else {
 			div.className = 'laca-ai-msg laca-ai-msg--ai';
@@ -151,13 +163,15 @@
 	async function sendMessage() {
 		const input = document.getElementById( 'laca-ai-input' );
 		const sendBtn = document.getElementById( 'laca-ai-send' );
-		const status  = document.getElementById( 'laca-ai-status' );
+		const status = document.getElementById( 'laca-ai-status' );
 		const message = input.value.trim();
 
-		if ( ! message || isBusy ) return;
+		if ( ! message || isBusy ) {
+			return;
+		}
 
 		isBusy = true;
-		sendBtn.disabled   = true;
+		sendBtn.disabled = true;
 		status.classList.add( 'laca-ai-thinking' );
 		input.value = '';
 		input.style.height = 'auto';
@@ -191,12 +205,16 @@
 				appendMessage( 'ai', data.reply );
 				history.push( { role: 'ai', content: data.reply } );
 			} else {
-				const errMsg = data.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+				const errMsg =
+					data.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
 				appendMessage( 'ai', `⚠ ${ errMsg }` );
 			}
 		} catch ( err ) {
 			thinking.remove();
-			appendMessage( 'ai', '⚠ Không thể kết nối. Kiểm tra API key trong cài đặt theme.' );
+			appendMessage(
+				'ai',
+				'⚠ Không thể kết nối. Kiểm tra API key trong cài đặt theme.'
+			);
 			console.error( '[LacaAI]', err );
 		}
 
@@ -210,8 +228,8 @@
 
 	function init() {
 		const { btn, win } = createUI();
-		const input        = document.getElementById( 'laca-ai-input' );
-		const sendBtn      = document.getElementById( 'laca-ai-send' );
+		const input = document.getElementById( 'laca-ai-input' );
+		const sendBtn = document.getElementById( 'laca-ai-send' );
 
 		// Toggle chat window
 		btn.addEventListener( 'click', () => {
@@ -248,7 +266,11 @@
 
 		// Close when clicking outside
 		document.addEventListener( 'click', ( e ) => {
-			if ( isOpen && ! win.contains( e.target ) && ! btn.contains( e.target ) ) {
+			if (
+				isOpen &&
+				! win.contains( e.target ) &&
+				! btn.contains( e.target )
+			) {
 				isOpen = false;
 				btn.classList.remove( 'laca-ai-open' );
 				win.classList.remove( 'laca-ai-visible' );

@@ -20,15 +20,6 @@ import { useSelect } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { __unstableIsPreviewMode } = useBlockEditContext();
-	if ( ( __unstableIsPreviewMode ?? false ) || ( attributes.__isPreview ?? false ) ) {
-		return (
-			<div style={ { width: '100%', lineHeight: 0 } }>
-				<img src={ previewImage } alt="Block Preview" style={ { width: '100%', height: 'auto', display: 'block' } } />
-			</div>
-		);
-	}
-
-
 	const {
 		postType,
 		taxonomy,
@@ -58,34 +49,40 @@ export default function Edit( { attributes, setAttributes } ) {
 			} ) );
 	}, [] );
 
-	const taxonomies = useSelect( ( select ) => {
-		const list = select( 'core' ).getTaxonomies
-			? select( 'core' ).getTaxonomies( { per_page: -1 } )
-			: [];
-		return ( list || [] )
-			.filter(
-				( t ) =>
-					Array.isArray( t.types ) && t.types.includes( postType )
-			)
-			.map( ( t ) => ( {
-				label: t.labels?.singular_name || t.name,
-				value: t.slug,
-				restBase: t.rest_base || t.slug,
-			} ) );
-	}, [ postType ] );
+	const taxonomies = useSelect(
+		( select ) => {
+			const list = select( 'core' ).getTaxonomies
+				? select( 'core' ).getTaxonomies( { per_page: -1 } )
+				: [];
+			return ( list || [] )
+				.filter(
+					( t ) =>
+						Array.isArray( t.types ) && t.types.includes( postType )
+				)
+				.map( ( t ) => ( {
+					label: t.labels?.singular_name || t.name,
+					value: t.slug,
+					restBase: t.rest_base || t.slug,
+				} ) );
+		},
+		[ postType ]
+	);
 
 	const selectedTax = taxonomies.find( ( t ) => t.value === taxonomy );
 	const taxonomyRestBase = selectedTax?.restBase || taxonomy;
 
-	const terms = useSelect( ( select ) => {
-		if ( ! taxonomy ) {
-			return [];
-		}
-		return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
-			per_page: -1,
-			hide_empty: true,
-		} );
-	}, [ taxonomy ] );
+	const terms = useSelect(
+		( select ) => {
+			if ( ! taxonomy ) {
+				return [];
+			}
+			return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, {
+				per_page: -1,
+				hide_empty: true,
+			} );
+		},
+		[ taxonomy ]
+	);
 
 	// Back-compat: old `serviceIds` maps to new `postIds`
 	const effectivePostIds =
@@ -94,10 +91,14 @@ export default function Edit( { attributes, setAttributes } ) {
 	const posts = useSelect(
 		( select ) => {
 			if ( mode === 'manual' ) {
-				return select( 'core' ).getEntityRecords( 'postType', postType, {
-					per_page: 50,
-					status: 'publish',
-				} );
+				return select( 'core' ).getEntityRecords(
+					'postType',
+					postType,
+					{
+						per_page: 50,
+						status: 'publish',
+					}
+				);
 			}
 
 			const query = {
@@ -111,10 +112,33 @@ export default function Edit( { attributes, setAttributes } ) {
 					.join( ',' );
 			}
 
-			return select( 'core' ).getEntityRecords( 'postType', postType, query );
+			return select( 'core' ).getEntityRecords(
+				'postType',
+				postType,
+				query
+			);
 		},
 		[ postType, mode, taxonomy, termIds, taxonomyRestBase ]
 	);
+
+	if (
+		( __unstableIsPreviewMode ?? false ) ||
+		( attributes.__isPreview ?? false )
+	) {
+		return (
+			<div style={ { width: '100%', lineHeight: 0 } }>
+				<img
+					src={ previewImage }
+					alt="Block Preview"
+					style={ {
+						width: '100%',
+						height: 'auto',
+						display: 'block',
+					} }
+				/>
+			</div>
+		);
+	}
 
 	const toggleItem = ( list, id ) => {
 		const newList = [ ...list ];
@@ -150,8 +174,14 @@ export default function Edit( { attributes, setAttributes } ) {
 						label={ __( 'Chế độ hiển thị', 'laca' ) }
 						value={ mode }
 						options={ [
-							{ label: __( 'Thủ công (Manual)', 'laca' ), value: 'manual' },
-							{ label: __( 'Tự động (Auto)', 'laca' ), value: 'auto' },
+							{
+								label: __( 'Thủ công (Manual)', 'laca' ),
+								value: 'manual',
+							},
+							{
+								label: __( 'Tự động (Auto)', 'laca' ),
+								value: 'auto',
+							},
 						] }
 						onChange={ ( value ) =>
 							setAttributes( {
@@ -180,19 +210,36 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 					{ mode === 'auto' && taxonomy && (
 						<>
-							<p><strong>{ __( 'Lọc theo taxonomy:', 'laca' ) }</strong></p>
+							<p>
+								<strong>
+									{ __( 'Lọc theo taxonomy:', 'laca' ) }
+								</strong>
+							</p>
 							{ ! terms ? (
 								<Spinner />
 							) : (
-								<div style={ { maxHeight: '200px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', marginBottom: '15px' } }>
+								<div
+									style={ {
+										maxHeight: '200px',
+										overflowY: 'auto',
+										border: '1px solid #ddd',
+										padding: '10px',
+										marginBottom: '15px',
+									} }
+								>
 									{ terms.map( ( term ) => (
 										<CheckboxControl
 											key={ term.id }
 											label={ term.name }
-											checked={ termIds.includes( term.id ) }
+											checked={ termIds.includes(
+												term.id
+											) }
 											onChange={ () =>
 												setAttributes( {
-													termIds: toggleItem( termIds, term.id ),
+													termIds: toggleItem(
+														termIds,
+														term.id
+													),
 												} )
 											}
 										/>
@@ -264,7 +311,10 @@ export default function Edit( { attributes, setAttributes } ) {
 									) }
 									onChange={ () =>
 										setAttributes( {
-											postIds: toggleItem( effectivePostIds, item.id ),
+											postIds: toggleItem(
+												effectivePostIds,
+												item.id
+											),
 											serviceIds: [],
 										} )
 									}
@@ -358,7 +408,22 @@ export default function Edit( { attributes, setAttributes } ) {
 								style={ { display: 'inline-flex' } }
 							>
 								<span className="btn-icon">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"></line><polyline points="10 4 20 4 20 14"></polyline></svg>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2.5"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<line
+											x1="4"
+											y1="20"
+											x2="20"
+											y2="4"
+										></line>
+										<polyline points="10 4 20 4 20 14"></polyline>
+									</svg>
 								</span>
 								<span className="btn-text">{ buttonText }</span>
 							</div>

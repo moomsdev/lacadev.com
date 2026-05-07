@@ -3,10 +3,12 @@
  * RAG-lite: chỉ trả lời dựa trên nội dung website.
  * Vanilla JS — không phụ thuộc thư viện nào.
  */
-(function () {
+( function () {
 	'use strict';
 
-	if (typeof lacaChatbot === 'undefined') return;
+	if ( typeof lacaChatbot === 'undefined' ) {
+		return;
+	}
 
 	const { endpoint, nonce, name, greeting, color, placeholder } = lacaChatbot;
 
@@ -14,7 +16,7 @@
 
 	const css = `
 	:root {
-		--cbot-color: ${color};
+		--cbot-color: ${ color };
 		--cbot-radius: 16px;
 	}
 	#laca-cbot-btn {
@@ -318,32 +320,32 @@
 	// ── Build UI ─────────────────────────────────────────────────────────────
 
 	function injectCSS() {
-		const el = document.createElement('style');
+		const el = document.createElement( 'style' );
 		el.textContent = css;
-		document.head.appendChild(el);
+		document.head.appendChild( el );
 	}
 
 	function buildUI() {
 		// Floating button
-		const btn = document.createElement('button');
+		const btn = document.createElement( 'button' );
 		btn.id = 'laca-cbot-btn';
-		btn.setAttribute('aria-label', 'Mở chatbot hỗ trợ');
+		btn.setAttribute( 'aria-label', 'Mở chatbot hỗ trợ' );
 		btn.innerHTML = `
-			<span class="cbot-open">${ICON_CHAT}</span>
-			<span class="cbot-close">${ICON_X}</span>
+			<span class="cbot-open">${ ICON_CHAT }</span>
+			<span class="cbot-close">${ ICON_X }</span>
 			<span id="laca-cbot-badge"></span>
 		`;
 
 		// Chat window
-		const win = document.createElement('div');
+		const win = document.createElement( 'div' );
 		win.id = 'laca-cbot-win';
-		win.setAttribute('role', 'dialog');
-		win.setAttribute('aria-label', name + ' Chat');
+		win.setAttribute( 'role', 'dialog' );
+		win.setAttribute( 'aria-label', name + ' Chat' );
 		win.innerHTML = `
 			<div class="cbot-header">
 				<div class="cbot-avatar">✦</div>
 				<div class="cbot-header-info">
-					<div class="cbot-title">${escHtml(name)}</div>
+					<div class="cbot-title">${ escHtml( name ) }</div>
 					<div class="cbot-subtitle"><span class="cbot-dot"></span> Dựa trên nội dung website</div>
 				</div>
 			</div>
@@ -352,88 +354,109 @@
 				<textarea
 					id="laca-cbot-input"
 					class="cbot-input"
-					placeholder="${escAttr(placeholder)}"
+					placeholder="${ escAttr( placeholder ) }"
 					rows="1"
 					aria-label="Nhập câu hỏi"
 				></textarea>
-				<button id="laca-cbot-send" class="cbot-send" aria-label="Gửi">${ICON_SEND}</button>
+				<button id="laca-cbot-send" class="cbot-send" aria-label="Gửi">${ ICON_SEND }</button>
 			</div>
 			<div class="cbot-powered">Powered by LacaDev AI · Chỉ trả lời nội dung website</div>
 		`;
 
-		document.body.appendChild(btn);
-		document.body.appendChild(win);
+		document.body.appendChild( btn );
+		document.body.appendChild( win );
 
 		return { btn, win };
 	}
 
 	// ── Helpers ──────────────────────────────────────────────────────────────
 
-	function escHtml(str) {
-		const d = document.createElement('div');
-		d.appendChild(document.createTextNode(str));
+	function escHtml( str ) {
+		const d = document.createElement( 'div' );
+		d.appendChild( document.createTextNode( str ) );
 		return d.innerHTML;
 	}
 
-	function escAttr(str) {
-		return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+	function escAttr( str ) {
+		return String( str )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#039;' );
 	}
 
-	/** Markdown cơ bản → HTML */
-	function md(text) {
+	/**
+	 * Markdown cơ bản → HTML
+	 * @param text
+	 */
+	function md( text ) {
 		return text
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;')
-			.replace(/```[\w]*\n?([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-			.replace(/`([^`\n]+)`/g, '<code>$1</code>')
-			.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-			.replace(/\*(.+?)\*/g, '<em>$1</em>')
-			.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-			.replace(/^- (.+)$/gm, '<li>$1</li>')
-			.replace(/(<li>[\s\S]+?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>')
-			.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-			.replace(/\n\n+/g, '</p><p>')
-			.replace(/\n/g, '<br>');
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace(
+				/```[\w]*\n?([\s\S]*?)```/g,
+				'<pre><code>$1</code></pre>'
+			)
+			.replace( /`([^`\n]+)`/g, '<code>$1</code>' )
+			.replace( /\*\*(.+?)\*\*/g, '<strong>$1</strong>' )
+			.replace( /\*(.+?)\*/g, '<em>$1</em>' )
+			.replace(
+				/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+				'<a href="$2" target="_blank" rel="noopener">$1</a>'
+			)
+			.replace( /^- (.+)$/gm, '<li>$1</li>' )
+			.replace( /(<li>[\s\S]+?<\/li>)(?!\s*<li>)/g, '<ul>$1</ul>' )
+			.replace( /^\d+\.\s+(.+)$/gm, '<li>$1</li>' )
+			.replace( /\n\n+/g, '</p><p>' )
+			.replace( /\n/g, '<br>' );
 	}
 
-	function appendMsg(role, content, sources) {
-		const msgs  = document.getElementById('laca-cbot-msgs');
-		const div   = document.createElement('div');
-		div.className = `cbot-msg cbot-msg--${role}`;
+	function appendMsg( role, content, sources ) {
+		const msgs = document.getElementById( 'laca-cbot-msgs' );
+		const div = document.createElement( 'div' );
+		div.className = `cbot-msg cbot-msg--${ role }`;
 
-		if (role === 'bot') {
-			let html = `<div class="cbot-bubble"><p>${md(content)}</p></div>`;
-			if (sources && sources.length) {
+		if ( role === 'bot' ) {
+			let html = `<div class="cbot-bubble"><p>${ md(
+				content
+			) }</p></div>`;
+			if ( sources && sources.length ) {
 				html += '<div class="cbot-sources">';
-				sources.forEach(s => {
-					html += `<a href="${escAttr(s.url)}" class="cbot-source-link" target="_blank" rel="noopener">${escHtml(s.title)}</a>`;
-				});
+				sources.forEach( ( s ) => {
+					html += `<a href="${ escAttr(
+						s.url
+					) }" class="cbot-source-link" target="_blank" rel="noopener">${ escHtml(
+						s.title
+					) }</a>`;
+				} );
 				html += '</div>';
 			}
 			div.innerHTML = html;
 		} else {
-			div.innerHTML = `<div class="cbot-bubble">${escHtml(content)}</div>`;
+			div.innerHTML = `<div class="cbot-bubble">${ escHtml(
+				content
+			) }</div>`;
 		}
 
-		msgs.appendChild(div);
+		msgs.appendChild( div );
 		msgs.scrollTop = msgs.scrollHeight;
 		return div;
 	}
 
 	function showTyping() {
-		const msgs = document.getElementById('laca-cbot-msgs');
-		const el   = document.createElement('div');
+		const msgs = document.getElementById( 'laca-cbot-msgs' );
+		const el = document.createElement( 'div' );
 		el.className = 'cbot-typing';
 		el.id = 'laca-cbot-typing';
 		el.innerHTML = '<span></span><span></span><span></span>';
-		msgs.appendChild(el);
+		msgs.appendChild( el );
 		msgs.scrollTop = msgs.scrollHeight;
 	}
 
 	function hideTyping() {
-		const el = document.getElementById('laca-cbot-typing');
-		if (el) el.remove();
+		const el = document.getElementById( 'laca-cbot-typing' );
+		if ( el ) {
+			el.remove();
+		}
 	}
 
 	// ── Chat Logic ───────────────────────────────────────────────────────────
@@ -441,42 +464,49 @@
 	let isBusy = false;
 
 	async function send() {
-		const input   = document.getElementById('laca-cbot-input');
-		const sendBtn = document.getElementById('laca-cbot-send');
+		const input = document.getElementById( 'laca-cbot-input' );
+		const sendBtn = document.getElementById( 'laca-cbot-send' );
 		const message = input.value.trim();
 
-		if (!message || isBusy) return;
+		if ( ! message || isBusy ) {
+			return;
+		}
 
 		isBusy = true;
 		sendBtn.disabled = true;
 		input.value = '';
 		input.style.height = 'auto';
 
-		appendMsg('user', message);
+		appendMsg( 'user', message );
 		showTyping();
 
 		try {
-			const res = await fetch(endpoint, {
-				method:  'POST',
+			const res = await fetch( endpoint, {
+				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-WP-Nonce':   nonce,
+					'X-WP-Nonce': nonce,
 				},
-				body: JSON.stringify({ message }),
-			});
+				body: JSON.stringify( { message } ),
+			} );
 
 			const data = await res.json();
 			hideTyping();
 
-			if (res.ok && data.reply) {
-				appendMsg('bot', data.reply, data.sources || []);
+			if ( res.ok && data.reply ) {
+				appendMsg( 'bot', data.reply, data.sources || [] );
 			} else {
-				const errText = data.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
-				appendMsg('bot', '⚠ ' + errText, []);
+				const errText =
+					data.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+				appendMsg( 'bot', '⚠ ' + errText, [] );
 			}
 		} catch {
 			hideTyping();
-			appendMsg('bot', '⚠ Không thể kết nối. Vui lòng thử lại sau.', []);
+			appendMsg(
+				'bot',
+				'⚠ Không thể kết nối. Vui lòng thử lại sau.',
+				[]
+			);
 		}
 
 		isBusy = false;
@@ -490,80 +520,84 @@
 		injectCSS();
 
 		const { btn, win } = buildUI();
-		const input        = document.getElementById('laca-cbot-input');
-		const sendBtn      = document.getElementById('laca-cbot-send');
-		const badge        = document.getElementById('laca-cbot-badge');
-		let   opened       = false;
+		const input = document.getElementById( 'laca-cbot-input' );
+		const sendBtn = document.getElementById( 'laca-cbot-send' );
+		const badge = document.getElementById( 'laca-cbot-badge' );
+		let opened = false;
 
 		// Toggle window
-		btn.addEventListener('click', () => {
-			const isOpen = win.classList.toggle('visible');
-			btn.classList.toggle('open', isOpen);
+		btn.addEventListener( 'click', () => {
+			const isOpen = win.classList.toggle( 'visible' );
+			btn.classList.toggle( 'open', isOpen );
 
-			if (isOpen) {
+			if ( isOpen ) {
 				badge.style.display = 'none';
 
 				// Hiện lời chào lần đầu
-				if (!opened) {
+				if ( ! opened ) {
 					opened = true;
-					setTimeout(() => {
-						appendMsg('bot', greeting, []);
-					}, 300);
+					setTimeout( () => {
+						appendMsg( 'bot', greeting, [] );
+					}, 300 );
 				}
 
-				setTimeout(() => input.focus(), 260);
+				setTimeout( () => input.focus(), 260 );
 			}
-		});
+		} );
 
 		// Gửi
-		sendBtn.addEventListener('click', send);
+		sendBtn.addEventListener( 'click', send );
 
 		// Enter gửi, Shift+Enter xuống dòng
-		input.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter' && !e.shiftKey) {
+		input.addEventListener( 'keydown', ( e ) => {
+			if ( e.key === 'Enter' && ! e.shiftKey ) {
 				e.preventDefault();
 				send();
 			}
 			// Auto-resize textarea
-			requestAnimationFrame(() => {
+			requestAnimationFrame( () => {
 				input.style.height = 'auto';
-				input.style.height = Math.min(input.scrollHeight, 100) + 'px';
-			});
-		});
+				input.style.height = Math.min( input.scrollHeight, 100 ) + 'px';
+			} );
+		} );
 
 		// Escape đóng
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape' && win.classList.contains('visible')) {
-				win.classList.remove('visible');
-				btn.classList.remove('open');
+		document.addEventListener( 'keydown', ( e ) => {
+			if ( e.key === 'Escape' && win.classList.contains( 'visible' ) ) {
+				win.classList.remove( 'visible' );
+				btn.classList.remove( 'open' );
 			}
-		});
+		} );
 
 		// Click ngoài đóng
-		document.addEventListener('click', (e) => {
-			if (win.classList.contains('visible') && !win.contains(e.target) && !btn.contains(e.target)) {
-				win.classList.remove('visible');
-				btn.classList.remove('open');
+		document.addEventListener( 'click', ( e ) => {
+			if (
+				win.classList.contains( 'visible' ) &&
+				! win.contains( e.target ) &&
+				! btn.contains( e.target )
+			) {
+				win.classList.remove( 'visible' );
+				btn.classList.remove( 'open' );
 			}
-		});
+		} );
 
 		// Hiện badge sau 3 giây để kéo chú ý (lần đầu vào trang)
-		if (!sessionStorage.getItem('laca_cbot_seen')) {
-			setTimeout(() => {
-				if (!win.classList.contains('visible')) {
+		if ( ! sessionStorage.getItem( 'laca_cbot_seen' ) ) {
+			setTimeout( () => {
+				if ( ! win.classList.contains( 'visible' ) ) {
 					badge.style.display = 'block';
 				}
-			}, 3000);
-			sessionStorage.setItem('laca_cbot_seen', '1');
+			}, 3000 );
+			sessionStorage.setItem( 'laca_cbot_seen', '1' );
 		} else {
 			badge.style.display = 'none';
 		}
 	}
 
 	// Ready
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', init);
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', init );
 	} else {
 		init();
 	}
-})();
+} )();

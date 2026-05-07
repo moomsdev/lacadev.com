@@ -160,6 +160,7 @@ function app_action_admin_enqueue_assets()
     wp_localize_script(AssetHandles::ADMIN_JS, 'ajaxurl_params', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('update_post_thumbnail'),  // Must match backend check_ajax_referer
+        'attachmentNonce' => wp_create_nonce('laca_get_attachment_url'),
     ]);
 
     /**
@@ -248,7 +249,7 @@ function app_action_admin_enqueue_assets()
         }
 
         wp_localize_script(AssetHandles::ADMIN_JS, 'lacaProjectCharts', [
-            'primary'  => carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc',
+            'primary'  => lacaSanitizeCssColor(carbon_get_theme_option('primary_color_ad'), '#2ea2cc'),
             'byStatus' => $by_status,
             'byMonth'  => $by_month,
         ]);
@@ -258,10 +259,10 @@ function app_action_admin_enqueue_assets()
     //  Assets::enqueueStyle(AssetHandles::THEME_CSS, $template_dir . '/dist/styles/theme.css');
 
     // Inject dynamic admin colors as CSS variables
-    $primary_color_ad = carbon_get_theme_option('primary_color_ad') ?: '#2ea2cc';
-    $secondary_color_ad = carbon_get_theme_option('secondary_color_ad') ?: '#1d2327';
-    $bg_color_ad = carbon_get_theme_option('bg_color_ad') ?: '#f0f0f1';
-    $text_color_ad = carbon_get_theme_option('text_color_ad') ?: '#3c434a';
+    $primary_color_ad = lacaSanitizeCssColor(carbon_get_theme_option('primary_color_ad'), '#2ea2cc');
+    $secondary_color_ad = lacaSanitizeCssColor(carbon_get_theme_option('secondary_color_ad'), '#1d2327');
+    $bg_color_ad = lacaSanitizeCssColor(carbon_get_theme_option('bg_color_ad'), '#f0f0f1');
+    $text_color_ad = lacaSanitizeCssColor(carbon_get_theme_option('text_color_ad'), '#3c434a');
 
     $custom_css = "
         :root {
@@ -538,7 +539,7 @@ add_filter('style_loader_tag', function ($tag, $handle, $href) {
     ];
 
     // If critical CSS file exists (inlined in header), load main bundle asynchronously
-    if (file_exists(get_template_directory() . '/dist/styles/critical.css')) {
+    if (file_exists(lacaDistDir('styles/critical.css'))) {
         $non_critical_styles[] = AssetHandles::THEME_CSS;
     }
 
@@ -604,9 +605,3 @@ add_filter('wp_resource_hints', function ($hints, $relation_type) {
 
     return $hints;
 }, 10, 2);
-
-// Hook vào action để enqueue assets thông qua function có sẵn thay vì thêm action mới
-add_action('wp_enqueue_scripts', 'app_action_theme_enqueue_assets');
-add_action('admin_enqueue_scripts', 'app_action_admin_enqueue_assets');
-add_action('login_enqueue_scripts', 'app_action_login_enqueue_assets');
-add_action('enqueue_block_editor_assets', 'app_action_editor_enqueue_assets'); // For Gutenberg editor

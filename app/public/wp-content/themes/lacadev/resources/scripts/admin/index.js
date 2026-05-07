@@ -258,6 +258,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			body: new URLSearchParams( {
 				action: 'mm_get_attachment_url_thumbnail',
 				attachmentID: postIdInput.value,
+				nonce: window.ajaxurl_params?.attachmentNonce || '',
 			} ),
 		} );
 	}
@@ -266,7 +267,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 // Log fields support (Laca Admin)
 // My project.js now handles password toggle and copy functionality for all fields
 // with .laca-password-input and .laca-copyable-input classes.
-
 
 // ===== LacaDashboard - Vanilla JS conversion =====
 ( function () {

@@ -50,6 +50,10 @@ const TRANSLATABLE_BLOCKS = [
 
 /**
  * AI Translate Sidebar Panel Component
+ * @param root0
+ * @param root0.clientId
+ * @param root0.name
+ * @param root0.attributes
  */
 const AITranslatePanel = ( { clientId, name, attributes } ) => {
 	const [ sourceLang, setSourceLang ] = useState( 'auto' );
@@ -65,7 +69,7 @@ const AITranslatePanel = ( { clientId, name, attributes } ) => {
 		return null;
 	}
 
-	const allLangs    = aiData.langs || [];
+	const allLangs = aiData.langs || [];
 	const targetLangs = allLangs.filter( ( l ) => l.value !== 'auto' );
 
 	const handleTranslate = () => {
@@ -75,23 +79,25 @@ const AITranslatePanel = ( { clientId, name, attributes } ) => {
 
 		const blockPayload = {
 			blockName: name,
-			attrs:     attributes,
-			innerHTML: ''
+			attrs: attributes,
+			innerHTML: '',
 		};
 
 		const formData = new URLSearchParams( {
-			action:      'lacadev_ai_translate_block',
-			nonce:       aiData.nonce,
+			action: 'lacadev_ai_translate_block',
+			nonce: aiData.nonce,
 			source_lang: sourceLang,
 			target_lang: targetLang,
-			block_data:  JSON.stringify( blockPayload ),
+			block_data: JSON.stringify( blockPayload ),
 		} );
 
 		window
 			.fetch( aiData.ajaxUrl, {
-				method:  'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body:    formData,
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: formData,
 			} )
 			.then( ( res ) => res.json() )
 			.then( ( json ) => {
@@ -99,7 +105,9 @@ const AITranslatePanel = ( { clientId, name, attributes } ) => {
 
 				if ( ! json.success ) {
 					setIsError( true );
-					setStatusMsg( json.data || __( 'Lỗi không xác định.', 'laca' ) );
+					setStatusMsg(
+						json.data || __( 'Lỗi không xác định.', 'laca' )
+					);
 					return;
 				}
 
@@ -152,9 +160,9 @@ const AITranslatePanel = ( { clientId, name, attributes } ) => {
 					<PanelRow>
 						<p
 							style={ {
-								color:      isError ? '#cc1818' : '#1a7a1a',
-								margin:     '0 0 8px',
-								fontSize:   '12px',
+								color: isError ? '#cc1818' : '#1a7a1a',
+								margin: '0 0 8px',
+								fontSize: '12px',
 								lineHeight: '1.5',
 							} }
 						>

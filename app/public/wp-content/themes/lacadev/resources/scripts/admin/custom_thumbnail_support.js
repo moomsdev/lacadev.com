@@ -38,20 +38,24 @@ const mediaGridObserver = new MutationObserver( ( mutations ) => {
 									'attachmentID',
 									el.getAttribute( 'data-id' )
 								);
+								formData.append(
+									'nonce',
+									window.ajaxurl_params?.attachmentNonce || ''
+								);
 
 								fetch( '/wp-admin/admin-ajax.php', {
 									method: 'POST',
 									body: formData,
 								} )
-									.then( ( response ) => response.text() )
+									.then( ( response ) => response.json() )
 									.then( ( data ) => {
-										if ( data ) {
+										if ( data?.success && data.data?.url ) {
 											const img =
 												el.querySelector( 'img' );
 											const filename =
 												el.querySelector( '.filename' );
 											if ( img ) {
-												img.src = data;
+												img.src = data.data.url;
 											}
 											if ( filename ) {
 												filename.textContent =

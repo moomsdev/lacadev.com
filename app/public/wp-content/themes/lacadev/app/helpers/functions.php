@@ -30,9 +30,50 @@ function currentLanguage()
 // ASSETS & RESOURCES
 // =============================================================================
 
+function lacaThemeRootDir()
+{
+    if (defined('APP_DIR')) {
+        return untrailingslashit(APP_DIR);
+    }
+
+    return dirname(get_template_directory());
+}
+
+function lacaThemeRootUri()
+{
+    return untrailingslashit(dirname(get_template_directory_uri()));
+}
+
+function lacaDistDir($path = '')
+{
+    return trailingslashit(lacaThemeRootDir()) . 'dist/' . ltrim($path, '/');
+}
+
+function lacaDistUrl($path = '')
+{
+    return trailingslashit(lacaThemeRootUri()) . 'dist/' . ltrim($path, '/');
+}
+
+function lacaResourceUrl($path = '')
+{
+    return trailingslashit(lacaThemeRootUri()) . 'resources/' . ltrim($path, '/');
+}
+
+function lacaSanitizeCssColor($value, $fallback = '#000000')
+{
+    $color = sanitize_hex_color((string) $value);
+
+    if ($color) {
+        return $color;
+    }
+
+    $fallback = sanitize_hex_color((string) $fallback);
+    return $fallback ?: '#000000';
+}
+
 function adminAsset($path)
 {
-    return get_stylesheet_directory_uri() . '/../dist/' . $path;
+    return lacaDistUrl($path);
 }
 
 function loadStyles($files = [])

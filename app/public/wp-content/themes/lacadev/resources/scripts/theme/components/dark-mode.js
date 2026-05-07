@@ -21,30 +21,40 @@ export function initToggleDarkMode() {
 		toggleInput.checked = initialTheme === 'dark';
 		toggleInput.setAttribute( 'aria-checked', initialTheme === 'dark' );
 
-		toggleInput.addEventListener( 'change', ( event ) => {
-			const isDark = event.target.checked;
-			const newTheme = isDark ? 'dark' : 'light';
-			toggleInput.setAttribute( 'aria-checked', isDark );
+		toggleInput.addEventListener(
+			'change',
+			( event ) => {
+				const isDark = event.target.checked;
+				const newTheme = isDark ? 'dark' : 'light';
+				toggleInput.setAttribute( 'aria-checked', isDark );
 
-			if ( document.startViewTransition ) {
-				document.startViewTransition( () => {
+				if ( document.startViewTransition ) {
+					document.startViewTransition( () => {
+						rootElement.setAttribute( 'data-theme', newTheme );
+						localStorage.setItem( 'theme', newTheme );
+					} );
+				} else {
 					rootElement.setAttribute( 'data-theme', newTheme );
 					localStorage.setItem( 'theme', newTheme );
-				} );
-			} else {
-				rootElement.setAttribute( 'data-theme', newTheme );
-				localStorage.setItem( 'theme', newTheme );
-			}
-		}, { signal } );
+				}
+			},
+			{ signal }
+		);
 	}
 
-	mediaQuery.addEventListener( 'change', ( e ) => {
-		if ( ! localStorage.getItem( 'theme' ) ) {
-			const newTheme = e.matches ? 'dark' : 'light';
-			rootElement.setAttribute( 'data-theme', newTheme );
-			if ( toggleInput ) toggleInput.checked = e.matches;
-		}
-	}, { signal } );
+	mediaQuery.addEventListener(
+		'change',
+		( e ) => {
+			if ( ! localStorage.getItem( 'theme' ) ) {
+				const newTheme = e.matches ? 'dark' : 'light';
+				rootElement.setAttribute( 'data-theme', newTheme );
+				if ( toggleInput ) {
+					toggleInput.checked = e.matches;
+				}
+			}
+		},
+		{ signal }
+	);
 
 	return () => controller.abort();
 }
