@@ -40,7 +40,7 @@ Trang cài đặt chính của theme, đăng ký qua Carbon Fields. Chia thành 
 | Google reCAPTCHA | `laca-recaptcha` | Site Key, Secret Key, cấu hình cho login/register/comment |
 | LacaDev PM & Bots | `laca-project-notifications` | Cài đặt Zalo Bot, email thông báo dự án |
 | Login Socials | `laca-login-socials` | OAuth (Google, Facebook) |
-| Quản trị & HD Sử dụng | `laca-management-settings` | Cài đặt quản trị nội bộ |
+| Quản trị | `laca-management-settings` | Cài đặt dashboard widget và quản trị nội bộ |
 
 **Chức năng luôn chạy (không cần bật):**
 - Inject CSS variables màu sắc vào `<head>` admin
@@ -437,9 +437,7 @@ AJAX: `lacadev_quick_search`
 
 ### Admin UX Service
 **File:** `app/src/Settings/LacaTools/Management/AdminUxService.php`  
-- **Menu:** Laca Admin → HD Sử dụng
-- Trang hướng dẫn sử dụng cho client (Carbon Fields repeater)
-- Thông tin hỗ trợ: SĐT, email, website
+- Submenu "Media Không Dùng" trong Media
 - Ẩn top-level menu `#toplevel_page_laca-admin` (submenus vẫn hiện)
 
 ### List Table Enhancements
